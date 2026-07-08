@@ -182,6 +182,7 @@
 | | /lgi-wbquery/waybill-query/app-waybill-address | 🔴 未使用 | | | | | |
 | | /lgi-wbquery/waybill-query/waybill-track-pay | 🔴 未使用 | | | | | |
 | | /lgi-wbquery/waybill-query/count-missing-collection-proof | 🔴 未使用 | | | | | |
+| 查询 | /lgi-wbquery/waybill-attachment-query/find-attachment-by-waybill-id-status | 🟢 使用 | | | 按运单号+状态+附件类型查询磅单附件列表 | | `userBase.transport.js` → `fetchWeighBillImages`，由 `waybillSettlement/components/WeighBillCarousel.vue` 调用，被 `SettlementInfo.vue` 引用，用于运单结算处理页磅单图片展示 |
 | | /lgi-wbquery/shipper/waybill-query/page-query | 🔴 未使用 | | | | | |
 | | /lgi-wbquery/shipper/waybill-query/page-query-downstream | 🔴 未使用 | | | | | |
 | 查询 | /lgi-wbquery/shipper/waybill-query/page-query-shipper-net-waybill | 🟢 使用 | | | 托运人端网货运单分页查询 | | `userBase.transport.js` → `pageQueryShipperNetWaybill`，用于托运人运单查看页 |
@@ -208,6 +209,6 @@
 
 ---
 
-**文档版本**: v1.4
+**文档版本**: v1.5
 **最后更新**: 2026年07月
 **整理人**: 王新骏

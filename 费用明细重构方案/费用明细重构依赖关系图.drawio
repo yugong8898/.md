@@ -1,0 +1,131 @@
+<mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1200" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- ===================== 阶段泳道 ===================== -->
+    <mxCell id="laneP0" value="阶段一 P0：安全修复 + 常量提取（10 个任务，互相独立，可并行提测）" style="swimlane;html=1;startSize=34;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=13;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="40" y="50" width="1360" height="300" as="geometry" />
+    </mxCell>
+    <mxCell id="laneP1" value="阶段二 P1：结构收拢（7 个任务，依赖 P0，建议顺序执行）" style="swimlane;html=1;startSize=34;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=13;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="40" y="390" width="1360" height="280" as="geometry" />
+    </mxCell>
+    <mxCell id="laneP2" value="阶段三 P2：组件拆分与解耦（4 个任务，依赖 P1，需完整回归）" style="swimlane;html=1;startSize=34;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=13;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="40" y="710" width="1360" height="190" as="geometry" />
+    </mxCell>
+    <mxCell id="laneP3" value="阶段四 P3：远期优化（1 个任务，可选，高风险）" style="swimlane;html=1;startSize=34;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=13;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="40" y="930" width="1360" height="150" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== P0 任务节点 ===================== -->
+    <mxCell id="P0-1" value="P0-1&lt;br&gt;countMoney 下标修复&lt;br&gt;&lt;font color=&quot;#b85450&quot;&gt;修 B1&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=11;" vertex="1" parent="laneP0">
+      <mxGeometry x="80" y="100" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P0-2" value="P0-2&lt;br&gt;debounce 写法修复&lt;br&gt;&lt;font color=&quot;#b85450&quot;&gt;修 B2&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=11;" vertex="1" parent="laneP0">
+      <mxGeometry x="320" y="100" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P0-3" value="P0-3&lt;br&gt;serviceRateMoney 声明&lt;br&gt;&lt;font color=&quot;#b85450&quot;&gt;修 B3&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=11;" vertex="1" parent="laneP0">
+      <mxGeometry x="560" y="100" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P0-4" value="P0-4&lt;br&gt;delTableRow 时序修复&lt;br&gt;&lt;font color=&quot;#b85450&quot;&gt;修 B4&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=11;" vertex="1" parent="laneP0">
+      <mxGeometry x="800" y="100" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P0-5" value="P0-5&lt;br&gt;commit 校验修复&lt;br&gt;&lt;font color=&quot;#b85450&quot;&gt;修 B5&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=11;" vertex="1" parent="laneP0">
+      <mxGeometry x="1040" y="100" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P0-6" value="P0-6&lt;br&gt;抹零取消清理&lt;br&gt;&lt;font color=&quot;#b85450&quot;&gt;修 B6·edit&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=11;" vertex="1" parent="laneP0">
+      <mxGeometry x="80" y="210" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P0-7" value="P0-7&lt;br&gt;保存前修正去硬编码&lt;br&gt;&lt;font color=&quot;#b85450&quot;&gt;修 B7·edit&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=11;" vertex="1" parent="laneP0">
+      <mxGeometry x="320" y="210" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P0-8" value="P0-8&lt;br&gt;v-model 修复&lt;br&gt;&lt;font color=&quot;#b85450&quot;&gt;修 B8&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=11;" vertex="1" parent="laneP0">
+      <mxGeometry x="560" y="210" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P0-9" value="P0-9&lt;br&gt;$forceUpdate→doLayout&lt;br&gt;&lt;font color=&quot;#b85450&quot;&gt;修 B9&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=11;" vertex="1" parent="laneP0">
+      <mxGeometry x="800" y="210" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P0-10" value="P0-10&lt;br&gt;魔法字符提取常量&lt;br&gt;&lt;font color=&quot;#9673a6&quot;&gt;config.js&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;strokeWidth=2;fontSize=11;" vertex="1" parent="laneP0">
+      <mxGeometry x="1040" y="210" width="190" height="56" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== P1 任务节点 ===================== -->
+    <mxCell id="P1-1" value="P1-1&lt;br&gt;油气优惠逻辑收拢&lt;br&gt;&lt;font color=&quot;#9673a6&quot;&gt;解 S7&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="laneP1">
+      <mxGeometry x="80" y="450" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P1-2" value="P1-2&lt;br&gt;油气接口 debounce&lt;br&gt;&lt;font color=&quot;#9673a6&quot;&gt;解 S3&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="laneP1">
+      <mxGeometry x="320" y="450" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P1-3" value="P1-3&lt;br&gt;小计与 UI 分离&lt;br&gt;&lt;font color=&quot;#9673a6&quot;&gt;解 S2&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="laneP1">
+      <mxGeometry x="560" y="450" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P1-4" value="P1-4&lt;br&gt;newList 构建统一&lt;br&gt;&lt;font color=&quot;#9673a6&quot;&gt;解 S1&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="laneP1">
+      <mxGeometry x="800" y="450" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P1-5" value="P1-5&lt;br&gt;废弃字段清理&lt;br&gt;&lt;font color=&quot;#9673a6&quot;&gt;无风险&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="laneP1">
+      <mxGeometry x="1040" y="450" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P1-6" value="P1-6&lt;br&gt;searchOptions 行级隔离&lt;br&gt;&lt;font color=&quot;#9673a6&quot;&gt;解 S4&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="laneP1">
+      <mxGeometry x="80" y="560" width="190" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P1-7" value="P1-7&lt;br&gt;commit 返回值规范&lt;br&gt;&lt;font color=&quot;#9673a6&quot;&gt;解 S-&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="laneP1">
+      <mxGeometry x="320" y="560" width="190" height="56" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== P2 任务节点 ===================== -->
+    <mxCell id="P2-1" value="P2-1&lt;br&gt;计算纯函数提取&lt;br&gt;&lt;font color=&quot;#9673a6&quot;&gt;解 S6+S2&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="laneP2">
+      <mxGeometry x="80" y="770" width="200" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P2-2" value="P2-2&lt;br&gt;拆出汇总副表&lt;br&gt;&lt;font color=&quot;#9673a6&quot;&gt;解 S8&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="laneP2">
+      <mxGeometry x="340" y="770" width="200" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P2-3" value="P2-3&lt;br&gt;拆出附件管理&lt;br&gt;&lt;font color=&quot;#9673a6&quot;&gt;useAttachment&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="laneP2">
+      <mxGeometry x="600" y="770" width="200" height="56" as="geometry" />
+    </mxCell>
+    <mxCell id="P2-4" value="P2-4&lt;br&gt;父子通信改 emit&lt;br&gt;&lt;font color=&quot;#9673a6&quot;&gt;解 S5&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="laneP2">
+      <mxGeometry x="860" y="770" width="200" height="56" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== P3 任务节点 ===================== -->
+    <mxCell id="P3-1" value="P3-1&lt;br&gt;抹零计算单一来源&lt;br&gt;&lt;font color=&quot;#b85450&quot;&gt;可选·高风险&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;strokeWidth=2;fontSize=11;" vertex="1" parent="laneP3">
+      <mxGeometry x="80" y="990" width="260" height="56" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== 依赖箭头 ===================== -->
+    <!-- P0 阶段内 -->
+    <mxCell id="e1" value="前置依赖" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#82b366;fontSize=10;" edge="1" parent="1" source="P0-1" target="P0-7">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- P0 → P2 -->
+    <mxCell id="e2" value="硬依赖" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#b85450;strokeWidth=2;fontSize=10;dashed=0;" edge="1" parent="1" source="P0-10" target="P2-1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- P0 → P3 -->
+    <mxCell id="e3" value="依赖防抖生效" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#b85450;fontSize=10;dashed=1;" edge="1" parent="1" source="P0-2" target="P3-1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- P1 阶段内 -->
+    <mxCell id="e4" value="依赖 buildOilGasItem" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#6c8ebf;fontSize=10;" edge="1" parent="1" source="P1-1" target="P1-4">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- P1 → P2 -->
+    <mxCell id="e5" value="calcSubtotal 迁入" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#d79b00;fontSize=10;" edge="1" parent="1" source="P1-3" target="P2-1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e6" value="前置" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#d79b00;fontSize=10;" edge="1" parent="1" source="P1-7" target="P2-4">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e7" value="建 P2-1 后" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#d79b00;fontSize=10;dashed=1;" edge="1" parent="1" source="P2-1" target="P2-2">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- P1/P0 → P3 -->
+    <mxCell id="e8" value="依赖小计独立计算" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#b85450;fontSize=10;dashed=1;" edge="1" parent="1" source="P1-3" target="P3-1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>

@@ -1,0 +1,70 @@
+<mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <mxCell id="title" value="费用明细组件重构 · 目标架构（P0→P2 完成后）" style="text;html=1;strokeColor=none;fillColor=none;fontSize=16;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="40" y="20" width="1120" height="34" as="geometry" />
+    </mxCell>
+
+    <!-- 父页面层 -->
+    <mxCell id="edit" value="edit.vue&lt;br&gt;&lt;font size=&quot;2&quot;&gt;编辑页（保存/提交流程）&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="80" y="80" width="220" height="60" as="geometry" />
+    </mxCell>
+    <mxCell id="read" value="read.vue&lt;br&gt;&lt;font size=&quot;2&quot;&gt;查看页（只读模板）&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="380" y="80" width="220" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- 主组件 -->
+    <mxCell id="cmd" value="CostMessageDetails.vue&lt;br&gt;&lt;font size=&quot;2&quot;&gt;费用明细核心（~600 行，职责收敛为&lt;br&gt;表格 CRUD + 汇总展示 + 附件入口）&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="160" y="220" width="340" height="90" as="geometry" />
+    </mxCell>
+
+    <!-- 拆分出的子组件 / mixin -->
+    <mxCell id="summary" value="CostSummaryTable.vue&lt;br&gt;&lt;font size=&quot;2&quot;&gt;汇总副表（解 S8，~250 行移出）&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="80" y="410" width="240" height="70" as="geometry" />
+    </mxCell>
+    <mxCell id="calcmixin" value="mixins/costCalculation.js&lt;br&gt;&lt;font size=&quot;2&quot;&gt;纯函数库：getBit / formatService /&lt;br&gt;calcFreightDiff / calcNetAmount /&lt;br&gt;calcSummaryTotal（解 S6+S2）&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="360" y="410" width="260" height="90" as="geometry" />
+    </mxCell>
+    <mxCell id="attach" value="mixins/useAttachment.js&lt;br&gt;&lt;font size=&quot;2&quot;&gt;附件管理：viewFiles / uploadSuccess /&lt;br&gt;fileRemove / handleLookImg 等（~80 行移出）&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="680" y="410" width="260" height="90" as="geometry" />
+    </mxCell>
+    <mxCell id="config" value="config.js&lt;br&gt;&lt;font size=&quot;2&quot;&gt;17 类具名常量&lt;br&gt;ZERO_ORDER_NUMBERS / PAYABLE_COST_TYPES /&lt;br&gt;FULL_PROCESS_FLAG / COMPANY_TYPE_B1 …&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="1000" y="410" width="240" height="90" as="geometry" />
+    </mxCell>
+
+    <!-- 箭头：父子通信（emit 解耦） -->
+    <mxCell id="a1" value="props" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#6c8ebf;fontSize=10;" edge="1" parent="1" source="edit" target="cmd">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="a2" value="props（只读）" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#6c8ebf;fontSize=10;" edge="1" parent="1" source="read" target="cmd">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="a3" value="@subtotal-change / @rate-change / @new-service-charge" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;strokeColor=#82b366;fontSize=9;" edge="1" parent="1" source="cmd" target="edit">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- 主组件 → 子模块依赖 -->
+    <mxCell id="b1" value="props 下传 / emit 上传" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#d79b00;fontSize=9;" edge="1" parent="1" source="cmd" target="summary">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="b2" value="mixins: [conf, costCalculation]（解 S6）" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#d79b00;fontSize=9;" edge="1" parent="1" source="cmd" target="calcmixin">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="b3" value="mixins: [..., useAttachment]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#d79b00;fontSize=9;" edge="1" parent="1" source="cmd" target="attach">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="b4" value="import 常量（P0-10 硬依赖）" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#b85450;strokeWidth=2;fontSize=9;" edge="1" parent="1" source="config" target="calcmixin">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="b5" value="$const 暴露给模板（P0-10）" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#b85450;fontSize=9;" edge="1" parent="1" source="config" target="cmd">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- 图例 -->
+    <mxCell id="legend" value="&lt;b&gt;图例&lt;/b&gt;&lt;br&gt;橙：主组件 / P2 改动　绿：拆分出的子组件·mixin　黄：配置常量&lt;br&gt;红箭头：硬依赖（P0-10→costCalculation.js）　解 Sx：解决对应结构性问题" style="text;html=1;strokeColor=#666666;fillColor=#f5f5f5;align=left;fontSize=10;verticalAlign=middle;rounded=1;" vertex="1" parent="1">
+      <mxGeometry x="80" y="540" width="1060" height="60" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>

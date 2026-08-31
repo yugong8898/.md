@@ -1,12 +1,13 @@
 # 技术栈：Vue3 + TypeScript + Vite（撮合PC端）
 
 ## 适用项目
-- `fe-match-end/match-owner-pc`：货主撮合PC端（monorepo 多包）
+<!-- 旧（2026-08 合仓替换，match-owner-pc 目录保留但不再维护）：- `fe-match-end/match-owner-pc`：货主撮合PC端（monorepo 多包） -->
+- `fe-match-end/web-match-owner`：货主撮合PC端（合仓：pnpm workspace + Turborepo 单仓）
 
 ## 技术栈
 - **框架**：Vue 3.5 + TypeScript 5
 - **构建工具**：Vite 7
-- **包结构**：monorepo（app-base / app-core / app-dispatch / app-main）
+- **包结构**：pnpm workspace 单仓，`apps/` 下（app-main / app-base / app-core / app-dispatch）
 - **样式**：CSS / SCSS
 - **HTTP**：待确认
 
@@ -110,7 +111,8 @@ async function fetchUser(id: number): Promise<UserInfo> {
 - 多个 `v-model`：`v-model:title="xxx"` / `v-model:content="yyy"`
 
 ## ESLint 验证命令
+<!-- 旧（2026-08 合仓替换）：cd fe-match-end/match-owner-pc/app-main -->
 ```bash
-cd fe-match-end/match-owner-pc/app-main
+cd fe-match-end/web-match-owner/apps/app-main
 npx eslint src/path/to/file.vue --fix
 ```

@@ -10,4 +10,5 @@
 | `platformweb` | [stack-vue2-admin.md](stack-vue2-admin.md) | Element UI | dart-sass | 强制 `::v-deep`，禁止 `/deep/` 或 `>>>` |
 | `bdbl-admin` | [stack-vue2-admin.md](stack-vue2-admin.md) | Element UI | node-sass | 新代码用 `::v-deep` |
 | `wlyd-app-consigner` | [stack-vue2-uniapp.md](stack-vue2-uniapp.md) | uView | SCSS | 条件编译、rpx 单位、多端（H5/小程序/APP） |
-| `fe-match-end/match-owner-pc` | [stack-vue3-vite.md](stack-vue3-vite.md) | 待确认 | SCSS/CSS | Composition API、script setup、`:deep()` |
+<!-- 旧（2026-08 合仓替换，match-owner-pc 目录保留但不再维护）：| `fe-match-end/match-owner-pc` | [stack-vue3-vite.md](stack-vue3-vite.md) | 待确认 | SCSS/CSS | Composition API、script setup、`:deep()` | -->
+| `fe-match-end/web-match-owner` | [stack-vue3-vite.md](stack-vue3-vite.md) | 待确认 | SCSS/CSS | Composition API、script setup、`:deep()` |

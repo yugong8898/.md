@@ -1,8 +1,14 @@
-# 技术栈：Vue3 + TypeScript + Vite（撮合PC端）
+# 技术栈：Vue3 + TypeScript + Vite（撮合PC端 / 企服线）
 
 ## 适用项目
 <!-- 旧（2026-08 合仓替换，match-owner-pc 目录保留但不再维护）：- `fe-match-end/match-owner-pc`：货主撮合PC端（monorepo 多包） -->
 - `fe-match-end/web-match-owner`：货主撮合PC端（合仓：pnpm workspace + Turborepo 单仓）
+- `ai-platform/es-ops-platform`：企服运营管理后台（Vue 3 + TS + Vite 6 + Element Plus + Pinia 3 + UnoCSS）
+- `ai-platform/es-web`：企服 Web 端（雇主端 / 服务商端，Vue 3 + TS + Vite 6 + Ant Design Vue 4 + Pinia 2 + @antv/g6）
+
+> ⚠️ **企服线（`ai-platform/`）不适用 WLYD 物流线规范**（uni-app 规范、条件编译、rpx、`/deep/` 及 WLYD 的 commit/文档/注释等工程约定均不适用）。
+> 编码规范以各项目自带文件为唯一事实源：`es-ops-platform` → `ai-platform/es-ops-platform/AGENTS.md`；`es-web` → `ai-platform/es-web/README.md`。
+> 本文件仅作为 Vue3 + TS 通用写法参考。
 
 ## 技术栈
 - **框架**：Vue 3.5 + TypeScript 5
@@ -113,6 +119,14 @@ async function fetchUser(id: number): Promise<UserInfo> {
 ## ESLint 验证命令
 <!-- 旧（2026-08 合仓替换）：cd fe-match-end/match-owner-pc/app-main -->
 ```bash
+# web-match-owner
 cd fe-match-end/web-match-owner/apps/app-main
+npx eslint src/path/to/file.vue --fix
+
+# 企服线（各自独立 git，flat config eslint.config.mjs，优先用项目自带 lint 脚本）
+cd ai-platform/es-ops-platform
+npx eslint src/path/to/file.vue --fix
+
+cd ai-platform/es-web
 npx eslint src/path/to/file.vue --fix
 ```

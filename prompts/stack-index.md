@@ -12,3 +12,5 @@
 | `wlyd-app-consigner` | [stack-vue2-uniapp.md](stack-vue2-uniapp.md) | uView | SCSS | 条件编译、rpx 单位、多端（H5/小程序/APP） |
 <!-- 旧（2026-08 合仓替换，match-owner-pc 目录保留但不再维护）：| `fe-match-end/match-owner-pc` | [stack-vue3-vite.md](stack-vue3-vite.md) | 待确认 | SCSS/CSS | Composition API、script setup、`:deep()` | -->
 | `fe-match-end/web-match-owner` | [stack-vue3-vite.md](stack-vue3-vite.md) | 待确认 | SCSS/CSS | Composition API、script setup、`:deep()` |
+| `ai-platform/es-ops-platform` | [stack-vue3-vite.md](stack-vue3-vite.md) | Element Plus | SCSS + UnoCSS | 企服线，不适用 WLYD 物流线规范；以项目自带 `AGENTS.md` 为唯一事实源 |
+| `ai-platform/es-web` | [stack-vue3-vite.md](stack-vue3-vite.md) | Ant Design Vue 4 | Less | 企服线，不适用 WLYD 物流线规范；以项目自带 `README.md` 为唯一事实源 |

@@ -68,9 +68,24 @@
 
 检查 `.md/temp/workflow-state.md` 是否存在。存在则读取并输出进度面板，询问是否从断点继续；不存在则从阶段 0 开始。
 
+**Stall 检测（防静默死亡，强制）**：已存在 `workflow-state.md` 时，计算「当前阶段」最近完成时间距今天的天数，并统计「不确定项追踪」中状态为「待确认」的条目数；停留超过 7 天或存在待确认项时，必须在进度面板上方输出停滞告警（阶段 / 停留天数 / 待确认数 / 首次阻塞时间），由用户明确选择继续、回退还是归档，不得无声沿用旧结论推进。
+
 ### 第二步：按阶段推进
 
 进入每个阶段前，先检查前置条件是否满足（上一阶段的产物是否存在）。如果前置产物不存在，提示用户先完成上一阶段，或手动补充输入。
+
+### 第三步：阶段出口 Harness 门禁（阶段 3 / 阶段 4，强制）
+
+产出代码改动的阶段标绿前必须跑机器门禁，`exit≠0` 不放行（`.md/scripts/quick-verify.sh` 只扫描 `git diff --cached`，须先 stage）：
+
+```bash
+git add -A && git diff --cached --stat   # 先核对改动范围是否符合技术方案
+bash .md/scripts/quick-verify.sh         # git 状态 / console.log / 大文件 / ESLint / 改动统计
+```
+
+- ESLint 失败 → 回退阶段 3 修复，error 清零后重跑
+- 改动落在 `ai-platform/es-web` / `es-ops-platform`（Vue 3 + TS 企服线）→ 追加 `npx tsc --noEmit`，且不套用物流线 uni-app / rpx / 条件编译规则
+- 详细判定表以 `wlyd-workflow` Skill 为准
 
 ---
 
@@ -106,6 +121,7 @@
 **前置条件**：阶段 0 产物存在
 
 **执行**：
+0. **先查知识库再读码（Graph，强制）**：按 `.repoWiki/kb/INDEX.md` → `kb/<project>/README.md` → `views.md` / `api.md` / `components.md` → `views/**.md` / `modules/**.md` 顺序检索（源码 `logisticsweb/src/views/X.vue` → 文档 `kb/logisticsweb/views/X.md`）；知识库已覆盖的结论直接复用并注明出处，滞后部分用 `.repoWiki/.sync-state.json` 锚点跑 `git diff` 兜底，只对增量实读源码，**不得直接全仓库 grep / 通读**
 1. 从需求文档中提取涉及的文件路径
 2. 对每个关键文件使用 `code-analyzer` 模块分析模式
 3. 输出现状分析报告
@@ -288,11 +304,13 @@
 - 阶段0/阶段2完成后，有待确认项时强制暂停，不接受裸"继续"，必须回复"已确认，继续"
 - 编码阶段（阶段3）必须逐文件执行，执行顺序按技术方案"开发顺序建议"章节，每文件完成后自检
 - 审查阶段发现 P0 问题时，暂停并列出问题清单，等用户修复后回复"已修复，重新审查"，再重跑阶段4
+- 阶段3 / 阶段4 标绿前必须通过 Harness 门禁（`git add -A && bash .md/scripts/quick-verify.sh`，`exit≠0` 不放行）
+- 阶段1 必须先查 `.repoWiki` 知识库再读码，不得直接全仓库 grep / 通读
 - 全流程完成后，提示用户运行 ESLint 验证
 - 产物文件统一保存到 `.md/temp/` 目录，完成后可归档或清理
 
 ---
 
-**文档版本**: v1.1
-**最后更新**: 2026年07月
+**文档版本**: v1.2
+**最后更新**: 2026年09月
 **整理人**: 王新骏

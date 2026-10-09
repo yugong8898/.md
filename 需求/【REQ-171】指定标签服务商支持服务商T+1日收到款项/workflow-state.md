@@ -4,11 +4,12 @@
 - 需求名称：指定标签服务商支持服务商T+1日收到款项
 - 需求编号：REQ-171（云效 RZMP-8904）
 - 工作区：.md/需求/【REQ-171】指定标签服务商支持服务商T+1日收到款项
-- 需求版本：R0
+- 需求版本：R1
 - 测试版本：T0
 - 开始时间：2026-09-30
 - 需求来源：.md/需求/【REQ-171】指定标签服务商支持服务商T+1日收到款项/【REQ-171】指定标签服务商支持服务商T+1日收到款项.md
 - 所属平台：万大圣&企服运管平台（企服线：ai-platform/es-web，仅 PC 端）
+- 测试用例：指定标签服务商支持服务商T+1日结算.md（QA 提供，飞书思维笔记导出）
 
 ## 阶段进度
 | 阶段 | 状态 | 产物文件 | 完成时间 |
@@ -16,21 +17,28 @@
 | 阶段0 需求分析 | ✅已完成（R1 范围收窄版） | 需求文档-指定标签服务商支持服务商T+1日收到款项.md | 2026-09-30 |
 | 阶段1 代码分析 | ✅已完成 | 代码分析-指定标签服务商支持服务商T+1日收到款项.md | 2026-09-30 |
 | 阶段2 技术方案 | ✅已完成 | 技术方案-指定标签服务商支持服务商T+1日收到款项.md | 2026-09-30 |
-| 阶段3 编码执行 | ✅已完成 | 4 文件改动（见下） | 2026-09-30 |
+| 阶段3 编码执行 | ✅已完成（含字段修正 + 文件定位修正） | 4 文件改动（见下） | 2026-09-30 ~ 2026-10-09 |
 | 阶段4 代码审查 | ✅已完成（通过，0 P0/P1，2 P2） | 审查报告见验证闭环记录 | 2026-09-30 |
-| 阶段5 测试基线与覆盖对齐 | ⏳待开始 | - | - |
+| 阶段5 测试基线与覆盖对齐 | ✅已完成 | 测试基线-前端R1范围可测子集.md | 2026-10-09 |
 | 阶段6 测试执行与Bug修复循环 | ⏳待开始 | - | - |
 
 ## 当前阶段
-阶段5 测试基线与覆盖对齐（等待用户"继续"）
+阶段6 测试执行与Bug修复循环（等待联调环境就绪 + 后端接口下发 settlementMode 字段）
 
 ## 阶段3 编码执行记录
 | 文件 | 改动 | 验证 |
 |---|---|---|
-| src/api/employer/order/types.ts | EmployerOrderDetailV2Result 新增 tPlusOneSettlement?: boolean（L1153-1155，TODO: wxj 标注） | ESLint ✓ vue-tsc ✓ |
-| src/api/supplier/order/types.ts | SupplierOrderDetailResponse 新增 tPlusOneSettlement?: boolean（L374-376，TODO: wxj 标注） | ESLint ✓ vue-tsc ✓ |
-| src/views/supplier/order/detail.vue | ① isTPlusOne computed（L77）② 顶部 a-alert 常驻提示（L177-184，.scroll gap 自动间距无需自定义样式） | ESLint ✓ vue-tsc ✓ |
-| src/views/employer/order/after-sale-apply.vue | ① isTPlusOneOrder computed（L119-120）② canOnlySelectCurrentScope T+1 前置 true（L127-128）③ filteredAfterSaleOptions T+1 分支：ss===4→仅返工/其余→[]（L303-308）④ 空选项兜底提示（L1162-1165，复用 empty-refund-info 样式）⑤ 提交按钮 T+1 空选项禁用（L1244） | ESLint ✓（1 warning 为存量 L1355 非本次引入）vue-tsc ✓ |
+| src/api/employer/order/types.ts | EmployerOrderDetailV2Result 新增 settlementMode?: 1 \| 2（L1153-1154，1=标准结算，2=T+1特殊结算） | ESLint ✓ vue-tsc ✓ |
+| src/api/provider/order/types.ts | OrderDetailResponse 新增 settlementMode?: 1 \| 2（L784-785） | ESLint ✓ vue-tsc ✓ |
+| src/views/provider/order/detail.vue | ① isTPlusOne computed（L65，detail?.settlementMode === 2）② 顶部纯 div T+1 常驻提示条 + 内联 SVG 图标 + .t-plus-one-tip BEM 样式（不依赖 a-alert 组件） | ESLint ✓ |
+| src/views/employer/order/after-sale-apply.vue | ① isTPlusOneOrder computed（L120，detail?.settlementMode === 2）② canOnlySelectCurrentScope T+1 前置 true（L127-128）③ filteredAfterSaleOptions T+1 分支：ss===4→仅返工/其余→[]（L303-308）④ 空选项兜底提示（L1168-1171，复用 empty-refund-info 样式）⑤ 提交按钮 T+1 空选项禁用（L1250） | ESLint ✓（1 warning 为存量 L1355 非本次引入）vue-tsc ✓ |
+
+### 阶段3 修正记录（2026-10-09）
+| 修正项 | 原实现 | 修正后 | 原因 |
+|--------|--------|--------|------|
+| 字段名 | tPlusOneSettlement?: boolean | settlementMode?: 1 \| 2 | 用户确认后端接口返回数字枚举 |
+| 服务商端目标文件 | supplier/order/detail.vue + supplier/order/types.ts | provider/order/detail.vue + provider/order/types.ts | PRD 6.4.4 正确目标为 provider 端，supplier 端已回退 |
+| 提示组件 | a-alert + :deep() 样式覆盖 | 纯 div + 内联 SVG + 自有 BEM 样式 | 用户要求不依赖组件库内部类名，便于维护 |
 
 偏差记录：① 方案预留 t-plus-one-alert 自定义 class，实施发现 .scroll 已有 gap:16px 间距，移除该 class（无功能影响）；② 代码分析报告引用的 filteredAfterSaleOptions 原文与实际代码略有出入（实际多一行提前 return，金额取值更复杂），改动方式与方案一致，无实质偏差。
 
@@ -57,18 +65,23 @@
 - 复审失效原因：无
 
 ## 不确定项追踪
-| # | 问题 | 状态 | 确认人 | 影响阶段 |
-|---|------|------|--------|---------|
-| Q2 | T+1 订单标识字段名与接口路径（前端全局搜索无占位） | 待确认 | 后端 | 阶段2/3 |
-| Q4 | 售后可选项来源 | ✅已解答（阶段1） | - | - |
-| Q12 | "售后类型为空"的形态 | ✅已解答（阶段1） | - | - |
-| Q13 | T+1 下 remaining（当前及剩余阶段售后）范围屏蔽方案：前端复用 canOnlySelectCurrentScope 强制 current；后端 remaining 入口 action 是否独立控制需确认 | 待确认 | 后端 | 阶段2/3 |
+| # | 问题 | 状态 | 确认人 | 影响阶段 | 结论 |
+|---|------|------|--------|---------|------|
+| Q2 | T+1 订单标识字段名与类型 | ✅已闭环（2026-10-09） | 用户确认 | 阶段3 | settlementMode?: 1 \| 2（1=标准，2=T+1），4 处消费点已全部替换 |
+| Q4 | 售后可选项来源 | ✅已解答（阶段1） | - | - | - |
+| Q12 | "售后类型为空"的形态 | ✅已解答（阶段1） | - | - | - |
+| Q13 | T+1 下 remaining 范围屏蔽方案 | 待联调验证 | 后端 | 阶段5/6 | 前端已复用 canOnlySelectCurrentScope 强制 current；后端 remaining 入口 action 是否独立控制需联调确认 |
+| Q14 | 空选项兜底文案"该订单当前阶段不支持售后申请" | 待产品确认 | 产品 | 阶段5/6 | PRD 未定义空状态文案，当前实现为自拟兜底 |
+| Q15 | 返工原因字段 | 待联调确认 | 后端 | 阶段5/6 | P2 建议，挂联调闭环 |
 
 ## 需求变更日志
 | 版本 | 变更时间 | 变更内容 | 影响的需求 | 回退阶段 | 处理结果 |
 |---|---|---|---|---|---|
 | R0 | 2026-09-30 | 初始需求（全量范围） | - | - | - |
 | R1 | 2026-09-30 | 范围收窄：仅 PRD 6.4.3（雇主端售后申请页）+ 6.4.4（服务商端订单详情页），仅 PC 端 es-web；移除确认订单页/雇主订单详情提示/运营后台/钱包流水/移动端 | R-001~R-022 → R-101~R-106 | 阶段0（重做） | 需求文档已重写为 R1 版 |
+| R1-fix1 | 2026-10-09 | 字段名修正：tPlusOneSettlement?: boolean → settlementMode?: 1 \| 2 | 4 处消费点 | 阶段3（定向替换） | ESLint 0 error，旧占位注释保留 |
+| R1-fix2 | 2026-10-09 | 文件定位修正：PRD 6.4.4 目标为 provider/order/detail.vue，supplier 端改动回退 | supplier→provider | 阶段3（回退+重新实现） | supplier 侧留回退注释，provider 侧新增提示条 |
+| R1-fix3 | 2026-10-09 | 提示组件改为纯手写样式：a-alert → div + SVG + BEM | provider/order/detail.vue | 阶段3（样式重构） | 不依赖组件库内部类名，便于维护 |
 
 ## 备注
 - 企服线项目（Vue 3 + TS），不套用 WLYD 物流线 uni-app / Vue2 规范

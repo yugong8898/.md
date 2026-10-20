@@ -30,10 +30,12 @@
 ## 阶段3 编码执行记录
 | 文件 | 改动 | 验证 |
 |---|---|---|
-| src/api/employer/order/types.ts | EmployerOrderDetailV2Result 新增 settlementMode?: 1 \| 2（L1153-1154，1=标准结算，2=T+1特殊结算） | ESLint ✓ vue-tsc ✓ |
-| src/api/provider/order/types.ts | OrderDetailResponse 新增 settlementMode?: 1 \| 2（L784-785） | ESLint ✓ vue-tsc ✓ |
-| src/views/provider/order/detail.vue | ① isTPlusOne computed（L65，detail?.settlementMode === 2）② 顶部纯 div T+1 常驻提示条 + 内联 SVG 图标 + .t-plus-one-tip BEM 样式（不依赖 a-alert 组件） | ESLint ✓ |
-| src/views/employer/order/after-sale-apply.vue | ① isTPlusOneOrder computed（L120，detail?.settlementMode === 2）② canOnlySelectCurrentScope T+1 前置 true（L127-128）③ filteredAfterSaleOptions T+1 分支：ss===4→仅返工/其余→[]（L303-308）④ 空选项兜底提示（L1168-1171，复用 empty-refund-info 样式）⑤ 提交按钮 T+1 空选项禁用（L1250） | ESLint ✓（1 warning 为存量 L1355 非本次引入）vue-tsc ✓ |
+| src/api/employer/order/types.ts | EmployerOrderDetailV2Result 新增 settlementMode?: 1 \| 2（L968，1=标准结算，2=T+1特殊结算） | ESLint ✓ vue-tsc ✓ |
+| src/api/provider/order/types.ts | OrderBasicInfo 新增 settlementMode?: 1 \| 2（L539） | ESLint ✓ vue-tsc ✓ |
+| src/api/employer/contract/types.ts | ContractInfo 新增 settlementMode?: 1 \| 2（L226，JSDoc 注释） | ESLint ✓ vue-tsc ✓ |
+| src/views/provider/order/detail.vue | ① isTPlusOne computed（L65，detail.value?.order.settlementMode === 2）② 顶部纯 div T+1 常驻提示条 + 内联 SVG 图标 + .t-plus-one-tip BEM 样式（不依赖 a-alert 组件） | ESLint ✓ |
+| src/views/employer/order/after-sale-apply.vue | ① isTPlusOneOrder computed（L120，detail.value?.order?.settlementMode === 2）② canOnlySelectCurrentScope T+1 前置 true（L128）③ filteredAfterSaleOptions T+1 分支：ss===4→仅返工/其余→[]（L304）④ orderStageScopeType T+1 场景置 undefined（L693）⑤ 空选项兜底提示（L1173，复用 empty-refund-info 样式）⑥ 提交按钮 T+1 空选项禁用（L1252） | ESLint ✓（1 warning 为存量非本次引入）vue-tsc ✓ |
+| src/views/employer/contract/common.vue | isTPlusOneOrder computed（L363，contractInfo.value?.settlementMode === 2）→ T+1 订单切换验收说明兜底文案（L364） | ESLint ✓ vue-tsc ✓ |
 
 ### 阶段3 修正记录（2026-10-09）
 | 修正项 | 原实现 | 修正后 | 原因 |
@@ -55,16 +57,10 @@
 | 阶段4 代码审查 | git diff（31 插入/1 修改行）+ 技术方案追踪矩阵 + 审查 6 维度 | 通过 | 0 | 0 | R-101~R-106 逐条核对通过；横向影响 8 项逐项确认（列表页/移动端/公共组件均不涉及）；无旧逻辑删除（唯一修改行为 disabled 条件增强）；2 个 P2 建议（返工原因字段确认 Q15、兜底文案 Q14）均挂联调闭环；git status 确认仅 4 个目标文件改动无污染 |
 
 ## 已处理文件（阶段3用）
-（暂无）
+6 个文件，详见上方「阶段3 编码执行记录」表。
 
 ## 阶段 3 允许改动文件
-（待阶段2技术方案确定）
-
-## 阶段 4 审查差异
-- SHA-256：未生成
-- 受检文件：未生成
-- 审查时间：未生成
-- 复审失效原因：无
+同上 6 个文件（3 types.ts + provider/detail.vue + after-sale-apply.vue + contract/common.vue）。
 
 ## 不确定项追踪
 | # | 问题 | 状态 | 确认人 | 影响阶段 | 结论 |

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服务商工作台App精简版原型 - 万大圣AI企服平台</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  background: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+/* 手机外框 */
+.phone-frame {
+  width: 375px;
+  background: #f5f6f8;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  position: relative;
+}
+
+/* 状态栏 */
+.status-bar {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: linear-gradient(135deg, #e8f4f8 0%, #f0e8f8 100%);
+  position: relative;
+  z-index: 10;
+}
+.status-time { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+.status-right { display: flex; align-items: center; gap: 5px; }
+.status-icon { font-size: 13px; }
+.status-battery {
+  width: 24px; height: 12px; border: 1.5px solid #333; border-radius: 3px;
+  position: relative; display: flex; align-items: center; padding: 1px;
+}
+.status-battery::after {
+  content: ''; position: absolute; right: -3px; top: 3px;
+  width: 2px; height: 4px; background: #333; border-radius: 0 1px 1px 0;
+}
+.battery-level { width: 70%; height: 100%; background: #333; border-radius: 1px; }
+
+/* 头部区域 */
+.header {
+  background: linear-gradient(135deg, #e8f4f8 0%, #f0e8f8 50%, #f8f0f4 100%);
+  padding: 8px 20px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.header-bg-monkey {
+  position: absolute; right: -20px; top: 40px; width: 180px; height: 180px;
+  opacity: 0.08; font-size: 160px; line-height: 1;
+}
+.header-bg-hi {
+  position: absolute; right: 60px; top: 50px;
+  background: rgba(255,255,255,0.6); padding: 4px 12px; border-radius: 12px;
+  font-size: 14px; color: #999; font-weight: 500;
+}
+.header-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; position: relative; z-index: 2;
+}
+.header-logo { display: flex; align-items: center; gap: 10px; }
+.logo-avatar {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; position: relative;
+}
+.logo-avatar::after {
+  content: '服务商'; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+  background: #6c5ce7; color: #fff; font-size: 8px; padding: 1px 6px; border-radius: 4px;
+  white-space: nowrap;
+}
+.logo-text { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-left: 4px; }
+.header-location {
+  display: flex; align-items: center; gap: 4px; font-size: 15px; color: #333; font-weight: 500;
+}
+.header-welcome { position: relative; z-index: 2; }
+.welcome-title {
+  font-size: 24px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+.welcome-subtitle { font-size: 13px; color: #888; line-height: 1.5; }
+
+/* 功能入口大卡片 */
+.quick-entries {
+  display: flex; gap: 10px; padding: 0 16px; margin-top: -10px; position: relative; z-index: 5;
+}
+.quick-card {
+  flex: 1; border-radius: 14px; padding: 14px 14px; position: relative; overflow: hidden;
+  min-height: 80px; cursor: pointer; transition: transform 0.2s;
+}
+.quick-card:active { transform: scale(0.97); }
+.quick-card.service {
+  background: linear-gradient(135deg, #c8d6ff 0%, #b8c4f0 100%);
+}
+.quick-card.business {
+  background: linear-gradient(135deg, #b8d8f8 0%, #a8c8f0 100%);
+}
+.quick-card-title { font-size: 17px; font-weight: 700; color: #1a1a2e; position: relative; z-index: 2; }
+.quick-card-icon {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  font-size: 44px; opacity: 0.9;
+}
+
+/* 指标卡片 */
+.metrics {
+  display: flex; gap: 8px; padding: 12px 16px 0;
+}
+.metric-card {
+  flex: 1; background: #fff; border-radius: 14px; padding: 12px 10px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.metric-icon {
+  width: 30px; height: 30px; border-radius: 8px; display: flex;
+  align-items: center; justify-content: center; font-size: 15px;
+}
+.metric-icon.green { background: #e8f8f0; color: #00b894; }
+.metric-icon.red { background: #fef0f0; color: #ff6b6b; }
+.metric-icon.blue { background: #e8f0fe; color: #4facfe; }
+.metric-label { font-size: 12px; color: #666; font-weight: 500; }
+.metric-value { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+.metric-value .unit { font-size: 12px; font-weight: 500; color: #666; margin-left: 1px; }
+.metric-status-list { margin-top: 6px; display: flex; flex-direction: column; gap: 3px; width: 100%; }
+.metric-status-item { display: flex; align-items: center; justify-content: space-between; font-size: 10px; padding: 2px 6px; border-radius: 5px; cursor: pointer; }
+.metric-status-item:active { background: #f5f6f8; }
+.metric-status-item .ms-label { display: flex; align-items: center; gap: 4px; color: #666; }
+.metric-status-item .ms-dot { width: 5px; height: 5px; border-radius: 50%; }
+.metric-status-item .ms-count { font-weight: 600; color: #333; }
+.metric-status-item.deposit .ms-dot { background: #ff9800; }
+.metric-status-item.acceptance .ms-dot { background: #2196f3; }
+
+/* 行动中心 - 精简版（横向滚动） */
+.action-center {
+  margin: 12px 16px 0; background: #fff; border-radius: 14px; padding: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.action-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+}
+.section-title { font-size: 16px; font-weight: 700; color: #1a1a2e; display: flex; align-items: center; gap: 4px; }
+.tip-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: #e8e8e8; color: #999; font-size: 10px; cursor: help; position: relative; }
+.tip-icon:active { background: #6c5ce7; color: #fff; }
+.tip-icon .tip-content { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 8px; background: #333; color: #fff; font-size: 11px; line-height: 1.6; padding: 10px 14px; border-radius: 8px; width: 240px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.tip-icon:active .tip-content { display: block; }
+.more-link { font-size: 12px; color: #999; cursor: pointer; }
+.action-scroll {
+  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.action-scroll::-webkit-scrollbar { display: none; }
+.action-chip {
+  flex-shrink: 0; display: flex; align-items: center; gap: 6px;
+  padding: 8px 12px; border-radius: 20px; background: #f5f6f8;
+  font-size: 12px; color: #666; cursor: pointer;
+}
+.action-chip .count { color: #6c5ce7; font-weight: 600; }
+.action-chip.has-data { background: #f0edff; color: #6c5ce7; }
+
+/* 发布服务卡片 - 精简版 */
+.publish-card {
+  margin: 12px 16px 0; background: linear-gradient(135deg, #f0edff 0%, #e8f0fe 100%);
+  border-radius: 14px; padding: 14px; display: flex; align-items: center;
+  justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.publish-info .publish-title { font-size: 17px; font-weight: 700; color: #6c5ce7; margin-bottom: 2px; }
+.publish-info .publish-desc { font-size: 12px; color: #888; }
+.publish-btn {
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  color: #fff; border: none; padding: 8px 16px; border-radius: 18px;
+  font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px;
+  cursor: pointer; box-shadow: 0 4px 12px rgba(108,92,231,0.3);
+}
+
+/* 待办动态 - 合并订单+售后，Tab切换 */
+.todo-section {
+  margin: 12px 16px 0; background: #fff; border-radius: 14px; padding: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.todo-tabs {
+  display: flex; gap: 20px; margin-bottom: 12px; border-bottom: 1px solid #f0f0f0;
+}
+.todo-tab {
+  font-size: 14px; color: #999; padding-bottom: 8px; cursor: pointer;
+  position: relative; font-weight: 500;
+}
+.todo-tab.active { color: #1a1a2e; font-weight: 700; }
+.todo-tab.active::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+  height: 2px; background: #6c5ce7; border-radius: 1px;
+}
+.todo-tab .badge {
+  display: inline-block; background: #ff6b6b; color: #fff; font-size: 10px;
+  padding: 1px 6px; border-radius: 8px; margin-left: 4px; font-weight: 500;
+}
+.todo-item {
+  padding: 10px 0; border-bottom: 1px solid #f5f5f5;
+}
+.todo-item:last-child { border-bottom: none; }
+.todo-content-scroll { max-height: 180px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.todo-content-scroll::-webkit-scrollbar { display: none; }
+.todo-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.todo-status {
+  font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 500;
+}
+.todo-status.pending-deposit { background: #fff3e0; color: #ff9800; }
+.todo-status.pending-accept { background: #e3f2fd; color: #2196f3; }
+.todo-status.refund { background: #fef0f0; color: #ff6b6b; }
+.todo-status.rework { background: #e8f5e9; color: #4caf50; }
+.todo-status.refund-rework { background: #f3e5f5; color: #9c27b0; }
+.todo-name { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+.todo-amount { font-size: 14px; font-weight: 700; color: #ff6b6b; }
+.todo-meta { font-size: 11px; color: #999; margin-bottom: 6px; }
+.todo-bottom { display: flex; align-items: center; justify-content: space-between; }
+.todo-urgency { font-size: 11px; color: #ff6b6b; font-weight: 500; }
+.todo-action-btn {
+  padding: 6px 14px; border-radius: 14px; font-size: 12px; font-weight: 500;
+  border: none; cursor: pointer;
+}
+.todo-action-btn.primary { background: #6c5ce7; color: #fff; }
+.todo-action-btn.secondary { background: #f0edff; color: #6c5ce7; }
+.todo-empty {
+  text-align: center; padding: 20px 0; color: #999; font-size: 13px;
+}
+.todo-more {
+  text-align: center; padding: 10px 0 4px; font-size: 13px; color: #6c5ce7;
+  cursor: pointer; font-weight: 500; border-top: 1px solid #f5f5f5; margin-top: 6px;
+}
+
+/* 重要商机推荐 - 横向滚动 */
+.business-section {
+  margin: 12px 16px 0; background: #fff; border-radius: 14px; padding: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.business-scroll {
+  display: flex; gap: 10px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  margin: 0 -4px; padding: 4px;
+}
+.business-scroll::-webkit-scrollbar { display: none; }
+.business-card {
+  flex: 0 0 260px; background: linear-gradient(135deg, #fafbff 0%, #f5f3ff 100%);
+  border: 1px solid #e8e4ff; border-radius: 12px; padding: 14px;
+  position: relative;
+}
+.business-tag {
+  display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 4px;
+  background: #f0edff; color: #6c5ce7; margin-bottom: 8px;
+}
+.business-match {
+  position: absolute; top: 12px; right: 12px; font-size: 10px; padding: 2px 8px;
+  border-radius: 8px; background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  color: #fff; font-weight: 500;
+}
+.business-title { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 8px; line-height: 1.4; padding-right: 60px; }
+.business-desc { font-size: 12px; color: #888; margin-bottom: 10px; line-height: 1.5; }
+.business-bottom { display: flex; align-items: center; justify-content: space-between; }
+.business-price { font-size: 16px; color: #ff6b6b; font-weight: 700; }
+.business-time { font-size: 11px; color: #999; }
+.business-more {
+  text-align: center; padding: 10px 0 4px; font-size: 13px; color: #6c5ce7;
+  cursor: pointer; font-weight: 500;
+}
+
+/* 底部导航 */
+.tab-bar {
+  bottom: 0; left: 0; right: 0; height: 65px;
+  background: #fff; display: flex; align-items: center; justify-content: space-around;
+  border-top: 1px solid #eee; padding-bottom: 8px; z-index: 100;
+}
+.tab-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  font-size: 10px; color: #999; cursor: pointer; padding: 6px 14px;
+}
+.tab-item.active { color: #6c5ce7; }
+.tab-icon { font-size: 20px; }
+
+/* 底部安全区 */
+.safe-area { height: 16px; background: #fff; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <!-- 状态栏 -->
+  <div class="status-bar">
+    <div class="status-time">17:33</div>
+    <div class="status-right">
+      <span class="status-icon">📶</span>
+      <span class="status-icon">📡</span>
+      <div class="status-battery"><div class="battery-level"></div></div>
+    </div>
+  </div>
+
+  <!-- 头部区域 -->
+  <div class="header">
+    <div class="header-bg-monkey">🐵</div>
+    <div class="header-bg-hi">Hi</div>
+    <div class="header-top">
+      <div class="header-logo">
+        <div class="logo-avatar">🐵</div>
+        <span class="logo-text">服务商端</span>
+      </div>
+      <div class="header-location">📍 全国</div>
+    </div>
+    <div class="header-welcome">
+      <div class="welcome-title">欢迎回来，Extreme</div>
+      <div class="welcome-subtitle">今天也要努力接单哦！AI正在为您匹配精准商机...</div>
+    </div>
+  </div>
+
+  <!-- 功能入口大卡片 -->
+  <div class="quick-entries">
+    <div class="quick-card service">
+      <div class="quick-card-title">我的服务</div>
+      <div class="quick-card-icon">💬</div>
+    </div>
+    <div class="quick-card business">
+      <div class="quick-card-title">我的商机</div>
+      <div class="quick-card-icon">👤</div>
+    </div>
+  </div>
+
+  <!-- 指标卡片 -->
+  <div class="metrics">
+    <div class="metric-card">
+      <div class="metric-icon green">¥</div>
+      <div class="metric-label">累计收益</div>
+      <div class="metric-value">0<span class="unit">元</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon red">⏳</div>
+      <div class="metric-label">进行中订单</div>
+      <div class="metric-value">4<span class="unit">单</span></div>
+      <div class="metric-status-list">
+        <div class="metric-status-item deposit">
+          <span class="ms-label"><span class="ms-dot"></span>待缴保证金</span>
+          <span class="ms-count">1单</span>
+        </div>
+        <div class="metric-status-item acceptance">
+          <span class="ms-label"><span class="ms-dot"></span>待提交交付物</span>
+          <span class="ms-count">3单</span>
+        </div>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon blue">✅</div>
+      <div class="metric-label">累计接单</div>
+      <div class="metric-value">3<span class="unit">单</span></div>
+    </div>
+  </div>
+
+  <!-- 发布服务卡片 -->
+  <div class="publish-card">
+    <div class="publish-info">
+      <div class="publish-title">发布服务</div>
+      <div class="publish-desc">增加曝光、吸引更多雇主下单</div>
+    </div>
+    <button class="publish-btn">✈ 去发布</button>
+  </div>
+
+  <!-- 重要商机推荐 - 横向滚动 -->
+  <div class="business-section" style="margin-bottom:0;">
+    <div class="action-header">
+      <div class="section-title">💼 重要商机推荐
+        <span class="tip-icon">?
+          <span class="tip-content">为确保推荐质量，只为您推荐经过平台审核，且与您的服务类目、地区、单价匹配的需求。暂不展示过期或失效需求。</span>
+        </span>
+      </div>
+      <span class="more-link">更多 ›</span>
+    </div>
+      <div style="text-align:center; padding:20px 10px;">
+        <div style="font-size:40px; opacity:0.4; margin-bottom:10px;">🔍</div>
+        <div style="font-size:14px; color:#666; font-weight:600; margin-bottom:4px;">暂时没有新的匹配商机</div>
+        <div style="font-size:12px; color:#999; margin-bottom:12px;">系统会持续为你留意，有新需求时第一时间通知你</div>
+        <div style="background:#f8f7ff; border-radius:10px; padding:12px 14px; text-align:left; margin-bottom:12px;">
+          <div style="font-size:12px; color:#6c5ce7; font-weight:600; margin-bottom:8px;">提升匹配命中率的三个办法：</div>
+          <div style="display:flex; align-items:center; gap:6px; font-size:11px; color:#666; margin-bottom:5px;"><span style="width:14px;height:14px;border-radius:50%;background:#6c5ce7;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>补全服务类目与资质信息</div>
+          <div style="display:flex; align-items:center; gap:6px; font-size:11px; color:#666; margin-bottom:5px;"><span style="width:14px;height:14px;border-radius:50%;background:#6c5ce7;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>完善服务案例与报价</div>
+          <div style="display:flex; align-items:center; gap:6px; font-size:11px; color:#666;"><span style="width:14px;height:14px;border-radius:50%;background:#6c5ce7;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span>保持账号活跃（登录/响应及时）</div>
+        </div>
+        <button style="background:linear-gradient(135deg,#6c5ce7,#a29bfe); color:#fff; border:none; padding:8px 20px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer;">去发布服务</button>
+      </div>
+  </div>
+
+  <!-- 待办动态 - 合并订单+售后，Tab切换 -->
+  <div class="todo-section">
+    <div class="todo-tabs">
+      <div class="todo-tab active">订单动态</div>
+      <div class="todo-tab">售后动态</div>
+    </div>
+    <div style="text-align:center; padding:30px 20px 10px;">
+      <div style="font-size:40px; opacity:0.4; margin-bottom:10px;">📭</div>
+      <div style="font-size:13px; color:#666; font-weight:600; margin-bottom:4px;">暂无待处理订单</div>
+      <div style="font-size:11px; color:#999;">有新订单时会提醒您</div>
+    </div>
+    <div class="todo-more">查看更多订单 ›</div>
+  </div>
+  <!-- 消息中心 - 精简版（横向滚动标签） -->
+  <div class="action-center" style="margin-bottom:12px;">
+    <div class="action-header">
+      <div class="section-title">消息中心</div>
+      <span class="more-link">全部 ›</span>
+    </div>
+    <div class="action-scroll">
+      <div class="action-chip">📈 服务通知 <span class="count">0</span></div>
+      <div class="action-chip">💬 交易消息 <span class="count">0</span></div>
+      <div class="action-chip">📋 售后消息 <span class="count">0</span></div>
+      <div class="action-chip">🔔 系统通知 <span class="count">0</span></div>
+    </div>
+  </div>
+
+  <!-- 底部导航 -->
+  <div class="tab-bar">
+    <div class="tab-item active">
+      <div class="tab-icon">⬛</div>
+      <span>工作台</span>
+    </div>
+    <div class="tab-item">
+      <div class="tab-icon">▤</div>
+      <span>需求大厅</span>
+    </div>
+    <div class="tab-item">
+      <div class="tab-icon">💬</div>
+      <span>消息</span>
+    </div>
+    <div class="tab-item">
+      <div class="tab-icon">😊</div>
+      <span>我的</span>
+    </div>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<script>
+function switchTab(type) {
+  var tabs = document.querySelectorAll('.todo-tab');
+  tabs.forEach(function(tab) { tab.classList.remove('active'); });
+  event.currentTarget.classList.add('active');
+  if (type === 'order') {
+    document.getElementById('orderContent').style.display = 'block';
+    document.getElementById('aftersaleContent').style.display = 'none';
+  } else {
+    document.getElementById('orderContent').style.display = 'none';
+    document.getElementById('aftersaleContent').style.display = 'block';
+  }
+}
+</script>
+
+</body>
+</html>

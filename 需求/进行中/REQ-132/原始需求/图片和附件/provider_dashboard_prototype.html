@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服务商工作台（V12新布局）- 万大圣AI企服平台</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f6fa; color: #333; font-size: 14px; }
+
+/* 顶部导航 */
+.topbar { height: 56px; background: #fff; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid #eee; position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+.logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; color: #1a1a2e; cursor: pointer; }
+.logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, #6c5ce7, #a29bfe); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; }
+
+/* 顶部引导条 */
+.topbar-guides { display: flex; align-items: center; gap: 6px; margin-right: 12px; }
+.guide-item { position: relative; display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+.guide-item.become { background: linear-gradient(135deg, #f0efff, #e8f4fd); color: #6c5ce7; border: 1px solid #d0cfff; }
+.guide-item.become:hover { background: linear-gradient(135deg, #e0ddff, #d0e8fd); }
+.guide-item.enter { background: linear-gradient(135deg, #e8f8f5, #f0fff4); color: #00b894; border: 1px solid #b8e8d8; }
+.guide-item.enter:hover { background: linear-gradient(135deg, #d0f0e8, #e0fff0); }
+.guide-item .guide-icon { font-size: 13px; }
+.guide-item .guide-arrow { font-size: 9px; opacity: 0.7; }
+
+.guide-card { position: absolute; top: 100%; left: 0; margin-top: 6px; width: 260px; background: #fff; border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); padding: 16px; opacity: 0; visibility: hidden; transform: translateY(-6px); transition: all 0.25s ease; z-index: 200; border: 1px solid #f0f0f0; }
+.guide-item:hover .guide-card { opacity: 1; visibility: visible; transform: translateY(0); }
+.guide-card::before { content: ''; position: absolute; top: -5px; left: 20px; width: 10px; height: 10px; background: #fff; transform: rotate(45deg); border-left: 1px solid #f0f0f0; border-top: 1px solid #f0f0f0; }
+.guide-card-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.guide-card-title.purple { color: #6c5ce7; }
+.guide-card-title.green { color: #00b894; }
+.guide-card-desc { font-size: 11px; color: #888; margin-bottom: 10px; line-height: 1.5; }
+.guide-card-features { margin-bottom: 10px; }
+.guide-card-feature { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #555; margin-bottom: 6px; }
+.guide-card-feature::before { content: '✓'; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0; }
+.guide-card.purple .guide-card-feature::before { background: #f0efff; color: #6c5ce7; }
+.guide-card.green .guide-card-feature::before { background: #e8f8f5; color: #00b894; }
+.guide-card-btn { width: 100%; padding: 8px; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.guide-card-btn.purple { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+.guide-card-btn.green { background: linear-gradient(135deg, #00b894, #00cec9); color: #fff; }
+.guide-card-note { font-size: 10px; color: #bbb; margin-top: 6px; text-align: center; }
+
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
+.topbar-item { display: flex; align-items: center; gap: 5px; color: #666; font-size: 12px; cursor: pointer; }
+.avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #6c5ce7, #a29bfe); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; }
+.avatar-wrap { display: flex; align-items: center; gap: 5px; }
+.avatar-wrap span { font-size: 11px; color: #999; }
+
+/* 左侧导航 */
+.sidebar { width: 180px; background: #fff; position: fixed; top: 56px; left: 0; bottom: 0; border-right: 1px solid #eee; padding: 12px 0; overflow-y: auto; }
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 16px; cursor: pointer; color: #555; font-size: 13px; margin-bottom: 1px; transition: all 0.2s; }
+.nav-item:hover { background: #f5f6fa; }
+.nav-item.active { background: #f0efff; color: #6c5ce7; font-weight: 600; border-right: 3px solid #6c5ce7; }
+.nav-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.nav-divider { height: 1px; background: #eee; margin: 10px 14px; }
+
+/* 主内容区 - 通栏欢迎语+分栏内容布局 */
+.main { margin-left: 180px; margin-top: 56px; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+/* 下方分栏区域：中间 + 右侧 */
+.content-section { display: flex; gap: 16px; align-items: flex-start; }
+.main-center { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.main-right { width: 260px; flex-shrink: 0; position: sticky; top: 72px; max-height: calc(100vh - 88px); overflow-y: auto; padding-right: 2px; }
+.main-right::-webkit-scrollbar { width: 4px; }
+.main-right::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+/* 欢迎语通栏 */
+.welcome-banner { background: #fff; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.welcome-banner h1 { font-size: 24px; color: #1a1a2e; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.welcome-banner h1::before { content: '✦'; font-size: 22px; color: #6c5ce7; }
+.welcome-banner p { font-size: 14px; color: #888; }
+.welcome-publish { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, #f0edff 0%, #e8f0fe 100%); border: 1px solid #e0d8ff; border-radius: 12px; padding: 12px 16px; flex-shrink: 0; }
+.welcome-publish-info { display: flex; flex-direction: column; gap: 2px; }
+.welcome-publish-title { font-size: 15px; font-weight: 700; color: #6c5ce7; }
+.welcome-publish-desc { font-size: 11px; color: #888; }
+.welcome-publish-btn { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; border: none; padding: 8px 16px; border-radius: 18px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(108,92,231,0.3); white-space: nowrap; }
+
+/* 指标卡片（中间区域内，与订单/售后同宽） */
+.metrics-section { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.metrics-section .metric-card { background: #fff; border-radius: 12px; padding: 16px 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #f0f0f0; cursor: pointer; transition: all 0.2s; }
+.metrics-section .metric-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.welcome-area { flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; }
+.welcome h1 { font-size: 22px; color: #1a1a2e; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.welcome h1::before { content: '✦'; font-size: 20px; color: #6c5ce7; }
+.welcome p { font-size: 13px; color: #888; }
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; flex: 1; }
+.metric-card { background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.2s; border: 1px solid #f0f0f0; }
+.metric-card:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
+.metric-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; margin-bottom: 6px; }
+.metric-icon.purple { background: #f0efff; color: #6c5ce7; }
+.metric-icon.blue { background: #e8f4fd; color: #0984e3; }
+.metric-icon.orange { background: #fff3e0; color: #e17055; }
+.metric-icon.green { background: #e8f8f5; color: #00b894; }
+.metric-value { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 1px; }
+.metric-value .unit { font-size: 12px; font-weight: 400; color: #999; margin-left: 1px; }
+.metric-label { font-size: 12px; color: #999; display: flex; align-items: center; justify-content: space-between; }
+.metric-arrow { color: #ccc; font-size: 12px; }
+.metric-status-list { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.metric-status-item { display: flex; align-items: center; justify-content: space-between; font-size: 11px; padding: 3px 8px; border-radius: 6px; cursor: pointer; transition: background 0.15s; }
+.metric-status-item:hover { background: #f5f6f8; }
+.metric-status-item .ms-label { display: flex; align-items: center; gap: 4px; color: #666; }
+.metric-status-item .ms-dot { width: 6px; height: 6px; border-radius: 50%; }
+.metric-status-item .ms-count { font-weight: 600; color: #333; }
+.metric-status-item .ms-arrow { color: #ccc; font-size: 10px; }
+.metric-status-item.deposit .ms-dot { background: #e17055; }
+.metric-status-item.acceptance .ms-dot { background: #0984e3; }
+
+/* 三栏核心模块 */
+.core-modules { display: flex; flex-direction: column; gap: 12px; }
+.module { background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; display: flex; flex-direction: column; }
+.module-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-shrink: 0; }
+.module-title { font-size: 14px; font-weight: 600; color: #1a1a2e; display: flex; align-items: center; gap: 6px; }
+.module-title .icon { font-size: 14px; }
+.module-title .count-badge { background: #ff7675; color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 600; }
+.module-actions { display: flex; align-items: center; gap: 8px; }
+.refresh-btn { color: #999; cursor: pointer; font-size: 12px; }
+.module-more { font-size: 11px; color: #999; cursor: pointer; display: flex; align-items: center; gap: 3px; }
+.tip-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: #e8e8e8; color: #999; font-size: 10px; cursor: help; position: relative; margin-right: 8px; }
+.tip-icon:hover { background: #6c5ce7; color: #fff; }
+.tip-icon .tip-content { display: none; position: absolute; bottom: 100%; right: 0; margin-bottom: 8px; background: #333; color: #fff; font-size: 11px; line-height: 1.6; padding: 10px 14px; border-radius: 8px; width: 280px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.tip-icon .tip-content::after { content: ''; position: absolute; top: 100%; right: 8px; border: 6px solid transparent; border-top-color: #333; }
+.tip-icon:hover .tip-content { display: block; }
+
+/* 动态列表（紧凑版） */
+.dynamic-list { display: flex; flex-direction: column; gap: 8px; flex: 1; max-height: 180px; overflow-y: auto; }
+.dynamic-list::-webkit-scrollbar { width: 4px; }
+.dynamic-list::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+.dynamic-item { padding: 10px; background: #fafbff; border-radius: 8px; border: 1px solid #f0f0f0; transition: all 0.2s; cursor: pointer; }
+.dynamic-item:hover { border-color: #d0cfff; background: #f8f7ff; }
+.dynamic-item-header { display: flex; align-items: center; margin-bottom: 5px; }
+.dynamic-status { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-right: 6px; flex-shrink: 0; }
+.dynamic-status.deposit { background: #fff3e0; color: #e17055; }
+.dynamic-status.acceptance { background: #e8f4fd; color: #0984e3; }
+.dynamic-status.ongoing { background: #e8f8f0; color: #00b894; }
+.dynamic-status.rejected { background: #ffeaea; color: #ff7675; }
+.dynamic-status.aftersale { background: #ffeaea; color: #ff7675; }
+.dynamic-status.aftersale-refund { background: #ffeaea; color: #ff7675; }
+.dynamic-status.aftersale-rework { background: #e8f8f0; color: #00b894; }
+.dynamic-status.aftersale-refund-rework { background: #f3e5f5; color: #9c27b0; }
+.dynamic-name { font-size: 12px; font-weight: 600; color: #1a1a2e; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dynamic-amount { font-size: 12px; font-weight: 700; color: #e17055; margin-left: 6px; flex-shrink: 0; }
+.dynamic-meta { font-size: 11px; color: #999; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dynamic-footer { display: flex; align-items: center; justify-content: space-between; }
+.dynamic-time { font-size: 11px; color: #999; display: flex; align-items: center; gap: 3px; }
+.dynamic-time.urgent { color: #ff7675; font-weight: 600; }
+.dynamic-btn { padding: 5px 12px; border: none; border-radius: 5px; font-size: 11px; cursor: pointer; font-weight: 500; white-space: nowrap; transition: all 0.2s; }
+.dynamic-btn.primary { background: #6c5ce7; color: #fff; }
+.dynamic-btn.primary:hover { background: #5b4bdb; }
+.dynamic-btn.secondary { background: #f0efff; color: #6c5ce7; }
+.reject-reason { font-size: 10px; color: #ff7675; background: #fff5f5; padding: 1px 6px; border-radius: 3px; margin-bottom: 5px; display: inline-block; }
+
+/* 商机卡片（横向三卡片） */
+.opportunity-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.opportunity-card { padding: 14px; background: #fafbff; border-radius: 10px; border: 1px solid #f0f0f0; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+.opportunity-card:hover { border-color: #d0cfff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(108,92,231,0.1); }
+.opportunity-tag { position: absolute; top: 0; right: 0; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; font-size: 10px; padding: 2px 10px; border-radius: 0 10px 0 8px; font-weight: 600; }
+.opportunity-category { display: inline-block; padding: 2px 8px; background: #f0efff; color: #6c5ce7; border-radius: 4px; font-size: 11px; margin-bottom: 8px; margin-top: 4px; }
+.opportunity-title { font-size: 13px; font-weight: 600; color: #1a1a2e; margin-bottom: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 36px; }
+.opportunity-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.opportunity-budget { font-size: 14px; font-weight: 700; color: #e17055; }
+.opportunity-cycle { font-size: 11px; color: #999; }
+.opportunity-time { font-size: 11px; color: #bbb; }
+
+/* 右侧行动中心 */
+.action-module { background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; margin-bottom: 12px; }
+.action-module .module-header { margin-bottom: 8px; }
+
+/* 右侧推广卡片 */
+.promo-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; padding: 18px 16px; color: #fff; position: relative; overflow: hidden; }
+.promo-card::before { content: ''; position: absolute; top: -20px; right: -20px; width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 50%; }
+.promo-card::after { content: ''; position: absolute; bottom: -30px; left: -10px; width: 70px; height: 70px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+.promo-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; position: relative; z-index: 1; }
+.promo-desc { font-size: 11px; opacity: 0.9; margin-bottom: 12px; line-height: 1.4; position: relative; z-index: 1; }
+.promo-features { margin-bottom: 12px; position: relative; z-index: 1; }
+.promo-feature { display: flex; align-items: center; gap: 6px; font-size: 11px; margin-bottom: 6px; opacity: 0.95; }
+.promo-feature::before { content: '✓'; width: 14px; height: 14px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0; }
+.promo-btn { width: 100%; padding: 8px; background: #fff; color: #667eea; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; position: relative; z-index: 1; transition: all 0.2s; }
+.promo-btn:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.15); transform: translateY(-1px); }
+.promo-note { font-size: 10px; opacity: 0.8; margin-top: 8px; text-align: center; position: relative; z-index: 1; }
+.action-item { display: flex; align-items: center; padding: 9px 0; border-bottom: 1px solid #f5f5f5; }
+.action-item:last-child { border-bottom: none; }
+.action-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-right: 8px; flex-shrink: 0; }
+.action-icon.publish { background: #f0efff; color: #6c5ce7; }
+.action-icon.service { background: #e8f4fd; color: #0984e3; }
+.action-icon.trade { background: #fff3e0; color: #e17055; }
+.action-icon.aftersale { background: #ffeaea; color: #ff7675; }
+.action-icon.system { background: #f0f0f0; color: #666; }
+.action-info { flex: 1; min-width: 0; }
+.action-title { font-size: 12px; color: #333; margin-bottom: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.action-desc { font-size: 10px; color: #999; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.action-btn { padding: 4px 10px; background: #f0efff; color: #6c5ce7; border: none; border-radius: 5px; font-size: 11px; cursor: pointer; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+
+/* 右侧栏商机推荐 */
+.right-opportunity { background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; }
+.right-opportunity .module-header { margin-bottom: 10px; }
+.right-opp-list { display: flex; flex-direction: column; gap: 8px; }
+.right-opp-card { padding: 10px; background: #fafbff; border-radius: 8px; border: 1px solid #f0f0f0; cursor: pointer; transition: all 0.2s; position: relative; }
+.right-opp-card:hover { border-color: #d0cfff; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(108,92,231,0.1); }
+.right-opp-tag { position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: 500; }
+.right-opp-category { display: inline-block; background: #f0efff; color: #6c5ce7; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-bottom: 6px; }
+.right-opp-title { font-size: 12px; color: #333; line-height: 1.4; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.right-opp-meta { display: flex; justify-content: space-between; align-items: center; }
+.right-opp-budget { font-size: 11px; color: #e17055; font-weight: 600; }
+.right-opp-time { font-size: 10px; color: #999; }
+
+/* === V11新布局样式 === */
+.ai-tag { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 500; margin-left: 6px; }
+
+/* 商机横向三卡片 */
+.opp-cards-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+.opp-cards-row::-webkit-scrollbar { height: 4px; }
+.opp-cards-row::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+.opp-card { background: #fafbff; border: 1px solid #f0f0f0; border-radius: 10px; padding: 12px; position: relative; cursor: pointer; transition: all 0.2s; overflow: hidden; flex: 0 0 260px; }
+.opp-card:hover { border-color: #d0cfff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(108,92,231,0.1); }
+.opp-card .opp-badge { position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: 500; }
+.opp-hover-actions { position: absolute; left: 0; right: 0; bottom: 0; padding: 24px 12px 12px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; background: linear-gradient(to top, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.9) 60%, rgba(255,255,255,0) 100%); opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+.opp-card:hover .opp-hover-actions { opacity: 1; pointer-events: auto; }
+.opp-detail-btn { padding: 7px 16px; border-radius: 16px; font-size: 13px; font-weight: 600; border: 1.5px solid #6c5ce7; background: #fff; color: #6c5ce7; cursor: pointer; }
+.opp-grab-btn { padding: 7px 16px; border-radius: 16px; font-size: 13px; font-weight: 600; border: none; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; cursor: pointer; box-shadow: 0 4px 10px rgba(108,92,231,0.3); }
+.opp-badge { position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: 500; }
+.opp-category { display: inline-block; background: #f0efff; color: #6c5ce7; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-bottom: 6px; }
+.opp-title { font-size: 13px; color: #333; line-height: 1.4; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 36px; }
+.opp-footer { display: flex; justify-content: space-between; align-items: center; }
+.opp-price { font-size: 12px; color: #e17055; font-weight: 700; }
+.opp-time { font-size: 10px; color: #999; }
+
+/* 行动中心网格（中间区域） */
+.action-grid { display: flex; flex-direction: column; gap: 4px; }
+.action-grid .action-item { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+.action-grid .action-item:last-child { border-bottom: none; }
+
+/* 右侧窄列动态列表 */
+.right-module { background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; margin-bottom: 12px; }
+.right-dynamic-list { display: flex; flex-direction: column; gap: 10px; }
+.right-dynamic-item { padding: 10px; background: #fafbff; border-radius: 8px; border: 1px solid #f0f0f0; }
+.right-dynamic-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.right-dynamic-amount { font-size: 13px; font-weight: 700; color: #ff6b6b; }
+.right-dynamic-name { font-size: 13px; font-weight: 600; color: #1a1a2e; margin-bottom: 3px; }
+.right-dynamic-meta { font-size: 11px; color: #999; margin-bottom: 8px; }
+.right-dynamic-footer { display: flex; align-items: center; justify-content: space-between; }
+.right-dynamic-time { font-size: 11px; color: #999; font-weight: 500; }
+.right-dynamic-time.urgent { color: #ff6b6b; }
+.right-dynamic-btn { padding: 5px 12px; border-radius: 12px; font-size: 11px; font-weight: 500; border: none; cursor: pointer; }
+.right-dynamic-btn.primary { background: #6c5ce7; color: #fff; }
+.right-dynamic-btn.secondary { background: #f0edff; color: #6c5ce7; }
+
+/* 供应商后台推广卡片 */
+.vendor-promo-card { background: linear-gradient(135deg, #f0efff 0%, #e8f4fd 100%); border: 1px solid #d0cfff; border-radius: 10px; padding: 14px; text-align: center; }
+.vendor-promo-header { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 8px; }
+.vendor-promo-icon { font-size: 24px; }
+.vendor-promo-title { font-size: 15px; font-weight: 700; color: #6c5ce7; }
+.vendor-promo-desc { font-size: 12px; color: #666; line-height: 1.5; margin-bottom: 10px; }
+.vendor-promo-btn { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; border: none; padding: 8px 20px; border-radius: 16px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(108,92,231,0.3); }
+.vendor-promo-note { font-size: 10px; color: #999; margin-top: 8px; }
+
+/* 供应商工作台完整卡片 */
+.vendor-workbench-card { background: linear-gradient(135deg, #f0efff 0%, #e8f0fe 100%); border-radius: 14px; padding: 18px 16px; position: relative; overflow: hidden; }
+.vw-bg-deco { position: absolute; right: -10px; top: 10px; font-size: 80px; opacity: 0.08; pointer-events: none; }
+.vw-title { font-size: 20px; font-weight: 800; color: #4a5cf0; margin-bottom: 4px; position: relative; z-index: 1; }
+.vw-subtitle { font-size: 12px; color: #666; margin-bottom: 14px; position: relative; z-index: 1; }
+.vw-features { background: rgba(255,255,255,0.7); border-radius: 10px; padding: 12px; margin-bottom: 12px; position: relative; z-index: 1; }
+.vw-feature { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; }
+.vw-feature-icon { width: 32px; height: 32px; border-radius: 8px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; box-shadow: 0 1px 4px rgba(108,92,231,0.1); }
+.vw-feature-text .vw-feature-name { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 2px; }
+.vw-feature-text .vw-feature-desc { font-size: 11px; color: #888; }
+.vw-note { background: rgba(255,255,255,0.5); border-radius: 8px; padding: 10px 12px; font-size: 11px; color: #666; line-height: 1.6; margin-bottom: 14px; position: relative; z-index: 1; }
+.vw-btn { display: block; width: 100%; background: linear-gradient(135deg, #4a5cf0, #6c5ce7); color: #fff; border: none; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(74,92,240,0.3); position: relative; z-index: 1; }
+
+/* 订单+售后2列并排 */
+.todo-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* 支付弹窗 */
+.payment-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
+.payment-modal-overlay.active { opacity: 1; visibility: visible; }
+.payment-modal { background: #fff; border-radius: 14px; width: 400px; padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.3s; }
+.payment-modal-overlay.active .payment-modal { transform: scale(1); }
+.payment-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.payment-modal-title { font-size: 17px; font-weight: 700; color: #1a1a2e; display: flex; align-items: center; gap: 6px; }
+.payment-modal-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #999; }
+.payment-order-info { background: #f8f9ff; border-radius: 8px; padding: 12px; margin-bottom: 14px; }
+.payment-order-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; }
+.payment-order-row:last-child { margin-bottom: 0; }
+.payment-order-label { color: #888; }
+.payment-order-value { color: #333; font-weight: 500; }
+.payment-amount { text-align: center; margin-bottom: 16px; }
+.payment-amount-label { font-size: 12px; color: #888; margin-bottom: 3px; }
+.payment-amount-value { font-size: 28px; font-weight: 700; color: #e17055; }
+.payment-amount-value .yuan { font-size: 16px; }
+.payment-methods { margin-bottom: 16px; }
+.payment-method-title { font-size: 12px; color: #888; margin-bottom: 8px; }
+.payment-method-list { display: flex; flex-direction: column; gap: 6px; }
+.payment-method-item { display: flex; align-items: center; padding: 10px 12px; border: 2px solid #f0f0f0; border-radius: 7px; cursor: pointer; transition: all 0.2s; }
+.payment-method-item:hover { border-color: #d0cfff; }
+.payment-method-item.selected { border-color: #6c5ce7; background: #f8f7ff; }
+.payment-method-icon { width: 26px; height: 26px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-right: 8px; }
+.payment-method-icon.wechat { background: #e8f8f5; color: #00b894; }
+.payment-method-icon.alipay { background: #e8f4fd; color: #0984e3; }
+.payment-method-name { font-size: 12px; font-weight: 500; color: #333; flex: 1; }
+.payment-method-radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; }
+.payment-method-item.selected .payment-method-radio { border-color: #6c5ce7; }
+.payment-method-item.selected .payment-method-radio::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #6c5ce7; }
+.payment-submit-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.payment-submit-btn:hover { box-shadow: 0 4px 14px rgba(108,92,231,0.3); }
+.payment-security { text-align: center; font-size: 10px; color: #bbb; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 3px; }
+</style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">万</div>
+    <span>万大圣 | AI企服平台</span>
+  </div>
+
+  <div class="topbar-right">
+    <div class="topbar-item">📍 全国</div>
+    <div class="topbar-item">🎧 客服</div>
+    <div class="topbar-item">🔔 消息</div>
+    <div class="avatar-wrap">
+      <div class="avatar">服</div>
+      <span>服务商</span>
+    </div>
+  </div>
+</div>
+
+<!-- 左侧导航 -->
+<div class="sidebar">
+  <div class="nav-item active"><span class="nav-icon">🏠</span><span>工作台</span></div>
+  <div class="nav-item"><span class="nav-icon">📋</span><span>需求大厅</span></div>
+  <div class="nav-item"><span class="nav-icon">💼</span><span>我的商机</span></div>
+  <div class="nav-item"><span class="nav-icon">💬</span><span>对话管理</span></div>
+  <div class="nav-divider"></div>
+  <div class="nav-item"><span class="nav-icon">📤</span><span>服务发布</span></div>
+  <div class="nav-item"><span class="nav-icon">⚙️</span><span>服务管理</span></div>
+  <div class="nav-item"><span class="nav-icon">📦</span><span>订单管理</span></div>
+  <div class="nav-item"><span class="nav-icon">🔧</span><span>售后管理</span></div>
+  <div class="nav-item"><span class="nav-icon">⭐</span><span>评价中心</span></div>
+  <div class="nav-divider"></div>
+  <div class="nav-item"><span class="nav-icon">🔔</span><span>通知消息</span></div>
+  <div class="nav-item"><span class="nav-icon">📄</span><span>合同管理</span></div>
+  <div class="nav-item"><span class="nav-icon">💰</span><span>我的钱包</span></div>
+  <div class="nav-item"><span class="nav-icon">🔒</span><span>我的保证金</span></div>
+  <div class="nav-item"><span class="nav-icon">🧾</span><span>发票管理</span></div>
+  <div class="nav-item"><span class="nav-icon">👤</span><span>个人中心</span></div>
+</div>
+
+<!-- 主内容区 -->
+<div class="main">
+  <!-- 通栏区域：欢迎语 + 指标卡片 -->
+  <!-- 欢迎语通栏 -->
+  <div class="welcome-banner">
+    <div class="welcome-text">
+      <h1>欢迎回来，Extreme</h1>
+      <p>今天也要努力接单哦！AI正在为您匹配精准商机...</p>
+    </div>
+    <div class="welcome-publish">
+      <div class="welcome-publish-info">
+        <div class="welcome-publish-title">发布服务</div>
+        <div class="welcome-publish-desc">增加曝光、吸引更多雇主下单</div>
+      </div>
+      <button class="welcome-publish-btn">✈ 去发布</button>
+    </div>
+  </div>
+  <!-- 下方分栏区域：中间 + 右侧 -->
+  <div class="content-section">
+    <div class="main-center">
+    <!-- 指标卡片（与商机/行动中心同宽） -->
+    <div class="metrics-section">
+      <div class="metric-card">
+        <div class="metric-icon purple">💰</div>
+        <div class="metric-value">¥12,580</div>
+        <div class="metric-label">累计收益 <span class="metric-arrow">›</span></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon blue">📋</div>
+        <div class="metric-value">8<span class="unit">单</span></div>
+        <div class="metric-label">累计接单数 <span class="metric-arrow">›</span></div>
+      </div>
+      <div class="metric-card" style="cursor:default;">
+        <div class="metric-icon orange">⏳</div>
+        <div class="metric-value">3<span class="unit">单</span></div>
+        <div class="metric-label">进行中订单</div>
+        <div class="metric-status-list">
+          <div class="metric-status-item deposit" onclick="void(0)">
+            <span class="ms-label"><span class="ms-dot"></span>待缴保证金</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span class="ms-count">1单</span><span class="ms-arrow">›</span></span>
+          </div>
+          <div class="metric-status-item acceptance" onclick="void(0)">
+            <span class="ms-label"><span class="ms-dot"></span>待提交交付物</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span class="ms-count">2单</span><span class="ms-arrow">›</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon green">✅</div>
+        <div class="metric-value">5<span class="unit">个</span></div>
+        <div class="metric-label">我的服务 <span class="metric-arrow">›</span></div>
+      </div>
+    </div>
+
+    <!-- 中间：重要商机推荐（横向三卡片） -->
+    <div class="module">
+      <div class="module-header">
+        <div class="module-title"><span class="icon">💼</span>重要商机推荐
+          <span class="tip-icon">?
+            <span class="tip-content">为确保推荐质量，只为您推荐经过平台审核，且与您的服务类目、地区、单价匹配的需求。暂不展示过期或失效需求。</span>
+          </span>
+        </div>
+        <div class="module-actions">
+          <span class="module-more">更多 ›</span>
+        </div>
+      </div>
+      <div class="opp-cards-row">
+        <div class="opp-card">
+          <span class="opp-badge">精准匹配</span>
+          <div class="opp-category">工商财税</div>
+          <div class="opp-title">北京朝阳区公司注册代办，含银行开户和税务登记</div>
+          <div class="opp-footer">
+            <span class="opp-price">¥3,000-5,000</span>
+            <span class="opp-time">1小时前</span>
+          </div>
+          <div class="opp-hover-actions">
+            <button class="opp-detail-btn">查看详情</button>
+            <button class="opp-grab-btn">立即抢单</button>
+          </div>
+        </div>
+        <div class="opp-card">
+          <span class="opp-badge">精准匹配</span>
+          <div class="opp-category">代理记账</div>
+          <div class="opp-title">小规模纳税人年度代理记账，含月度报税和财务报表</div>
+          <div class="opp-footer">
+            <span class="opp-price">¥3,600/年</span>
+            <span class="opp-time">3小时前</span>
+          </div>
+          <div class="opp-hover-actions">
+            <button class="opp-detail-btn">查看详情</button>
+            <button class="opp-grab-btn">立即抢单</button>
+          </div>
+        </div>
+        <div class="opp-card">
+          <span class="opp-badge">精准匹配</span>
+          <div class="opp-category">知识产权</div>
+          <div class="opp-title">商标注册申请（第35类广告销售），需加急处理</div>
+          <div class="opp-footer">
+            <span class="opp-price">¥1,200-1,800</span>
+            <span class="opp-time">5小时前</span>
+          </div>
+          <div class="opp-hover-actions">
+            <button class="opp-detail-btn">查看详情</button>
+            <button class="opp-grab-btn">立即抢单</button>
+          </div>
+        </div>
+        <div class="opp-card">
+          <span class="opp-badge">推荐</span>
+          <div class="opp-category">品牌设计</div>
+          <div class="opp-title">企业品牌VI设计，含Logo、名片、宣传册全套设计</div>
+          <div class="opp-footer">
+            <span class="opp-price">¥5,000-8,000</span>
+            <span class="opp-time">8小时前</span>
+          </div>
+          <div class="opp-hover-actions">
+            <button class="opp-detail-btn">查看详情</button>
+            <button class="opp-grab-btn">立即抢单</button>
+          </div>
+        </div>
+        <div class="opp-card">
+          <span class="opp-badge">推荐</span>
+          <div class="opp-category">法律咨询</div>
+          <div class="opp-title">企业常年法律顾问服务，含合同审核、合规咨询</div>
+          <div class="opp-footer">
+            <span class="opp-price">¥12,000/年</span>
+            <span class="opp-time">12小时前</span>
+          </div>
+          <div class="opp-hover-actions">
+            <button class="opp-detail-btn">查看详情</button>
+            <button class="opp-grab-btn">立即抢单</button>
+          </div>
+        </div>
+        <div class="opp-card">
+          <span class="opp-badge">推荐</span>
+          <div class="opp-category">IT技术</div>
+          <div class="opp-title">小程序商城开发，含后台管理、支付对接、多端适配</div>
+          <div class="opp-footer">
+            <span class="opp-price">¥15,000-25,000</span>
+            <span class="opp-time">1天前</span>
+          </div>
+          <div class="opp-hover-actions">
+            <button class="opp-detail-btn">查看详情</button>
+            <button class="opp-grab-btn">立即抢单</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 中间：订单动态 + 售后动态（2列并排） -->
+    <div class="todo-two-col">
+      <!-- 订单动态 -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-title"><span class="icon">📦</span>订单动态 <span class="count-badge">6</span></div>
+          <div class="module-actions">
+            <span class="module-more">更多 ›</span>
+          </div>
+        </div>
+        <div class="dynamic-list">
+          <div class="dynamic-item">
+            <div class="dynamic-item-header">
+              <span class="dynamic-status deposit">待缴保证金</span>
+              <span class="dynamic-name">公司注册代办服务</span>
+              <span class="dynamic-amount">¥2,000</span>
+            </div>
+            <div class="dynamic-meta">订单号：WD20260914001 · 北京科技有限公司</div>
+            <div class="dynamic-footer">
+              <span class="dynamic-time">更新于12h前</span>
+              <button class="dynamic-btn primary">缴纳保证金</button>
+            </div>
+          </div>
+          <div class="dynamic-item">
+            <div class="dynamic-item-header">
+              <span class="dynamic-status acceptance">待提交交付物</span>
+              <span class="dynamic-name">代理记账年度服务</span>
+              <span class="dynamic-amount">¥3,600</span>
+            </div>
+            <div class="dynamic-meta">订单号：WD20260910002 · 上海贸易有限公司</div>
+            <div class="dynamic-footer">
+              <span class="dynamic-time">更新于2h前</span>
+              <button class="dynamic-btn primary">提交交付物</button>
+            </div>
+          </div>
+          <div class="dynamic-item">
+            <div class="dynamic-item-header">
+              <span class="dynamic-status acceptance">待提交交付物</span>
+              <span class="dynamic-name">网站建设定制开发服务</span>
+              <span class="dynamic-amount">¥8,800</span>
+            </div>
+            <div class="dynamic-meta">订单号：WD20260908003 · 广州传媒有限公司</div>
+            <div class="dynamic-footer">
+              <span class="dynamic-time">更新于5h前</span>
+              <button class="dynamic-btn primary">提交交付物</button>
+            </div>
+          </div>
+          <div class="dynamic-item">
+            <div class="dynamic-item-header">
+              <span class="dynamic-status deposit">待缴保证金</span>
+              <span class="dynamic-name">商标注册申请服务</span>
+              <span class="dynamic-amount">¥1,800</span>
+            </div>
+            <div class="dynamic-meta">订单号：WD20260915004 · 深圳科技有限公司</div>
+            <div class="dynamic-footer">
+              <span class="dynamic-time">更新于1天前</span>
+              <button class="dynamic-btn primary">缴纳保证金</button>
+            </div>
+          </div>
+          <div class="dynamic-item">
+            <div class="dynamic-item-header">
+              <span class="dynamic-status acceptance">待提交交付物</span>
+              <span class="dynamic-name">品牌VI设计服务</span>
+              <span class="dynamic-amount">¥6,500</span>
+            </div>
+            <div class="dynamic-meta">订单号：WD20260906005 · 杭州电商有限公司</div>
+            <div class="dynamic-footer">
+              <span class="dynamic-time">更新于2天前</span>
+              <button class="dynamic-btn primary">提交交付物</button>
+            </div>
+          </div>
+          <div class="dynamic-item">
+            <div class="dynamic-item-header">
+              <span class="dynamic-status acceptance">待提交交付物</span>
+              <span class="dynamic-name">小程序商城开发</span>
+              <span class="dynamic-amount">¥18,000</span>
+            </div>
+            <div class="dynamic-meta">订单号：WD20260901006 · 北京零售有限公司</div>
+            <div class="dynamic-footer">
+              <span class="dynamic-time">更新于3天前</span>
+              <button class="dynamic-btn primary">提交交付物</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 售后动态 -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-title"><span class="icon">🔧</span>售后动态 <span class="count-badge">6</span></div>
+          <div class="module-actions">
+            <span class="module-more">更多 ›</span>
+          </div>
+        </div>
+        <div class="dynamic-list">
+          <div class="dynamic-item">
+            <div class="dynamic-item-header">
+              <span class="dynamic-status aftersale-refund">仅退款</span>
+              <span class="dynamic-name">网站建设定制开发</span>
+            </div>
+            <div class="dynamic-meta">售后编号：AS20260914001 · 广州传媒</div>
+            <div class="dynamic-footer">
+              <span class="dynamic-time">更新于8h前</span>
+              <button class="dynamic-btn secondary">售后处理</button>
+            </div>
+          </div>
+          <div class="dynamic-item">
+            <div class="dynamic-item-header">
+              <span class="dynamic-status aftersale-rework">仅返工</span>
+              <span class="dynamic-name">财税咨询季度服务</span>
+            </div>
+            <div class="dynamic-meta">售后编号：AS20260913002 · 杭州科技</div>
+            <div class="dynamic-footer">
+              <span class="dynamic-time">更新于18h前</span>
+              <button class="dynamic-btn secondary">售后处理</button>
+            </div>
+          </div>
+          <div class="dynamic-item">
+            <div class="dynamic-item-header">
+              <span class="dynamic-status aftersale-refund-rework">退款+返工</span>
+              <span class="dynamic-name">商标注册申请服务</span>
+            </div>
+            <div class="dynamic-meta">售后编号：AS20260912003 · 深圳贸易</div>
+            <div class="dynamic-footer">
+              <span class="dynamic-time">更新于22h前</span>
+              <button class="dynamic-btn secondary">售后处理</button>
+            </div>
+          </div>
+          <div class="dynamic-item">
+            <div class="dynamic-item-header">
+              <span class="dynamic-status aftersale-refund">仅退款</span>
+              <span class="dynamic-name">企业年报审计服务</span>
+            </div>
+            <div class="dynamic-meta">售后编号：AS20260911004 · 成都实业</div>
+            <div class="dynamic-footer">
+              <span class="dynamic-time">更新于1天前</span>
+              <button class="dynamic-btn secondary">售后处理</button>
+            </div>
+          </div>
+          <div class="dynamic-item">
+            <div class="dynamic-item-header">
+              <span class="dynamic-status aftersale-rework">仅返工</span>
+              <span class="dynamic-name">营业执照变更服务</span>
+            </div>
+            <div class="dynamic-meta">售后编号：AS20260910005 · 武汉制造</div>
+            <div class="dynamic-footer">
+              <span class="dynamic-time">更新于2天前</span>
+              <button class="dynamic-btn secondary">售后处理</button>
+            </div>
+          </div>
+          <div class="dynamic-item">
+            <div class="dynamic-item-header">
+              <span class="dynamic-status aftersale-refund-rework">退款+返工</span>
+              <span class="dynamic-name">专利申请代理服务</span>
+            </div>
+            <div class="dynamic-meta">售后编号：AS20260908006 · 南京医药</div>
+            <div class="dynamic-footer">
+              <span class="dynamic-time">更新于3天前</span>
+              <button class="dynamic-btn secondary">售后处理</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右侧：行动中心 + 供应商工作台卡片 -->
+  <div class="main-right">
+    <!-- 行动中心 -->
+    <div class="module">
+      <div class="module-header">
+        <div class="module-title"><span class="icon">📌</span>消息中心</div>
+        <div class="module-actions">
+          <span class="module-more">全部 ›</span>
+        </div>
+      </div>
+      <div class="action-grid">
+        <div class="action-item">
+          <div class="action-icon service">🔔</div>
+          <div class="action-info">
+            <div class="action-title">2条服务通知未读</div>
+            <div class="action-desc">新订单提醒、审核结果</div>
+          </div>
+          <button class="action-btn">去处理</button>
+        </div>
+        <div class="action-item">
+          <div class="action-icon trade">📦</div>
+          <div class="action-info">
+            <div class="action-title">3条交易消息待查看</div>
+            <div class="action-desc">订单状态变更、支付通知</div>
+          </div>
+          <button class="action-btn">去处理</button>
+        </div>
+        <div class="action-item">
+          <div class="action-icon aftersale">🔧</div>
+          <div class="action-info">
+            <div class="action-title">1条售后消息待处理</div>
+            <div class="action-desc">雇主发起售后，请及时响应</div>
+          </div>
+          <button class="action-btn">去处理</button>
+        </div>
+        <div class="action-item">
+          <div class="action-icon system">⚙️</div>
+          <div class="action-info">
+            <div class="action-title">1条系统通知未读</div>
+            <div class="action-desc">平台公告、规则更新</div>
+          </div>
+          <button class="action-btn">去处理</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 供应商工作台完整卡片 -->
+    <div class="vendor-workbench-card">
+      <div class="vw-bg-deco">📊</div>
+      <div class="vw-title">供应商工作台</div>
+      <div class="vw-subtitle">管理业务订单、服务交付与经营数据</div>
+      <div class="vw-features">
+        <div class="vw-feature">
+          <div class="vw-feature-icon">📋</div>
+          <div class="vw-feature-text">
+            <div class="vw-feature-name">订单管理</div>
+            <div class="vw-feature-desc">跟进订单进度，高效履约交付</div>
+          </div>
+        </div>
+        <div class="vw-feature">
+          <div class="vw-feature-icon">📈</div>
+          <div class="vw-feature-text">
+            <div class="vw-feature-name">经营数据</div>
+            <div class="vw-feature-desc">查看收益数据，掌握经营情况</div>
+          </div>
+        </div>
+        <div class="vw-feature">
+          <div class="vw-feature-icon">📑</div>
+          <div class="vw-feature-text">
+            <div class="vw-feature-name">任务接单</div>
+            <div class="vw-feature-desc">获取更多任务，扩展业务机会</div>
+          </div>
+        </div>
+      </div>
+      <div class="vw-note">供应商是服务商的子集，您可以随时切换至供应商工作台，管理业务与订单</div>
+      <button class="vw-btn">进入供应商工作台</button>
+    </div>
+  </div>
+  </div>
+</div>
+
+</body>
+</html>

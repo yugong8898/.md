@@ -18,8 +18,8 @@
 |------|------|---------|---------|
 | 阶段0 需求分析 | ✅已完成 | [阶段0-需求文档-REQ-132.md](./阶段0-需求文档-REQ-132.md) | 2026-10-20 |
 | 阶段1 代码分析 | ✅已完成 | [阶段1-代码分析-REQ-132.md](./阶段1-代码分析-REQ-132.md) | 2026-10-20 |
-| 阶段2 技术方案 | ✅已完成 | [阶段2-技术方案-REQ-132.md](./阶段2-技术方案-REQ-132.md) | 2026-10-20 |
-| 阶段3 编码执行 | ⏳进行中（第一批骨架 + mock + R-8 未认证页面 + 组件拆分完成） | - | - |
+| 阶段2 技术方案 | ✅已完成（v1.2） | [阶段2-技术方案-REQ-132.md](./阶段2-技术方案-REQ-132.md) | 2026-10-21 |
+| 阶段3 编码执行 | ⏳进行中（第一批完成，第二批待接口契约） | - | - |
 | 阶段4 代码审查 | ⏳待开始 | - | - |
 | 阶段5 测试基线与覆盖对齐 | ⏳待开始 | - | - |
 | 阶段6 测试执行与Bug修复循环 | ⏳待开始 | - | - |
@@ -27,55 +27,45 @@
 | 阶段7 需求复盘（第二轮） | ⏳待开始 | - | - |
 
 ## 当前阶段
-阶段3 编码执行（第一批骨架 + mock + R-8 未认证页面调整 + SupplierCtaCard 组件拆分已完成，第二批待接口契约）
+阶段3 编码执行（第一批完成，第二批待接口契约）
 
-> 第一批产出：formatDynamicModuleTime + DynamicModuleHeader + useDynamicModule + 三个模块容器组件 + index.vue 布局重排。
-> Mock 数据产出：三模块填充设计稿示例数据（订单动态 2 条 / 售后动态 2 条 / 商机推荐 4 条），指标卡第 3 张新增待缴保证金/待提交交付物子项计数。
-> 布局修正：从 top-section 方案改为左右两列布局（left-column: 指标卡+商机+订单/售后动态 | right-column: 消息中心+供应商工作台），宽度统一 368px。
-> 发布服务迁移：从 ActionCenter 移至 WelcomeSection 右上角卡片（R-026）。
-> R-8 未认证页面调整：SupplierCtaCard 扩展为三态（未认证/已认证未入驻/已入驻）；左列三模块 v-if="certified" 条件渲染，v-else 显示 CertificationPlaceholder；WelcomeSection 新增「了解服务商接单规则」按钮 + CertificationBanner 共享组件预览大图；图片 URL 收敛至 constants.ts 唯一定义点。
-> 组件拆分收尾：三个动态模块改为文件夹包裹 + 状态组件独立拆分（XxxSkeleton/XxxError/XxxEmpty）；SupplierCtaCard 拆为文件夹（index.vue 编排层 + useSupplierCtaCard.ts composable + styles.less 共享样式 + 三个子组件各自内聚样式与模板）；样式全部按 SCSS 嵌套规范重写。
-> Q1–Q5/Q7–Q10 仍为「待确认」状态，第二批需后端契约后推进。
+**第一批交付结果**：
+> 布局：左右两列（left-column: 指标卡+商机+订单/售后动态 | right-column: 消息中心+供应商工作台），宽度统一 368px；WelcomeSection 全宽置顶。
+> 三动态模块：`useDynamicModule` 泛型中间层（fetchFn 注入 + 5 分钟轮询 + 四态渲染）+ 三个模块容器组件（文件夹结构，Skeleton/Error/Empty 独立状态组件）+ `DynamicModuleHeader` 通用标题栏 + `formatDynamicModuleTime`（stub 占位，用户手动处理中）。
+> Mock 数据：独立 `mocks/*.ts` + `types.ts` 卡片视图模型（订单动态 5 条 / 售后动态 5 条 / 商机推荐 6 条，契约确认后整体删除）；`total` 为服务端返回总数语义；指标卡第 3 张含待缴保证金/待提交交付物子项计数（R-022/R-023）。
+> R-8 未认证页面：SupplierCtaCard 三态（未认证/已认证未入驻/已入驻）；左列三模块 `v-if="certified"` 条件渲染 + CertificationPlaceholder 占位；WelcomeSection 含「了解服务商接单规则」按钮 + CertificationBanner 共享组件（URL 组件内唯一定义，无独立 constants.ts）。
+> 组件数据自治：fetchStatistics 由 MetricCards 拉取、unreadStore.refresh 由 ActionCenter 拉取（各自挂载自拉 + watch 主体切换重拉），index.vue 为纯编排层（无数据拉取职责）。
+> R-026：发布服务入口位于 WelcomeSection 右上角卡片。
+> 类型扩展：`page_workbench.ts` 的 SupplierStatusGuidanceStatus 含 not_certified / go_certify 枚举值。
+> 商机 hover 埋点保持手写 `trackClk`（专用封装已回滚，口径待 Q8 确认）。
+> Q1–Q5/Q7–Q17 共 16 项待确认，第二批需后端契约后推进。
 
 ## 验证闭环记录
 | 阶段 | 锚点 | 验证结果 | 偏差数 | 修正次数 | 证据 |
 |---|---|---|---|---|---|
-| 阶段0 需求分析 | PRD 全文（更新版，含 6 处实质修改）+ 原型图 + 用户三次补充 | 已修正后通过 | 3 | 1 | ① 原型图推翻正文「模块在行动中心下方」表述，改以 image 3.png 为准（§2）；② 删除线第 3 条（售后 <4h 标红）确认不实现（R-015 保留追溯）；③ 用户澄清三模块为已有列表数据快捷入口，推翻「复用现有列表接口」假设，改为独立/融合接口待定（§1） |
+| 阶段0 需求分析 | PRD 全文（更新版，含 6 处实质修改）+ 原型图 + 用户三次补充 | 已修正后通过 | 3 | 1 | ① 布局以 image 3.png 原型图为准（§2）；② 售后 <4h 标红不实现（R-015 保留追溯）；③ 三模块为已有列表数据快捷入口，独立/融合接口待定（§1） |
 
-## 横向搜索记录（阶段 0 已执行）
-```
-✅ 工作台首页 provider/dashboard/index.vue        ✅ 订单列表 provider/order/list.vue（Tab 接口驱动）
-✅ 订单详情 provider/order/detail.vue             ✅ 售后列表/详情 provider/after-sale/*
-✅ 我的商机列表/详情 provider/my-opportunity/*    ✅ 接口封装 api/provider/{order,afterSale,dashboard,creditScore}
-✅ 状态管理 stores/provider/dashboard.ts          ✅ 认证拦截 composables/useCertCheck.ts
-✅ 抢单链路 composables/useGrabOrder.ts           ✅ 供应商/雇主禁用 useEmployerFeatureAvailability.ts
-✅ 路由 router/routes/provider/*                  ⚠️ App 端：正式仓库不在本 workspace（Q6）
-```
-
-## 已处理文件（阶段3用）
-| 文件 | 操作 | 批次 |
+## 已处理文件（阶段3）
+| 文件 | 现状 | 批次 |
 |------|------|------|
-| `src/utils/date.ts` | 新增 formatDynamicModuleTime | 第一批 |
-| `dashboard/components/DynamicModuleHeader.vue` | 新增 | 第一批 |
-| `dashboard/composables/useDynamicModule.ts` | 新增 | 第一批 |
-| `dashboard/components/OrderDynamicModule.vue` | 新增 + mock 数据 | 第一批 + mock |
-| `dashboard/components/AfterSaleDynamicModule.vue` | 新增 + mock 数据 | 第一批 + mock |
-| `dashboard/components/OpportunityRecommendModule.vue` | 新增 + mock 数据 | 第一批 + mock |
-| `dashboard/components/WelcomeSection.vue` | 新增（从 index.vue 拆分） | 前置 |
-| `dashboard/components/MetricCards.vue` | 新增（从 index.vue 拆分）+ R-022/R-023 子项计数 | 前置 + mock |
-| `dashboard/components/ActionCenter.vue` | 新增（从 index.vue 拆分）- 移除 publish_service | 前置 + 调整 |
-| `dashboard/components/SupplierCtaCard.vue` | ~~新增（从 index.vue 拆分）- 宽度自适应~~ → 已拆为文件夹 | 前置 + 调整 → 拆分 |
-| `dashboard/components/SupplierCtaCard/index.vue` | 编排层（三态路由 + 外层容器） | 拆分 |
-| `dashboard/components/SupplierCtaCard/useSupplierCtaCard.ts` | composable（状态 + 接口 + 埋点 + 生命周期） | 拆分 |
-| `dashboard/components/SupplierCtaCard/styles.less` | 共享样式变量与公共 BEM 类 | 拆分 |
-| `dashboard/components/SupplierCtaCard/UncertifiedCard.vue` | 未认证引导卡（自有样式） | 拆分 |
-| `dashboard/components/SupplierCtaCard/SupplierRegisterCard.vue` | 已认证未入驻申请卡（自有样式） | 拆分 |
-| `dashboard/components/SupplierCtaCard/SupplierWorkbenchCard.vue` | 已入驻工作台切换卡（自有样式） | 拆分 |
-| `dashboard/components/CertificationPlaceholder.vue` | 新增（R-8 未认证占位图） | R-8 |
-| `dashboard/components/CertificationBanner.vue` | 新增（R-8 认证横幅共享组件） | R-8 |
-| `dashboard/constants.ts` | 新增（CERTIFICATION_BANNER_URL 唯一定义） | R-8 |
-| `dashboard/components/WelcomeSection.vue` | 新增 + 发布服务卡片（R-026） | 前置 + 调整 |
-| `dashboard/index.vue` | 修改（布局重排 + 引入新组件 + 左右两列布局） | 第一批 + 布局修正 |
+| `src/utils/date.ts` | formatDynamicModuleTime（stub 占位，逻辑暂注释，用户手动处理中） | 第一批 |
+| `dashboard/components/DynamicModuleHeader.vue` | 通用动态模块标题栏 | 第一批 |
+| `dashboard/composables/useDynamicModule.ts` | 泛型中间层（fetchFn + 轮询 + 四态）；`total` 注释为服务端总数语义 | 第一批 |
+| `dashboard/components/WelcomeSection.vue` | 欢迎区 + 发布服务卡片（R-026）+ 接单规则按钮（R-8） | 前置 |
+| `dashboard/components/MetricCards.vue` | 指标卡 + R-022/R-023 子项计数；数据自治（挂载自拉 fetchStatistics + watch 主体重拉） | 前置 + 迁移 |
+| `dashboard/components/ActionCenter.vue` | 消息中心；刷新图标内部消化（无 emit）；数据自治（自拉 unreadStore + watch 主体重拉） | 前置 + 迁移 |
+| `dashboard/components/SupplierCtaCard/` | 文件夹结构：index.vue 编排层（三态路由）+ useSupplierCtaCard.ts composable + styles.less 共享样式 + UncertifiedCard / SupplierRegisterCard / SupplierWorkbenchCard 三子组件 | 拆分 |
+| `dashboard/components/CertificationPlaceholder.vue` | R-8 未认证占位图容器 | R-8 |
+| `dashboard/components/CertificationBanner.vue` | R-8 认证横幅共享组件（URL 唯一定义点） | R-8 |
+| `dashboard/index.vue` | 纯编排层：左右两列布局 + certified 条件渲染 + 新手引导链路；无数据拉取职责（refreshDashboard 已拆分至组件） | 第一批 + 迁移 |
+| `dashboard/types.ts` | `OrderDynamicItem` / `AfterSaleDynamicItem` 卡片视图模型（47 行） | mock 抽离 |
+| `dashboard/mocks/orderDynamic.ts` | 订单动态 mock 5 条 + `mockOrderDynamicTotal`（联调后随目录整体删除） | mock 抽离 |
+| `dashboard/mocks/afterSaleDynamic.ts` | 售后动态 mock 5 条 + `mockAfterSaleDynamicTotal` | mock 抽离 |
+| `dashboard/mocks/opportunityRecommend.ts` | 商机 mock 6 条 + `mockOpportunityRecommendTotal` | mock 抽离 |
+| `dashboard/components/OrderDynamicModule/` | 文件夹结构：index.vue 编排层（四态路由 + 订单卡片列表）+ Skeleton / Error / Empty | 第一批 + mock |
+| `dashboard/components/AfterSaleDynamicModule/` | 文件夹结构：index.vue 编排层（四态路由 + 售后工单卡片）+ Skeleton / Error / Empty | 第一批 + mock |
+| `dashboard/components/OpportunityRecommendModule/` | 文件夹结构：index.vue 编排层（四态路由 + 横向商机卡片）+ Skeleton / Error / Empty；埋点保持手写 `trackClk`（待 Q8） | 第一批 + mock |
+| `src/tracking/page_workbench.ts` | SupplierStatusGuidanceStatus 含 not_certified / go_certify 枚举 | 类型扩展 |
 
 ## 阶段 3 允许改动文件
 （待阶段 2 技术方案确定后填入）
@@ -99,6 +89,13 @@
 | Q8 | 商机标签「精准匹配」vs「为你推荐」 | 待确认 | 产品 | 阶段3 | PRD 内部二选一 |
 | Q9 | 未认证兜底图高保真稿 | 待确认 | 产品 / UI | 阶段3 | 有则按稿，无则按原型 |
 | Q10 | 订单详情页锚点定位方案（detail.vue 现状无 anchor/scrollTo/hash 能力） | 待确认 | 前端 / 产品 | 阶段2/3 | 可选 A.新增 hash 锚点 B.降级跳详情页顶部 |
+| Q11 | 订单接口无「订单编号」字段（`ProviderOrderInfo` 仅 `id`） | 待确认 | 后端 | 阶段3 | 阶段1 §8.5 G1；影响订单动态与售后关联订单展示 |
+| Q12 | 订单接口无「状态更新时间」（列表项仅 `createTime`） | 待确认 | 后端 | 阶段3 | 阶段1 §8.5 G2；**阻塞 R-004 排序规则**，无字段则需降级按 createTime |
+| Q13 | 订单列表项无「阶段状态」（`stageStatus` 仅详情页 `OrderStageView`） | 待确认 | 后端 | 阶段3 | 阶段1 §8.5 G3；**阻塞「待提交交付物」分类判定** |
+| Q14 | 商机接口无「匹配度标识」字段 | 待确认 | 后端 | 阶段3 | 阶段1 §8.5 G4；标签文案另见 Q8 |
+| Q15 | `real_create_time` 在 `HallDemandItem` 中类型缺失 | 待确认 | 后端 | 阶段3 | 阶段1 §8.5 G5 |
+| Q16 | 「订单金额」三字段口径未定（totalAmount / adjustedTotalAmount / totalPayAmount） | 待确认 | 产品 / 后端 | 阶段3 | 阶段1 §8.5 G6 |
+| Q17 | 死代码链 `handleDemandSidebarClick` 是否确认废弃 | 待确认 | 产品 | 阶段3 | 对应「海量精准需求」入口，详见备注 |
 
 ## 需求变更日志
 | 版本 | 变更时间 | 变更内容 | 影响的需求 | 回退阶段 | 处理结果 |
@@ -108,10 +105,20 @@
 | PRD 内部更新 | 2026-10-20 | PRD 六处更新：① 售后上限明确 6 条 ② 新增相对时间三段规则 ③ 删除售后 <4h 标红 ④ 新增信用分禁用接单 ⑤ 轮询范围限定三模块 ⑥ 1.5s 降级标注「以研发为准」 | R-012/R-015/R-027/R-028/R-035 | 不回退（尚未编码） | 已并入阶段 0 文档 |
 | 用户澄清 1 | 2026-10-20 | 三模块为已有列表数据的快捷入口；商机交互与现有一致 | §1 需求本质 | 不回退 | 写入 §1，带动 Q1/Q2/Q3 重估 |
 | 用户澄清 2 | 2026-10-20 | 接口形态：三独立 or 一融合，待定 | §7 接口说明 | 不回退 | 列为 Q1，采用接口无关中间层设计规避阻塞 |
+| 用户澄清 3 | 2026-10-21 | 数据格式：订单动态参考 `provider/order/list`，售后参考 `provider/after-sale`，商机沿用「我的商机」现有数据，不再另起接口结构 | Q2/Q3 | 不回退 | 落阶段1 §8 字段对照表；新增 Q11–Q16 |
+| 用户澄清 4 | 2026-10-21 | 数据契约：`total` 由服务端返回（待处理总数），`list` 长度由服务端截断（≤6），前端不截断不计数 | 三模块 fetchFn | 不回退 | mock 拆出独立 total（12 / 8 / 9），`useDynamicModule` 注释更正 |
 
-> ⚠️ PRD 头部版本表仍为 V1.0（2026-09-18），本次更新未登记版本号 —— 建议让产品补记，便于后续追溯。
+> ⚠️ PRD 头部版本表仍为 V1.0（2026-09-18），需求变更未登记版本号——建议让产品补记，便于后续追溯。
 
 ## 备注
 - 企服线项目（Vue 3 + TS + Ant Design Vue），**不套用** WLYD 物流线 uni-app / Vue2 / Element UI 规范；编码规范以 `ai-platform/es-web/README.md` 与 `.cursor/` 为事实源
 - 阶段 3 门禁：`bash .md/scripts/quick-verify.sh` + `npx tsc --noEmit`（企服线追加类型检查）
 - 阶段 0 采用「先骨架、后契约」两段式开发顺序（见需求文档 §11），避免被后端契约阻塞
+- 横向搜索（阶段 0 已执行，11 项）：工作台首页 / 订单列表 / 订单详情 / 售后列表·详情 / 我的商机列表·详情 / api 封装 / stores / 认证拦截 / 抢单链路 / 雇主禁用 / 路由；App 端正式仓库不在本 workspace
+- 埋点纪律：埋点口径改动必须先经产品/数据侧确认（等价 ≠ 授权）；商机埋点专用封装因未经确认已回滚，待 Q8 口径确认后再统一
+- 死代码链待定（见 Q17）：`handleDemandSidebarClick`(index.vue) → `PROVIDER_TASK_LIST_PATH` → `newTaskCount`；对应「海量精准需求」入口，在 `.bak` 中即为定义未调用
+- 同源孤儿（待清理）：`index.vue` 的 `WORKBENCH_PGID` / `WORKBENCH_PG_NAME` / `getProviderWorkbenchUserContext` 与 `tracking/page_workbench.ts:6,7,26` 重复定义；`WORKBENCH_AUTH_POPUP_ENTRY_SOURCE` / `PROVIDER_SERVICE_PUBLISH_PATH` 为孤儿常量（MetricCards.vue / WelcomeSection.vue 各有同名常量在使用）
+- 存量缺陷（按边界未动）：`my-opportunity/list.vue` 只 import 未调用 `trackBusinessGrabOrderClick` / `trackBusinessViewDetailClick`，按钮埋点靠手写 `trackClk`
+- 阶段文档阅读注意：阶段2 §3.1 的 top-section 布局已被设计稿推翻，实际落地为左右两列——规划改动一律以「实际落地」列与当前代码为准；阶段1 基线快照存在过期项（已标注）
+- 门禁状态（2026-10-21）：`vue-tsc --noEmit` exit=0；ESLint dashboard 全量 0 error / 24 warning（其中 15 条为 `ProviderGuideOverlay.vue` 存量样式问题，未处理；三改动文件 2 条存量：ActionCenter 双空行、@enterWorkbench 连字符）
+- 行为差异备案（用户已确认）：① 点消息中心刷新图标仅刷新未读数（指标卡数据由 MetricCards 自治）；② 新手引导时序不依赖数据请求；③ 两接口请求各自消化异常，不再聚合中断页面初始化

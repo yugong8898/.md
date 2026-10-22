@@ -31,7 +31,7 @@
 
 **第一批交付结果**：
 > 布局：左右两列（left-column: 指标卡+商机+订单/售后动态 | right-column: 消息中心+供应商工作台），宽度统一 368px；WelcomeSection 全宽置顶。
-> 三动态模块：`useDynamicModule` 泛型中间层（fetchFn 注入 + 5 分钟轮询 + 四态渲染）+ 三个模块容器组件（文件夹结构，Skeleton/Error/Empty 独立状态组件）+ `DynamicModuleHeader` 通用标题栏 + `formatDynamicModuleTime`（stub 占位，用户手动处理中）。
+> 三动态模块：`useDynamicModule` 泛型中间层（fetchFn 注入 + 5 分钟轮询 + 四态渲染）+ 三个模块容器组件（文件夹结构，Skeleton/Error/Empty 独立状态组件）+ `DynamicModuleHeader` 通用标题栏 + `formatDynamicModuleTime`（透传 stub，R-027 三段规则已注释；需求文档变更中，待本地拿到最新版后再定）。
 > Mock 数据：独立 `mocks/*.ts` + `types.ts` 卡片视图模型（订单动态 5 条 / 售后动态 5 条 / 商机推荐 6 条，契约确认后整体删除）；`total` 为服务端返回总数语义；指标卡第 3 张含待缴保证金/待提交交付物子项计数（R-022/R-023）。
 > R-8 未认证页面：SupplierCtaCard 三态（未认证/已认证未入驻/已入驻）；左列三模块 `v-if="certified"` 条件渲染 + CertificationPlaceholder 占位；WelcomeSection 含「了解服务商接单规则」按钮 + CertificationBanner 共享组件（URL 组件内唯一定义，无独立 constants.ts）。
 > 组件数据自治：fetchStatistics 由 MetricCards 拉取、unreadStore.refresh 由 ActionCenter 拉取（各自挂载自拉 + watch 主体切换重拉），index.vue 为纯编排层（无数据拉取职责）。
@@ -48,7 +48,7 @@
 ## 已处理文件（阶段3）
 | 文件 | 现状 | 批次 |
 |------|------|------|
-| `src/utils/date.ts` | formatDynamicModuleTime（stub 占位，逻辑暂注释，用户手动处理中） | 第一批 |
+| `src/utils/date.ts` | formatDynamicModuleTime（透传 stub，R-027 注释保留；需求文档变更中待确认） | 第一批 + 清理 |
 | `dashboard/components/DynamicModuleHeader.vue` | 通用动态模块标题栏 | 第一批 |
 | `dashboard/composables/useDynamicModule.ts` | 泛型中间层（fetchFn + 轮询 + 四态）；`total` 注释为服务端总数语义 | 第一批 |
 | `dashboard/components/WelcomeSection.vue` | 欢迎区 + 发布服务卡片（R-026）+ 接单规则按钮（R-8） | 前置 |
@@ -65,6 +65,7 @@
 | `dashboard/components/OrderDynamicModule/` | 文件夹结构：index.vue 编排层（四态路由 + 订单卡片列表）+ Skeleton / Error / Empty | 第一批 + mock |
 | `dashboard/components/AfterSaleDynamicModule/` | 文件夹结构：index.vue 编排层（四态路由 + 售后工单卡片）+ Skeleton / Error / Empty | 第一批 + mock |
 | `dashboard/components/OpportunityRecommendModule/` | 文件夹结构：index.vue 编排层（四态路由 + 横向商机卡片）+ Skeleton / Error / Empty；埋点保持手写 `trackClk`（待 Q8） | 第一批 + mock |
+| `src/views/provider/order/detail.vue` | R-007 锚点滚动：`scrollToHash` + `id="bond"` / `id="deliverable"` + watch route.hash | Q10 实现 |
 | `src/tracking/page_workbench.ts` | SupplierStatusGuidanceStatus 含 not_certified / go_certify 枚举 | 类型扩展 |
 
 ## 阶段 3 允许改动文件
@@ -85,17 +86,17 @@
 | Q4 | 「待提交交付物」tab id | 待确认 | 后端 / 天保 | 阶段2/3 | 影响 R-023 跳转 |
 | Q5 | 指标卡两个计数来源 | 待确认 | 后端 | 阶段2/3 | 建议随 API-1 返回 |
 | Q6 | ~~App 端本期是否交付~~ | ✅已关闭 | - | - | App 端由其他开发人员负责，本期仅交付 Web 端 |
-| Q7 | 信用分禁用接单拦截方式 | 待确认 | 后端 / 信用分需求方 | 阶段2/3 | 前端侧无现成实现 |
-| Q8 | 商机标签「精准匹配」vs「为你推荐」 | 待确认 | 产品 | 阶段3 | PRD 内部二选一 |
-| Q9 | 未认证兜底图高保真稿 | 待确认 | 产品 / UI | 阶段3 | 有则按稿，无则按原型 |
-| Q10 | 订单详情页锚点定位方案（detail.vue 现状无 anchor/scrollTo/hash 能力） | 待确认 | 前端 / 产品 | 阶段2/3 | 可选 A.新增 hash 锚点 B.降级跳详情页顶部 |
+| Q7 | 信用分禁用接单拦截方式 | 待确认 | 后端 / 信用分需求方 | 阶段2/3 | 前端侧无现成实现；信用分 API 已集成（CreditLevelBadge + creditScoreProfile），但无接单拦截逻辑 |
+| Q8 | 商机标签「精准匹配」vs「为你推荐」 | 待确认 | 产品 | 阶段3 | OpportunityListItem.vue 硬编码「精准匹配」，待 Q8 确认后统一替换 |
+| Q9 | ~~未认证兜底图高保真稿~~ | ✅已关闭 | - | - | 无高保真稿，按原型降级实现：CertificationPlaceholder.vue（蓝底渐变 + CertificationBanner），待设计稿确认后可调整 |
+| Q10 | ~~订单详情页锚点定位方案~~ | ✅已实现 | 前端 | 阶段3 | detail.vue 新增 scrollToHash + BondCard/SingleDeliverableSection 外层 div 加 id 锚点；OrderListItem 跳转已带 hash |
 | Q11 | 订单接口无「订单编号」字段（`ProviderOrderInfo` 仅 `id`） | 待确认 | 后端 | 阶段3 | 阶段1 §8.5 G1；影响订单动态与售后关联订单展示 |
 | Q12 | 订单接口无「状态更新时间」（列表项仅 `createTime`） | 待确认 | 后端 | 阶段3 | 阶段1 §8.5 G2；**阻塞 R-004 排序规则**，无字段则需降级按 createTime |
 | Q13 | 订单列表项无「阶段状态」（`stageStatus` 仅详情页 `OrderStageView`） | 待确认 | 后端 | 阶段3 | 阶段1 §8.5 G3；**阻塞「待提交交付物」分类判定** |
 | Q14 | 商机接口无「匹配度标识」字段 | 待确认 | 后端 | 阶段3 | 阶段1 §8.5 G4；标签文案另见 Q8 |
-| Q15 | `real_create_time` 在 `HallDemandItem` 中类型缺失 | 待确认 | 后端 | 阶段3 | 阶段1 §8.5 G5 |
-| Q16 | 「订单金额」三字段口径未定（totalAmount / adjustedTotalAmount / totalPayAmount） | 待确认 | 产品 / 后端 | 阶段3 | 阶段1 §8.5 G6 |
-| Q17 | 死代码链 `handleDemandSidebarClick` 是否确认废弃 | 待确认 | 产品 | 阶段3 | 对应「海量精准需求」入口，详见备注 |
+| Q15 | `real_create_time` 在 `HallDemandItem` 中类型缺失 | 待确认 | 后端 | 阶段3 | 阶段1 §8.5 G5；`employer_id` 类型不一致（定义 number，实际返回 string） |
+| Q16 | 「订单金额」三字段口径未定（totalAmount / adjustedTotalAmount / totalPayAmount） | 待确认 | 产品 / 后端 | 阶段3 | 阶段1 §8.5 G6；三字段均在 ProviderOrderInfo 中定义，待产品确认卡片展示哪个 |
+| Q17 | 死代码链 `handleDemandSidebarClick` 是否确认废弃 | 待确认 | 产品 | 阶段3 | 代码核实：handleDemandSidebarClick 定义但模板零调用，PROVIDER_TASK_LIST_PATH / newTaskCount 同属死链 |
 
 ## 需求变更日志
 | 版本 | 变更时间 | 变更内容 | 影响的需求 | 回退阶段 | 处理结果 |
@@ -117,8 +118,8 @@
 - 横向搜索（阶段 0 已执行，11 项）：工作台首页 / 订单列表 / 订单详情 / 售后列表·详情 / 我的商机列表·详情 / api 封装 / stores / 认证拦截 / 抢单链路 / 雇主禁用 / 路由；App 端正式仓库不在本 workspace
 - 埋点纪律：埋点口径改动必须先经产品/数据侧确认（等价 ≠ 授权）；商机埋点专用封装因未经确认已回滚，待 Q8 口径确认后再统一
 - 死代码链待定（见 Q17）：`handleDemandSidebarClick`(index.vue) → `PROVIDER_TASK_LIST_PATH` → `newTaskCount`；对应「海量精准需求」入口，在 `.bak` 中即为定义未调用
-- 同源孤儿（待清理）：`index.vue` 的 `WORKBENCH_PGID` / `WORKBENCH_PG_NAME` / `getProviderWorkbenchUserContext` 与 `tracking/page_workbench.ts:6,7,26` 重复定义；`WORKBENCH_AUTH_POPUP_ENTRY_SOURCE` / `PROVIDER_SERVICE_PUBLISH_PATH` 为孤儿常量（MetricCards.vue / WelcomeSection.vue 各有同名常量在使用）
+- 同源孤儿（✅ 2026-10-22 已清理）：`index.vue` 的 `WORKBENCH_PGID` / `WORKBENCH_PG_NAME` / `getProviderWorkbenchUserContext` / `WORKBENCH_AUTH_POPUP_ENTRY_SOURCE` / `PROVIDER_SERVICE_PUBLISH_PATH` 已删除（tracking/page_workbench.ts 已有同名定义；子组件各自持有 WORKBENCH_AUTH_POPUP_ENTRY_SOURCE 副本）
 - 存量缺陷（按边界未动）：`my-opportunity/list.vue` 只 import 未调用 `trackBusinessGrabOrderClick` / `trackBusinessViewDetailClick`，按钮埋点靠手写 `trackClk`
 - 阶段文档阅读注意：阶段2 §3.1 的 top-section 布局已被设计稿推翻，实际落地为左右两列——规划改动一律以「实际落地」列与当前代码为准；阶段1 基线快照存在过期项（已标注）
-- 门禁状态（2026-10-21）：`vue-tsc --noEmit` exit=0；ESLint dashboard 全量 0 error / 24 warning（其中 15 条为 `ProviderGuideOverlay.vue` 存量样式问题，未处理；三改动文件 2 条存量：ActionCenter 双空行、@enterWorkbench 连字符）
+- 门禁状态（2026-10-22）：`vue-tsc --noEmit` exit=0；`formatDynamicModuleTime` 透传 stub（R-027 注释保留，需求文档变更中待本地拿到最新版后再定）；空 `@media (max-width: 768px)` 已删除；Q10 锚点滚动已实现（detail.vue scrollToHash + id 锚点）
 - 行为差异备案（用户已确认）：① 点消息中心刷新图标仅刷新未读数（指标卡数据由 MetricCards 自治）；② 新手引导时序不依赖数据请求；③ 两接口请求各自消化异常，不再聚合中断页面初始化

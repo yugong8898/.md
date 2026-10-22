@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+  <defs>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .subtitle { font-size: 12px; fill: #666; }
+      .state-label { font-size: 14px; font-weight: 700; }
+      .state-sub { font-size: 11px; fill: #636e72; }
+      .cond { font-size: 11px; fill: #5653F8; font-weight: 600; }
+      .action { font-size: 10px; fill: #2d3436; }
+      .note { font-size: 10px; fill: #e17055; }
+    </style>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5653F8"/>
+    </marker>
+    <marker id="arr-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e17055"/>
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#00b894"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="560" rx="12" fill="#f8f9fc"/>
+
+  <!-- Title -->
+  <text x="480" y="36" text-anchor="middle" class="title">SupplierCtaCard — 三态状态机</text>
+  <text x="480" y="56" text-anchor="middle" class="subtitle">useSupplierCtaCard(certified) · 2026-10-22</text>
+
+  <!-- ===== Data Source Section ===== -->
+  <rect x="40" y="80" width="880" height="80" rx="10" fill="#dfe6e9" opacity="0.3"/>
+  <text x="60" y="100" font-size="13" font-weight="700" fill="#2d3436">数据源 (两个独立维度)</text>
+
+  <rect x="60" y="110" width="260" height="38" rx="8" fill="#6c5ce7" opacity="0.15" stroke="#6c5ce7" stroke-width="1.5"/>
+  <text x="190" y="134" text-anchor="middle" font-size="12" font-weight="600" fill="#6c5ce7">certified (prop ← dashboardStore)</text>
+
+  <rect x="360" y="110" width="280" height="38" rx="8" fill="#00b894" opacity="0.15" stroke="#00b894" stroke-width="1.5"/>
+  <text x="500" y="134" text-anchor="middle" font-size="12" font-weight="600" fill="#00b894">supplierStatus (接口 onboarding/status)</text>
+
+  <rect x="680" y="110" width="220" height="38" rx="8" fill="#e17055" opacity="0.15" stroke="#e17055" stroke-width="1.5"/>
+  <text x="790" y="134" text-anchor="middle" font-size="12" font-weight="600" fill="#e17055">onboardingStatus (乐观值校准)</text>
+
+  <!-- ===== Three States ===== -->
+
+  <!-- State 1: not_certified -->
+  <rect x="60" y="200" width="260" height="200" rx="12" fill="#e17055" opacity="0.08" stroke="#e17055" stroke-width="2"/>
+  <text x="190" y="228" text-anchor="middle" class="state-label" fill="#e17055">① not_certified</text>
+  <text x="190" y="248" text-anchor="middle" class="state-sub">未认证用户</text>
+
+  <line x1="80" y1="260" x2="300" y2="260" stroke="#e17055" stroke-width="0.5" opacity="0.3"/>
+
+  <text x="80" y="280" class="cond">条件: !certified</text>
+  <text x="80" y="298" class="action">UI: UncertifiedCard.vue</text>
+  <text x="80" y="316" class="action">  ├ 3 条权益说明</text>
+  <text x="80" y="334" class="action">  └ "立即认证，开始接单" 按钮</text>
+  <text x="80" y="356" class="action">背景: supplierRegisterBg</text>
+  <text x="80" y="374" class="action">class: cta-card--uncertified</text>
+  <text x="80" y="392" class="action">埋点: go_certify</text>
+
+  <!-- State 2: not_supplier -->
+  <rect x="350" y="200" width="260" height="200" rx="12" fill="#fdcb6e" opacity="0.12" stroke="#fdcb6e" stroke-width="2"/>
+  <text x="480" y="228" text-anchor="middle" class="state-label" fill="#d68910">② not_supplier</text>
+  <text x="480" y="248" text-anchor="middle" class="state-sub">已认证 · 未入驻供应商</text>
+
+  <line x1="370" y1="260" x2="590" y2="260" stroke="#fdcb6e" stroke-width="0.5" opacity="0.3"/>
+
+  <text x="370" y="280" class="cond">条件: certified &amp;&amp; !showSupplierWorkbenchCard</text>
+  <text x="370" y="298" class="action">UI: SupplierRegisterCard.vue</text>
+  <text x="370" y="316" class="action">  ├ 平台供应商介绍</text>
+  <text x="370" y="334" class="action">  └ "立即申请入驻" 按钮 (loading)</text>
+  <text x="370" y="356" class="action">背景: supplierRegisterBg</text>
+  <text x="370" y="374" class="action">class: cta-card--register</text>
+  <text x="370" y="392" class="action">埋点: supplier_apply</text>
+
+  <!-- State 3: supplier -->
+  <rect x="640" y="200" width="260" height="200" rx="12" fill="#00b894" opacity="0.08" stroke="#00b894" stroke-width="2"/>
+  <text x="770" y="228" text-anchor="middle" class="state-label" fill="#00b894">③ supplier</text>
+  <text x="770" y="248" text-anchor="middle" class="state-sub">已认证 · 已入驻供应商</text>
+
+  <line x1="660" y1="260" x2="880" y2="260" stroke="#00b894" stroke-width="0.5" opacity="0.3"/>
+
+  <text x="660" y="280" class="cond">条件: certified &amp;&amp; showSupplierWorkbenchCard</text>
+  <text x="660" y="298" class="action">UI: SupplierWorkbenchCard.vue</text>
+  <text x="660" y="316" class="action">  ├ 供应商工作台介绍</text>
+  <text x="660" y="334" class="action">  └ "进入供应商工作台" 按钮</text>
+  <text x="660" y="356" class="action">背景: supplierDashboardBg</text>
+  <text x="660" y="374" class="action">class: cta-card--workbench</text>
+  <text x="660" y="392" class="action">埋点: enter_workbench</text>
+
+  <!-- ===== Transition Arrows ===== -->
+  <!-- not_certified → not_supplier (认证完成) -->
+  <path d="M 320 300 L 348 300" fill="none" stroke="#e17055" stroke-width="1.5" marker-end="url(#arr-red)"/>
+  <text x="334" y="290" text-anchor="middle" font-size="9" fill="#e17055">认证完成</text>
+
+  <!-- not_supplier → supplier (入驻审批通过) -->
+  <path d="M 610 300 L 638 300" fill="none" stroke="#00b894" stroke-width="1.5" marker-end="url(#arr-green)"/>
+  <text x="624" y="290" text-anchor="middle" font-size="9" fill="#00b894">入驻通过</text>
+
+  <!-- ===== Computed Logic ===== -->
+  <rect x="60" y="430" width="840" height="110" rx="10" fill="#5653F8" opacity="0.06" stroke="#5653F8" stroke-width="1"/>
+  <text x="80" y="452" font-size="13" font-weight="700" fill="#5653F8">computed 判定链 (useSupplierCtaCard.ts)</text>
+
+  <text x="80" y="474" font-size="11" fill="#2d3436" font-family="monospace">showSupplierWorkbenchCard = supplierStatus === ONBOARDED || onboardingStatus === APPROVED</text>
+  <text x="80" y="494" font-size="11" fill="#2d3436" font-family="monospace">supplierGuidanceStatus = !certified ? 'not_certified'</text>
+  <text x="380" y="494" font-size="11" fill="#2d3436" font-family="monospace">: showSupplierWorkbenchCard ? 'supplier' : 'not_supplier'</text>
+
+  <text x="80" y="518" class="note">⚠ loading 守卫: certified &amp;&amp; supplierStatusLoading &amp;&amp; supplierStatus == null (未认证用户跳过 loading，避免恒真阻塞)</text>
+  <text x="80" y="534" class="note">⚠ 乐观值: supplierStatus 先用 userStore.currentProvider.supplierStatus 渲染，再调接口校准</text>
+
+  <!-- ===== Emit Flow ===== -->
+  <text x="480" y="418" text-anchor="middle" font-size="12" font-weight="600" fill="#e84393">emit 上抛 → index.vue → useBecomeSupplier 方法</text>
+</svg>

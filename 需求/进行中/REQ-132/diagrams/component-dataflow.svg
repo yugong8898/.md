@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 720" font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+  <defs>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .subtitle { font-size: 12px; fill: #666; }
+      .node { font-size: 12px; font-weight: 600; fill: #2d3436; }
+      .node-sub { font-size: 10px; fill: #636e72; }
+      .arrow-label { font-size: 10px; fill: #5653F8; font-weight: 600; }
+      .section-label { font-size: 14px; font-weight: 700; fill: #2d3436; }
+      .legend-text { font-size: 10px; fill: #636e72; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5653F8"/>
+    </marker>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b2bec3"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1060" height="720" rx="12" fill="#f8f9fc"/>
+
+  <!-- Title -->
+  <text x="530" y="36" text-anchor="middle" class="title">es-web 服务商工作台 — 组件层级与数据流</text>
+  <text x="530" y="56" text-anchor="middle" class="subtitle">REQ-132 · 2026-10-22 · 单一数据源: userStore.isProviderCertified</text>
+
+  <!-- ===== Store Layer ===== -->
+  <rect x="40" y="80" width="980" height="90" rx="10" fill="#dfe6e9" opacity="0.4"/>
+  <text x="60" y="100" class="section-label">Store 层 (Pinia)</text>
+
+  <rect x="60" y="110" width="200" height="48" rx="8" fill="#6c5ce7" opacity="0.15" stroke="#6c5ce7" stroke-width="1.5"/>
+  <text x="160" y="130" text-anchor="middle" class="node" fill="#6c5ce7">useUserStore</text>
+  <text x="160" y="146" text-anchor="middle" class="node-sub">isProviderCertified (authStatus===1)</text>
+
+  <rect x="300" y="110" width="220" height="48" rx="8" fill="#0984e3" opacity="0.12" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="410" y="130" text-anchor="middle" class="node" fill="#0984e3">useProviderDashboardStore</text>
+  <text x="410" y="146" text-anchor="middle" class="node-sub">certified = computed(() => userStore.isProviderCertified)</text>
+
+  <rect x="560" y="110" width="200" height="48" rx="8" fill="#00b894" opacity="0.12" stroke="#00b894" stroke-width="1.5"/>
+  <text x="660" y="130" text-anchor="middle" class="node" fill="#00b894">useBecomeSupplier</text>
+  <text x="660" y="146" text-anchor="middle" class="node-sub">supplierStatus / loading / Modal state</text>
+
+  <rect x="800" y="110" width="200" height="48" rx="8" fill="#e17055" opacity="0.12" stroke="#e17055" stroke-width="1.5"/>
+  <text x="900" y="130" text-anchor="middle" class="node" fill="#e17055">API Layer</text>
+  <text x="900" y="146" text-anchor="middle" class="node-sub">user/info · onboarding/status</text>
+
+  <!-- Store arrows -->
+  <line x1="260" y1="134" x2="298" y2="134" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="520" y1="134" x2="558" y2="134" stroke="#0984e3" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="760" y1="134" x2="798" y2="134" stroke="#00b894" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ===== index.vue (编排层) ===== -->
+  <rect x="40" y="190" width="980" height="110" rx="10" fill="#ffeaa7" opacity="0.15" stroke="#fdcb6e" stroke-width="1.5"/>
+  <text x="60" y="212" class="section-label" fill="#d68910">index.vue — 编排层 (~420 行)</text>
+
+  <rect x="60" y="224" width="140" height="32" rx="6" fill="#fdcb6e" opacity="0.3"/>
+  <text x="130" y="245" text-anchor="middle" class="node" fill="#d68910">storeToRefs</text>
+  <text x="130" y="260" text-anchor="middle" class="node-sub">certified, userName...</text>
+
+  <rect x="220" y="224" width="160" height="32" rx="6" fill="#fdcb6e" opacity="0.3"/>
+  <text x="300" y="245" text-anchor="middle" class="node" fill="#d68910">v-if="certified"</text>
+  <text x="300" y="260" text-anchor="middle" class="node-sub">左列三模块 / 占位图</text>
+
+  <rect x="400" y="224" width="160" height="32" rx="6" fill="#fdcb6e" opacity="0.3"/>
+  <text x="480" y="245" text-anchor="middle" class="node" fill="#d68910">:certified="certified"</text>
+  <text x="480" y="260" text-anchor="middle" class="node-sub">→ SupplierCtaCard prop</text>
+
+  <rect x="580" y="224" width="180" height="32" rx="6" fill="#fdcb6e" opacity="0.3"/>
+  <text x="670" y="245" text-anchor="middle" class="node" fill="#d68910">useBecomeSupplier()</text>
+  <text x="670" y="260" text-anchor="middle" class="node-sub">Modal state 留在父组件</text>
+
+  <rect x="780" y="224" width="220" height="32" rx="6" fill="#fdcb6e" opacity="0.3"/>
+  <text x="890" y="245" text-anchor="middle" class="node" fill="#d68910">emit: apply / enterWorkbench</text>
+  <text x="890" y="260" text-anchor="middle" class="node-sub">→ useBecomeSupplier 方法</text>
+
+  <!-- Arrow from store to index.vue -->
+  <line x1="410" y1="160" x2="410" y2="188" stroke="#0984e3" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="420" y="180" class="arrow-label">dashboardStore</text>
+
+  <!-- ===== Component Layer ===== -->
+  <rect x="40" y="320" width="980" height="380" rx="10" fill="#74b9ff" opacity="0.06"/>
+  <text x="60" y="342" class="section-label" fill="#0984e3">组件层 (components/)</text>
+
+  <!-- Left column components -->
+  <!-- WelcomeSection -->
+  <rect x="60" y="355" width="280" height="65" rx="8" fill="#5653F8" opacity="0.1" stroke="#5653F8" stroke-width="1.5"/>
+  <text x="75" y="375" class="node" fill="#5653F8">WelcomeSection</text>
+  <text x="75" y="392" class="node-sub">props: userName, creditLevel, isProviderCertified</text>
+  <text x="75" y="407" class="node-sub">内聚: 纯展示 · 认证按钮用 CertificationBanner expose</text>
+
+  <!-- MetricCards -->
+  <rect x="60" y="430" width="280" height="50" rx="8" fill="#0984e3" opacity="0.1" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="75" y="450" class="node" fill="#0984e3">MetricCards</text>
+  <text x="75" y="467" class="node-sub">自包含 · 读 dashboardStore 统计 · 4 张指标卡</text>
+
+  <!-- OpportunityRecommendModule -->
+  <rect x="60" y="490" width="280" height="50" rx="8" fill="#6c5ce7" opacity="0.1" stroke="#6c5ce7" stroke-width="1.5"/>
+  <text x="75" y="510" class="node" fill="#6c5ce7">OpportunityRecommendModule/</text>
+  <text x="75" y="527" class="node-sub">useDynamicModule&lt;HallDemandItem&gt; + Skeleton/Error/Empty</text>
+
+  <!-- Dynamic row -->
+  <rect x="60" y="550" width="280" height="50" rx="8" fill="#00b894" opacity="0.1" stroke="#00b894" stroke-width="1.5"/>
+  <text x="75" y="570" class="node" fill="#00b894">OrderDynamicModule/ + AfterSaleDynamicModule/</text>
+  <text x="75" y="587" class="node-sub">useDynamicModule&lt;T&gt; · 5 分钟轮询 · 四态渲染</text>
+
+  <!-- CertificationPlaceholder -->
+  <rect x="60" y="610" width="280" height="50" rx="8" fill="#e17055" opacity="0.1" stroke="#e17055" stroke-width="1.5" stroke-dasharray="4"/>
+  <text x="75" y="630" class="node" fill="#e17055">CertificationPlaceholder</text>
+  <text x="75" y="647" class="node-sub">v-else · 内含 CertificationBanner (可见模式)</text>
+
+  <!-- Right column components -->
+  <!-- ActionCenter -->
+  <rect x="380" y="355" width="280" height="65" rx="8" fill="#fdcb6e" opacity="0.15" stroke="#fdcb6e" stroke-width="1.5"/>
+  <text x="395" y="375" class="node" fill="#d68910">ActionCenter</text>
+  <text x="395" y="392" class="node-sub">消息中心 · 自包含 · 读 dashboardStore</text>
+  <text x="395" y="407" class="node-sub">R-024 从全宽区移至右列 · R-026 发布服务已迁出</text>
+
+  <!-- SupplierCtaCard -->
+  <rect x="380" y="430" width="280" height="120" rx="8" fill="#e17055" opacity="0.08" stroke="#e17055" stroke-width="1.5"/>
+  <text x="395" y="450" class="node" fill="#e17055">SupplierCtaCard/ (目录)</text>
+  <text x="395" y="467" class="node-sub">index.vue — 编排层 (三态路由)</text>
+  <text x="395" y="484" class="node-sub">useSupplierCtaCard(certified) — composable</text>
+  <text x="395" y="501" class="node-sub">├ UncertifiedCard.vue → emit goCertify</text>
+  <text x="395" y="518" class="node-sub">├ SupplierRegisterCard.vue → emit apply</text>
+  <text x="395" y="535" class="node-sub">└ SupplierWorkbenchCard.vue → emit enterWorkbench</text>
+
+  <!-- Shared components -->
+  <rect x="700" y="355" width="300" height="65" rx="8" fill="#a29bfe" opacity="0.1" stroke="#a29bfe" stroke-width="1.5"/>
+  <text x="715" y="375" class="node" fill="#6c5ce7">CertificationBanner.vue (共享)</text>
+  <text x="715" y="392" class="node-sub">props: hidden, preview · expose: openPreview()</text>
+  <text x="715" y="407" class="node-sub">被 WelcomeSection(hidden) 与 CertificationPlaceholder(可见) 复用</text>
+
+  <rect x="700" y="430" width="300" height="50" rx="8" fill="#a29bfe" opacity="0.1" stroke="#a29bfe" stroke-width="1.5"/>
+  <text x="715" y="450" class="node" fill="#6c5ce7">DynamicModuleHeader.vue (共享)</text>
+  <text x="715" y="467" class="node-sub">标题 + 刷新按钮 + 查看更多 · 三个动态模块共用</text>
+
+  <rect x="700" y="490" width="300" height="50" rx="8" fill="#a29bfe" opacity="0.1" stroke="#a29bfe" stroke-width="1.5"/>
+  <text x="715" y="510" class="node" fill="#6c5ce7">composables/useDynamicModule.ts</text>
+  <text x="715" y="527" class="node-sub">fetchFn + 5min 轮询 + onUnmounted 清除 + 四态</text>
+
+  <!-- Modal layer -->
+  <rect x="700" y="560" width="300" height="65" rx="8" fill="#fd79a8" opacity="0.1" stroke="#fd79a8" stroke-width="1.5"/>
+  <text x="715" y="580" class="node" fill="#e84393">Modal 层 (渲染在 index.vue 根)</text>
+  <text x="715" y="597" class="node-sub">SupplierAuthRequiredModal</text>
+  <text x="715" y="612" class="node-sub">SupplierWalletRequiredModal · SupplierEligibilityModal</text>
+
+  <!-- Data flow arrows -->
+  <!-- index.vue → left column -->
+  <line x1="200" y1="300" x2="200" y2="353" stroke="#0984e3" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <text x="210" y="330" class="arrow-label">v-if certified</text>
+
+  <!-- index.vue → right column -->
+  <line x1="520" y1="300" x2="520" y2="353" stroke="#e17055" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <text x="530" y="330" class="arrow-label" fill="#e17055">:certified prop</text>
+
+  <!-- SupplierCtaCard → Modal (emit) -->
+  <path d="M 660 490 Q 750 490 750 558" fill="none" stroke="#e84393" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <text x="700" y="530" font-size="10" fill="#e84393" font-weight="600">emit → index.vue → Modal</text>
+
+  <!-- Legend -->
+  <rect x="60" y="670" width="940" height="36" rx="6" fill="#f1f2f6"/>
+  <rect x="80" y="680" width="14" height="14" rx="3" fill="#6c5ce7" opacity="0.3"/>
+  <text x="100" y="692" class="legend-text">Store</text>
+  <rect x="150" y="680" width="14" height="14" rx="3" fill="#fdcb6e" opacity="0.5"/>
+  <text x="170" y="692" class="legend-text">编排层</text>
+  <rect x="230" y="680" width="14" height="14" rx="3" fill="#0984e3" opacity="0.2"/>
+  <text x="250" y="692" class="legend-text">自包含组件</text>
+  <rect x="350" y="680" width="14" height="14" rx="3" fill="#5653F8" opacity="0.2"/>
+  <text x="370" y="692" class="legend-text">纯展示组件</text>
+  <rect x="470" y="680" width="14" height="14" rx="3" fill="#a29bfe" opacity="0.2"/>
+  <text x="490" y="692" class="legend-text">共享组件/工具</text>
+  <rect x="610" y="680" width="14" height="14" rx="3" fill="#fd79a8" opacity="0.2"/>
+  <text x="630" y="692" class="legend-text">Modal 浮层</text>
+  <text x="780" y="692" class="legend-text">── 数据流 → 组件消费</text>
+</svg>

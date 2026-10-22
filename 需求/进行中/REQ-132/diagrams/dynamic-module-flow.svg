@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+  <defs>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .subtitle { font-size: 12px; fill: #666; }
+      .section { font-size: 14px; font-weight: 700; fill: #2d3436; }
+      .node { font-size: 12px; font-weight: 600; fill: #2d3436; }
+      .node-sub { font-size: 10px; fill: #636e72; }
+      .code { font-size: 10px; fill: #2d3436; font-family: monospace; }
+      .note { font-size: 10px; fill: #e17055; }
+    </style>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5653F8"/>
+    </marker>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#00b894"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="600" rx="12" fill="#f8f9fc"/>
+
+  <!-- Title -->
+  <text x="480" y="36" text-anchor="middle" class="title">useDynamicModule&lt;T&gt; — 通用数据流架构</text>
+  <text x="480" y="56" text-anchor="middle" class="subtitle">REQ-132 · 接口无关中间层 · 2026-10-22</text>
+
+  <!-- ===== Layer 1: API ===== -->
+  <rect x="40" y="80" width="880" height="70" rx="10" fill="#e17055" opacity="0.08" stroke="#e17055" stroke-width="1.5"/>
+  <text x="60" y="100" class="section" fill="#e17055">API 层 (当前 mock / 后续替换 fetchFn)</text>
+
+  <rect x="60" y="110" width="200" height="30" rx="6" fill="#e17055" opacity="0.15"/>
+  <text x="160" y="130" text-anchor="middle" class="node" fill="#e17055">mockOrderList()</text>
+
+  <rect x="280" y="110" width="200" height="30" rx="6" fill="#e17055" opacity="0.15"/>
+  <text x="380" y="130" text-anchor="middle" class="node" fill="#e17055">mockAfterSaleList()</text>
+
+  <rect x="500" y="110" width="200" height="30" rx="6" fill="#e17055" opacity="0.15"/>
+  <text x="600" y="130" text-anchor="middle" class="node" fill="#e17055">mockOpportunityList()</text>
+
+  <rect x="720" y="110" width="180" height="30" rx="6" fill="#b2bec3" opacity="0.15" stroke="#b2bec3" stroke-width="1" stroke-dasharray="4"/>
+  <text x="810" y="130" text-anchor="middle" class="node" fill="#636e72">真实 API (TODO)</text>
+
+  <!-- ===== Layer 2: Composable ===== -->
+  <rect x="40" y="170" width="880" height="160" rx="10" fill="#5653F8" opacity="0.05" stroke="#5653F8" stroke-width="1.5"/>
+  <text x="60" y="192" class="section" fill="#5653F8">useDynamicModule&lt;T&gt; (composables/useDynamicModule.ts)</text>
+
+  <!-- Input -->
+  <rect x="60" y="205" width="180" height="50" rx="8" fill="#5653F8" opacity="0.1"/>
+  <text x="150" y="224" text-anchor="middle" class="node" fill="#5653F8">fetchFn: () => T[]</text>
+  <text x="150" y="242" text-anchor="middle" class="node-sub">接口取数函数（mock/真实均可）</text>
+
+  <!-- Core logic -->
+  <rect x="260" y="205" width="240" height="110" rx="8" fill="#5653F8" opacity="0.08"/>
+  <text x="380" y="224" text-anchor="middle" class="node" fill="#5653F8">核心机制</text>
+  <text x="280" y="244" class="code">data: Ref&lt;T[]&gt;</text>
+  <text x="280" y="260" class="code">loading: Ref&lt;boolean&gt;</text>
+  <text x="280" y="276" class="code">error: Ref&lt;string | null&gt;</text>
+  <text x="280" y="292" class="code">refresh(): 手动刷新</text>
+  <text x="280" y="308" class="code">startPolling() / stopPolling()</text>
+
+  <!-- Polling -->
+  <rect x="520" y="205" width="180" height="50" rx="8" fill="#00b894" opacity="0.1"/>
+  <text x="610" y="224" text-anchor="middle" class="node" fill="#00b894">轮询控制</text>
+  <text x="610" y="242" text-anchor="middle" class="node-sub">DEFAULT_POLLING_INTERVAL</text>
+
+  <rect x="720" y="205" width="180" height="50" rx="8" fill="#00b894" opacity="0.1"/>
+  <text x="810" y="224" text-anchor="middle" class="node" fill="#00b894">生命周期</text>
+  <text x="810" y="242" text-anchor="middle" class="node-sub">onMounted → start</text>
+
+  <!-- Lifecycle detail -->
+  <rect x="520" y="265" width="380" height="50" rx="8" fill="#dfe6e9" opacity="0.3"/>
+  <text x="710" y="284" text-anchor="middle" class="code">onUnmounted → stopPolling() 清除定时器</text>
+  <text x="710" y="302" text-anchor="middle" class="code">每次 refresh 重置 requestVersion 防竞态</text>
+
+  <!-- Arrow: fetchFn → core -->
+  <line x1="240" y1="230" x2="258" y2="230" stroke="#5653F8" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- ===== Layer 3: Components ===== -->
+  <rect x="40" y="350" width="880" height="100" rx="10" fill="#0984e3" opacity="0.05" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="60" y="372" class="section" fill="#0984e3">组件层 — 三个动态模块各自消费 useDynamicModule&lt;T&gt;</text>
+
+  <!-- OrderDynamicModule -->
+  <rect x="60" y="385" width="260" height="55" rx="8" fill="#0984e3" opacity="0.1" stroke="#0984e3" stroke-width="1"/>
+  <text x="75" y="405" class="node" fill="#0984e3">OrderDynamicModule/</text>
+  <text x="75" y="420" class="node-sub">useDynamicModule&lt;OrderDynamicItem&gt;</text>
+  <text x="75" y="435" class="node-sub">fetchFn = mockOrderList</text>
+
+  <!-- AfterSaleDynamicModule -->
+  <rect x="340" y="385" width="260" height="55" rx="8" fill="#0984e3" opacity="0.1" stroke="#0984e3" stroke-width="1"/>
+  <text x="355" y="405" class="node" fill="#0984e3">AfterSaleDynamicModule/</text>
+  <text x="355" y="420" class="node-sub">useDynamicModule&lt;AfterSaleDynamicItem&gt;</text>
+  <text x="355" y="435" class="node-sub">fetchFn = mockAfterSaleList</text>
+
+  <!-- OpportunityRecommendModule -->
+  <rect x="620" y="385" width="280" height="55" rx="8" fill="#6c5ce7" opacity="0.1" stroke="#6c5ce7" stroke-width="1"/>
+  <text x="635" y="405" class="node" fill="#6c5ce7">OpportunityRecommendModule/</text>
+  <text x="635" y="420" class="node-sub">useDynamicModule&lt;HallDemandItem&gt;</text>
+  <text x="635" y="435" class="node-sub">fetchFn = mockOpportunityList</text>
+
+  <!-- Arrows from composable to components -->
+  <line x1="380" y1="315" x2="190" y2="383" stroke="#0984e3" stroke-width="1.2" marker-end="url(#a1)"/>
+  <line x1="380" y1="315" x2="470" y2="383" stroke="#0984e3" stroke-width="1.2" marker-end="url(#a1)"/>
+  <line x1="380" y1="315" x2="760" y2="383" stroke="#6c5ce7" stroke-width="1.2" marker-end="url(#a1)"/>
+
+  <!-- ===== Layer 4: Four States ===== -->
+  <rect x="40" y="470" width="880" height="110" rx="10" fill="#00b894" opacity="0.05" stroke="#00b894" stroke-width="1.5"/>
+  <text x="60" y="492" class="section" fill="#00b894">四态渲染 (每个模块目录内独立状态组件)</text>
+
+  <rect x="60" y="505" width="190" height="60" rx="8" fill="#fdcb6e" opacity="0.15" stroke="#fdcb6e" stroke-width="1"/>
+  <text x="155" y="525" text-anchor="middle" class="node" fill="#d68910">loading</text>
+  <text x="155" y="542" text-anchor="middle" class="node-sub">XxxSkeleton.vue</text>
+  <text x="155" y="558" text-anchor="middle" class="node-sub">骨架屏占位</text>
+
+  <rect x="270" y="505" width="190" height="60" rx="8" fill="#e17055" opacity="0.12" stroke="#e17055" stroke-width="1"/>
+  <text x="365" y="525" text-anchor="middle" class="node" fill="#e17055">error</text>
+  <text x="365" y="542" text-anchor="middle" class="node-sub">XxxError.vue</text>
+  <text x="365" y="558" text-anchor="middle" class="node-sub">请求失败 + 重试按钮</text>
+
+  <rect x="480" y="505" width="190" height="60" rx="8" fill="#b2bec3" opacity="0.15" stroke="#b2bec3" stroke-width="1"/>
+  <text x="575" y="525" text-anchor="middle" class="node" fill="#636e72">empty</text>
+  <text x="575" y="542" text-anchor="middle" class="node-sub">XxxEmpty.vue</text>
+  <text x="575" y="558" text-anchor="middle" class="node-sub">暂无数据提示</text>
+
+  <rect x="690" y="505" width="210" height="60" rx="8" fill="#00b894" opacity="0.12" stroke="#00b894" stroke-width="1"/>
+  <text x="795" y="525" text-anchor="middle" class="node" fill="#00b894">data</text>
+  <text x="795" y="542" text-anchor="middle" class="node-sub">模块主 index.vue</text>
+  <text x="795" y="558" text-anchor="middle" class="node-sub">正常渲染业务数据</text>
+
+  <!-- Arrows from components to states -->
+  <line x1="190" y1="440" x2="155" y2="503" stroke="#fdcb6e" stroke-width="1" marker-end="url(#a2)"/>
+  <line x1="470" y1="440" x2="365" y2="503" stroke="#e17055" stroke-width="1" marker-end="url(#a2)"/>
+  <line x1="760" y1="440" x2="575" y2="503" stroke="#b2bec3" stroke-width="1" marker-end="url(#a2)"/>
+  <line x1="760" y1="440" x2="795" y2="503" stroke="#00b894" stroke-width="1" marker-end="url(#a2)"/>
+
+  <!-- ===== Shared Header ===== -->
+  <rect x="40" y="470" width="880" height="0" rx="0" fill="none"/>
+
+  <!-- Note -->
+  <text x="480" y="595" text-anchor="middle" class="note">⚠ 三个模块的状态组件（Skeleton/Error/Empty）彼此独立、刻意不做共享抽取 — 各模块目录内各自持有</text>
+
+  <!-- ===== Right side: DynamicModuleHeader ===== -->
+  <rect x="740" y="350" width="170" height="0" rx="0" fill="none"/>
+</svg>

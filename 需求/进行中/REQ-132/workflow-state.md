@@ -20,18 +20,31 @@
 | 阶段1 代码分析 | ✅已完成 | [阶段1-代码分析-REQ-132.md](./阶段1-代码分析-REQ-132.md) | 2026-10-20 |
 | 阶段2 技术方案 | ✅已完成（v1.2） | [阶段2-技术方案-REQ-132.md](./阶段2-技术方案-REQ-132.md) | 2026-10-21 |
 | 阶段3 编码执行 | ✅已完成（四批：骨架→API→真实API接入→UI定稿+轮询统一+缺陷修复；mock 先行） | [阶段3-实施记录-REQ-132.md](./阶段3-实施记录-REQ-132.md) | 2026-10-23 |
-| 阶段4 代码审查 | 🔴P0待修复（首轮审查完成） | [阶段4-审查报告-REQ-132.md](./阶段4-审查报告-REQ-132.md) | 2026-10-22（首轮） |
+| 阶段4 代码审查 | ✅通过（首轮 2026-10-22 → 补充 2026-10-23 → P0 修复后复审 2026-10-23） | [阶段4-审查报告-REQ-132.md](./阶段4-审查报告-REQ-132.md) | 2026-10-23（复审通过） |
 | 阶段5 测试基线与覆盖对齐 | ⏳待开始 | - | - |
 | 阶段6 测试执行与Bug修复循环 | ⏳待开始 | - | - |
 | 阶段7 需求复盘（第一轮） | ⏳待开始 | - | - |
 | 阶段7 需求复盘（第二轮） | ⏳待开始 | - | - |
 
 ## 当前阶段
-阶段4 代码审查（🔴 P0 待修复）
+阶段4 代码审查（✅ 复审通过，可进入阶段 5）
+
+> **P0×2 已于 2026-10-23 修复并复审通过**：① `OrderListItem` 新增 `displayAmount`，按 `todoType` 区分保证金/订单金额（R-002/R-003）；② `AfterSaleListItem` 新增 `AFTER_SALE_TYPE_TEXT` 映射，标签位展示售后类型（R-009/R-010）。复审差异 SHA-256：`87e51ad6f62f25bf265f3c5464c37830e6247e350f58fdb4e509c238390909de`。
+>
+> ⚠️ 剩余 P1-3（MetricCards 计数启用清单）已记入实施记录遗留项；P1-4 转 Q18 待后端/产品确认，均不阻塞阶段 5。
 
 > 首轮审查 2026-10-22 完成：发现 2 个 P0（① OrderListItem 金额恒显 bondAmount，交付物卡应为 orderAmount（R-003）；② AfterSaleListItem 未展示售后类型，afterSaleType 数字枚举无映射（R-009/R-010））+ 2 个 P1（③ MetricCards R-022/R-023 计数启用清单遗漏风险；④ 售后编号契约缺口，新增 Q18）。详见阶段4-审查报告。修复后回复"已修复，重新审查"。
 
-> 阶段3 已于 2026-10-22 完成，详见 [阶段3-实施记录-REQ-132.md](./阶段3-实施记录-REQ-132.md)
+> **补充审查（2026-10-23，UI 定稿后）**：新发现 3 项并已修复（① `useDynamicModule` 返回值写死 `list: []`/`error: true` 导致三模块恒显示「数据加载失败」；② `ModuleEmptyState.vue` 被外部改写为 0 字节导致 SFC 解析失败；③ 消息中心 `error` 未消费）。**首轮 P0×2 仍未修复**，且代码已变更，首轮结论失效，须修复后合并重跑阶段 4。
+
+> 阶段3 已于 2026-10-23 完成（四批），详见 [阶段3-实施记录-REQ-132.md](./阶段3-实施记录-REQ-132.md)
+
+**第四批交付结果（2026-10-23，UI 定稿 R1）**：
+> 商机卡片按高保真稿定稿：296×182 固定 + 横向滚动；标签按标注 52×20 / 圆角 2-12-2-12 / 渐变 `#EBEFFD→#F5E0FD`；标题 14/500、类目胶囊 26px/12px、价格 24px（`¥`16px）、周期 14px（空值隐藏）、时间右下角带时钟图标用 `createTime`；保留 hover 态与「查看详情/立即抢单」双按钮。
+> 标题栏改版：数量改括号 `(2)`、「查看更多」改「更多 ›」、**移除刷新入口**、新增 ⓘ 悬浮提示（商机）；**商机标题不展示数量**；消息中心改用同一组件（「更多 ›」→ `/provider/notification`）。
+> 空态：新建公共 `ModuleEmptyState.vue`（缺省图+标题+描述+插槽），复用 `img-empty-no-data.svg`，三模块改为复用；商机保留建议卡 + 紫色描边「发布服务」按钮。
+> 轮询统一：新增 `composables/usePolling.ts`（首拉 + 5 分钟 + 并发防重 + 页面隐藏暂停/切回补拉）；`useDynamicModule` 委托它（对外 API 不变，三模块零改动）；消息中心沿用原 `unreadStore` 接口接入。
+> vue-tsc --noEmit exit=0、ESLint 0 error。
 
 **第三批交付结果（2026-10-22）**：
 > 三个动态模块 fetchFn 从 mock 切换为真实 API 调用：
@@ -67,16 +80,21 @@
 |---|---|---|---|---|---|
 | 阶段0 需求分析 | PRD 全文（更新版，含 6 处实质修改）+ 原型图 + 用户三次补充 | 已修正后通过 | 3 | 1 | ① 布局以 image 3.png 原型图为准（§2）；② 售后 <4h 标红不实现（R-015 保留追溯）；③ 三模块为已有列表数据快捷入口，独立/融合接口待定（§1） |
 | 阶段3 编码执行 | 阶段2技术方案 v1.2 | 通过 | 0 | 0 | vue-tsc --noEmit exit=0；三批交付内容与方案一致；范围外改动已记录于实施文档 |
+| 阶段3 第四批 | 设计高保真稿（3倍图+标注）+ R1 需求 | 已修正后通过 | 3 | 1 | ① 字号初版偏大（标签16/数字28）按标注回改 12/24；② 误删 hover 与双按钮，用户纠正后恢复；③ `useDynamicModule` 返回值写死致恒失败并修复。vue-tsc exit=0、ESLint 0 error |
+| 阶段4 补充审查 | 首轮审查报告 + 当前代码 | 已修正后通过 | 0（新增 3 项已修） | 3 | `useDynamicModule` 返回值已修正；`ModuleEmptyState.vue` 已重写（1712 字节，SFC 结构完整）；消息中心 error 已接 `message.error` |
+| 阶段4 复审 | 首轮报告 P0×2 + 修复后代码 | 通过 | 0 | 0 | P0-1 金额按 todoType 区分（R-002/R-003）；P0-2 售后类型映射（R-009/R-010）；vue-tsc exit=0、ESLint 0 error；SHA-256 已记录 |
 
 ## 已处理文件（阶段3）
 | 文件 | 现状 | 批次 |
 |------|------|------|
 | `src/utils/date.ts` | formatDynamicModuleTime（透传 stub，后端返回已格式化的相对时间字符串，前端不做三段规则转换；已确认为最终方案） | 第一批 + 确认 |
-| `dashboard/components/DynamicModuleHeader.vue` | 通用动态模块标题栏 | 第一批 |
+| `dashboard/components/DynamicModuleHeader.vue` | 通用动态模块标题栏（UI 定稿：数量括号 + 「更多 ›」+ ⓘ + 移除刷新入口；消息中心共用） | 第一批 + 第四批 |
+| `dashboard/components/ModuleEmptyState.vue` | 通用空态（缺省图 + 标题 + 描述 + 插槽），三模块复用 | 第四批 |
+| `dashboard/composables/usePolling.ts` | 统一轮询（首拉 + 5 分钟 + 并发防重 + 页面隐藏暂停/切回补拉） | 第四批 |
 | `dashboard/composables/useDynamicModule.ts` | 泛型中间层（fetchFn + 轮询 + 四态）；`total` 注释为服务端总数语义 | 第一批 |
 | `dashboard/components/WelcomeSection.vue` | 欢迎区 + 发布服务卡片（R-026）+ 接单规则按钮（R-8） | 前置 |
 | `dashboard/components/MetricCards.vue` | 指标卡 + R-022/R-023 子项计数；数据自治（挂载自拉 fetchStatistics + watch 主体重拉） | 前置 + 迁移 |
-| `dashboard/components/ActionCenter.vue` | 消息中心；刷新图标内部消化（无 emit）；数据自治（自拉 unreadStore + watch 主体重拉） | 前置 + 迁移 |
+| `dashboard/components/ActionCenter.vue` | 消息中心；改用公共标题栏（「更多 ›」→ `/provider/notification`）；刷新入口移除（逻辑注释保留）；取数统一走 `usePolling(() => unreadStore.refresh())` + watch 主体重拉；失败接 `message.error` | 前置 + 迁移 + 第四批 |
 | `dashboard/components/SupplierCtaCard/` | 文件夹结构：index.vue 编排层（三态路由）+ useSupplierCtaCard.ts composable + styles.less 共享样式 + UncertifiedCard / SupplierRegisterCard / SupplierWorkbenchCard 三子组件 | 拆分 |
 | `dashboard/components/CertificationPlaceholder.vue` | R-8 未认证占位图容器 | R-8 |
 | `dashboard/components/CertificationBanner.vue` | R-8 认证横幅共享组件（URL 唯一定义点） | R-8 |
@@ -112,10 +130,10 @@
 - `src/api/provider/dashboard/index.ts`（REQ-132 四个 API 函数）
 
 ## 阶段 4 审查差异
-- SHA-256：未生成
-- 受检文件：未生成
-- 审查时间：未生成
-- 复审失效原因：无
+- SHA-256：`87e51ad6f62f25bf265f3c5464c37830e6247e350f58fdb4e509c238390909de`
+- 受检文件：`AfterSaleDynamicModule/AfterSaleListItem.vue`、`OrderDynamicModule/OrderListItem.vue`
+- 审查时间：2026-10-23（P0 修复后复审）
+- 复审失效原因：首轮审查后代码变更（UI 定稿第四批 + P0 修复），首轮结论失效已重跑；本次指纹后若代码再变更须重新计算并重跑阶段 4
 
 ## 不确定项追踪
 | # | 问题 | 状态 | 确认人 | 影响阶段 | 结论 |

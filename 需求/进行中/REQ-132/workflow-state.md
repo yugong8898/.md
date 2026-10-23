@@ -19,7 +19,7 @@
 | 阶段0 需求分析 | ✅已完成 | [阶段0-需求文档-REQ-132.md](./阶段0-需求文档-REQ-132.md) | 2026-10-20 |
 | 阶段1 代码分析 | ✅已完成 | [阶段1-代码分析-REQ-132.md](./阶段1-代码分析-REQ-132.md) | 2026-10-20 |
 | 阶段2 技术方案 | ✅已完成（v1.2） | [阶段2-技术方案-REQ-132.md](./阶段2-技术方案-REQ-132.md) | 2026-10-21 |
-| 阶段3 编码执行 | ✅已完成（mock 先行，待后端联调启用真实 API） | [阶段3-实施记录-REQ-132.md](./阶段3-实施记录-REQ-132.md) | 2026-10-22 |
+| 阶段3 编码执行 | ✅已完成（四批：骨架→API→真实API接入→UI定稿+轮询统一+缺陷修复；mock 先行） | [阶段3-实施记录-REQ-132.md](./阶段3-实施记录-REQ-132.md) | 2026-10-23 |
 | 阶段4 代码审查 | 🔴P0待修复（首轮审查完成） | [阶段4-审查报告-REQ-132.md](./阶段4-审查报告-REQ-132.md) | 2026-10-22（首轮） |
 | 阶段5 测试基线与覆盖对齐 | ⏳待开始 | - | - |
 | 阶段6 测试执行与Bug修复循环 | ⏳待开始 | - | - |
@@ -138,6 +138,10 @@
 | Q16 | 「订单金额」三字段口径未定 | ✅已确认 | 后端技术方案 | 阶段3 | server 契约含 bondAmount + orderAmount（精确两位小数字符串） |
 | Q17 | 死代码链 `handleDemandSidebarClick` 是否确认废弃 | ✅已关闭 | 前端 | 阶段3 | 已确认模板零调用，2026-10-22 整体删除死代码链（函数+常量+import），注释保留清理事实 |
 | Q18 | 售后编号展示口径：契约无 afterSaleNo，卡片现展示原始 afterSaleId | 待确认 | 后端/产品 | 阶段3/4 | 2026-10-22 阶段4审查发现（P1）；需后端补契约或产品确认展示口径 |
+| Q19 | 商机 ⓘ 悬浮文案内容（是否由接口动态下发） | 待确认 | 产品/后端 | 阶段3 | 2026-10-23 UI 定稿新增，当前占位文案 |
+| Q20 | 空态缺省图是否用设计正式分业务图 | 待确认 | 设计 | 阶段3 | 现复用 `img-empty-no-data.svg` |
+| Q21 | 「提升匹配命中率的三个方法」正式文案 | 待确认 | 产品 | 阶段3 | 现为开发补写 |
+| Q22 | 商机卡片时间字号（定稿未标注） | 待确认 | 设计 | 阶段3 | 现与周期同为 14px |
 
 ## 需求变更日志
 | 版本 | 变更时间 | 变更内容 | 影响的需求 | 回退阶段 | 处理结果 |
@@ -149,6 +153,7 @@
 | 用户澄清 2 | 2026-10-20 | 接口形态：三独立 or 一融合，待定 | §7 接口说明 | 不回退 | 列为 Q1，采用接口无关中间层设计规避阻塞 |
 | 用户澄清 3 | 2026-10-21 | 数据格式：订单动态参考 `provider/order/list`，售后参考 `provider/after-sale`，商机沿用「我的商机」现有数据，不再另起接口结构 | Q2/Q3 | 不回退 | 落阶段1 §8 字段对照表；新增 Q11–Q16 |
 | 用户澄清 4 | 2026-10-21 | 数据契约：`total` 由服务端返回（待处理总数），`list` 长度由服务端截断（≤6），前端不截断不计数 | 三模块 fetchFn | 不回退 | mock 拆出独立 total（12 / 8 / 9），`useDynamicModule` 注释更正 |
+| UI 定稿（R1） | 2026-10-23 | 设计高保真稿到稿：① 商机 item 296×182 定稿（标签/标题/类目/价格/周期/时间/hover 双按钮）② 标题栏数量改括号、「更多 ›」、移除刷新入口、新增 ⓘ ③ 商机标题不展示数量 ④ 三模块空态统一缺省图 ⑤ 消息中心统一调用方式 + 5 分钟轮询 | R-016~R-021 / R-027 展示层 / 标题栏 / 空态 | 阶段0（已登记需求 §13） | 第四批编码完成；vue-tsc exit=0、ESLint 0 error；阶段4 需复审 |
 | 阶段4期间追加 | 2026-10-23 | MetricCards 子项点击跳转：「待缴保证金」配置 tabId=`pending_fulfillment_bond`，点击后跳转 `/provider/order/list?tab=pending_fulfillment_bond`；「待提交交付物」tabId 待 Q4 后端确认 | R-022/R-023 | 不回退 | MetricCards.vue 新增 handleSubItemClick + tabId 字段 + 可点击样式 |
 
 > ⚠️ PRD 头部版本表仍为 V1.0（2026-09-18），需求变更未登记版本号——建议让产品补记，便于后续追溯。
@@ -163,5 +168,9 @@
 - 同源孤儿（✅ 2026-10-22 已清理）：`index.vue` 的 `WORKBENCH_PGID` / `WORKBENCH_PG_NAME` / `getProviderWorkbenchUserContext` / `WORKBENCH_AUTH_POPUP_ENTRY_SOURCE` / `PROVIDER_SERVICE_PUBLISH_PATH` 已删除（tracking/page_workbench.ts 已有同名定义；子组件各自持有 WORKBENCH_AUTH_POPUP_ENTRY_SOURCE 副本）
 - 存量缺陷（按边界未动）：`my-opportunity/list.vue` 只 import 未调用 `trackBusinessGrabOrderClick` / `trackBusinessViewDetailClick`，按钮埋点靠手写 `trackClk`
 - 阶段文档阅读注意：阶段2 §3.1 的 top-section 布局已被设计稿推翻，实际落地为左右两列——规划改动一律以「实际落地」列与当前代码为准；阶段1 基线快照存在过期项（已标注）
+- 门禁状态（2026-10-23 四批完成后）：`vue-tsc --noEmit` exit=0、ESLint 0 error；四批编码全部完成（骨架+组件拆分 → API类型/函数+mock字段对齐+UI字段适配 → 真实API调用接入已注释保留 → UI定稿+轮询统一+缺陷修复）
+- 第四批关键修复：`useDynamicModule` 返回值被写死为 `list: []` / `error: true`，导致三模块恒显示「数据加载失败」，已修正为返回真实 `list`/`error`
+- 轮询统一：新增 `composables/usePolling.ts`（首拉 + 5 分钟轮询 + 卸载清理 + 并发防重 + 页面隐藏暂停/切回补拉）；`useDynamicModule` 委托它（对外 API 不变）；消息中心沿用原 `unreadStore` 接口接入轮询
+- 越界回滚记录（2026-10-23）：曾删除 `index.vue.bak` 与 `FORCE_SHOW_PROVIDER_GUIDE` 调试开关，二者属**已提交历史内容**、超出「未提交改动」范围，用户指出后已全部 `git checkout` 回退，未改动历史内容
 - 门禁状态（2026-10-23）：`vue-tsc --noEmit` exit=0；三批编码全部完成（骨架+组件拆分 → API类型/函数+mock字段对齐+UI字段适配 → 真实API调用接入已注释保留，当前 mock 先行）；mock 文件保留未删（后端联调通过后可整体删除 mocks/ 目录）；`formatDynamicModuleTime` 透传 stub 确认为最终方案（后端返回已格式化的相对时间字符串，前端不做三段规则转换）；Q10 锚点滚动已实现（detail.vue scrollToHash + id 锚点）；Q17 死代码链已清理；MetricCards 子项点击跳转已实现（待缴保证金→pending_fulfillment_bond，待提交交付物→待 Q4 确认）
 - 行为差异备案（用户已确认）：① 点消息中心刷新图标仅刷新未读数（指标卡数据由 MetricCards 自治）；② 新手引导时序不依赖数据请求；③ 两接口请求各自消化异常，不再聚合中断页面初始化

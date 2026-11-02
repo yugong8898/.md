@@ -8,7 +8,7 @@
 - 测试版本：T0
 - 开始时间：2026-10-20
 - 需求来源：[原始需求/REQ-132 服务商工作台展示订单_售后动态.md](./原始需求/REQ-132%20服务商工作台展示订单_售后动态.md)
-- 所属平台：企服线 `ai-platform/es-web`（服务商端 PC）
+- 所属平台：企服线 `wds/wds-web`（服务商端 PC）
 - **范围收口（2026-10-20）**：本期仅交付 Web 端，App 端由其他开发人员负责
 - 产品经理：傅杰彬
 - 测试用例：无（QA 未提供，阶段 5 由 AI 推导并标注）
@@ -177,7 +177,7 @@
 > ⚠️ PRD 头部版本表仍为 V1.0（2026-09-18），需求变更未登记版本号——建议让产品补记，便于后续追溯。
 
 ## 备注
-- 企服线项目（Vue 3 + TS + Ant Design Vue），**不套用** WLYD 物流线 uni-app / Vue2 / Element UI 规范；编码规范以 `ai-platform/es-web/README.md` 与 `.cursor/` 为事实源
+- 企服线项目（Vue 3 + TS + Ant Design Vue），**不套用** WLYD 物流线 uni-app / Vue2 / Element UI 规范；编码规范以 `wds/wds-web/README.md` 与 `.cursor/` 为事实源
 - 阶段 3 门禁：`bash .md/scripts/quick-verify.sh` + `npx tsc --noEmit`（企服线追加类型检查）
 - 阶段 0 采用「先骨架、后契约」两段式开发顺序（见需求文档 §11），避免被后端契约阻塞
 - 横向搜索（阶段 0 已执行，11 项）：工作台首页 / 订单列表 / 订单详情 / 售后列表·详情 / 我的商机列表·详情 / api 封装 / stores / 认证拦截 / 抢单链路 / 雇主禁用 / 路由；App 端正式仓库不在本 workspace

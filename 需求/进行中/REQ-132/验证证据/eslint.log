@@ -1,0 +1,41 @@
+
+/Users/limengxiao/workspace/wlyd/wds/wds-web/src/views/provider/dashboard/components/AfterSaleDynamicModule/AfterSaleSkeleton.vue
+  10:25  warning  ':key' should be on a new line   vue/max-attributes-per-line
+  10:34  warning  'class' should be on a new line  vue/max-attributes-per-line
+
+/Users/limengxiao/workspace/wlyd/wds/wds-web/src/views/provider/dashboard/components/OpportunityRecommendModule/OpportunitySkeleton.vue
+  10:25  warning  ':key' should be on a new line   vue/max-attributes-per-line
+  10:34  warning  'class' should be on a new line  vue/max-attributes-per-line
+
+/Users/limengxiao/workspace/wlyd/wds/wds-web/src/views/provider/dashboard/components/OrderDynamicModule/OrderSkeleton.vue
+  10:25  warning  ':key' should be on a new line   vue/max-attributes-per-line
+  10:34  warning  'class' should be on a new line  vue/max-attributes-per-line
+
+/Users/limengxiao/workspace/wlyd/wds/wds-web/src/views/provider/dashboard/components/ProviderGuideOverlay.vue
+   73:17   warning  'class' should be on a new line                   vue/max-attributes-per-line
+  127:36   warning  'class' should be on a new line                   vue/max-attributes-per-line
+  152:33   warning  'class' should be on a new line                   vue/max-attributes-per-line
+  152:59   warning  '@click' should be on a new line                  vue/max-attributes-per-line
+  158:36   warning  'class' should be on a new line                   vue/max-attributes-per-line
+  183:33   warning  'class' should be on a new line                   vue/max-attributes-per-line
+  183:59   warning  '@click' should be on a new line                  vue/max-attributes-per-line
+  189:36   warning  'class' should be on a new line                   vue/max-attributes-per-line
+  214:33   warning  'class' should be on a new line                   vue/max-attributes-per-line
+  214:59   warning  '@click' should be on a new line                  vue/max-attributes-per-line
+  220:36   warning  'class' should be on a new line                   vue/max-attributes-per-line
+  243:33   warning  'class' should be on a new line                   vue/max-attributes-per-line
+  243:59   warning  '@click' should be on a new line                  vue/max-attributes-per-line
+  249:36   warning  'class' should be on a new line                   vue/max-attributes-per-line
+  265:75   warning  'type' should be on a new line                    vue/max-attributes-per-line
+  265:89   warning  '@click' should be on a new line                  vue/max-attributes-per-line
+  265:102  warning  Custom event name 'go-cert' must be camelCase     vue/custom-event-name-casing
+  268:56   warning  'type' should be on a new line                    vue/max-attributes-per-line
+  268:70   warning  '@click' should be on a new line                  vue/max-attributes-per-line
+  268:83   warning  Custom event name 'defer-cert' must be camelCase  vue/custom-event-name-casing
+
+/Users/limengxiao/workspace/wlyd/wds/wds-web/src/views/provider/dashboard/index.vue
+  266:11  warning  v-on event '@enterWorkbench' must be hyphenated  vue/v-on-event-hyphenation
+
+✖ 27 problems (0 errors, 27 warnings)
+  0 errors and 16 warnings potentially fixable with the `--fix` option.
+

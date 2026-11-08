@@ -1,0 +1,162 @@
+wds/wds-web/src/api/employer/index.ts(4,1): error TS2308: Module './certification' has already exported a member named 'EmployerPublicUploadResult'. Consider explicitly re-exporting to resolve the ambiguity.
+wds/wds-web/src/api/employer/index.ts(6,1): error TS2308: Module './order' has already exported a member named 'ContractPartyInfo'. Consider explicitly re-exporting to resolve the ambiguity.
+wds/wds-web/src/api/employer/index.ts(10,1): error TS2308: Module './order' has already exported a member named 'AfterSaleAttachment'. Consider explicitly re-exporting to resolve the ambiguity.
+wds/wds-web/src/api/employer/index.ts(10,1): error TS2308: Module './order' has already exported a member named 'AfterSaleListItem'. Consider explicitly re-exporting to resolve the ambiguity.
+wds/wds-web/src/api/employer/index.ts(10,1): error TS2308: Module './order' has already exported a member named 'AfterSaleListParams'. Consider explicitly re-exporting to resolve the ambiguity.
+wds/wds-web/src/api/employer/index.ts(10,1): error TS2308: Module './order' has already exported a member named 'AfterSaleListResult'. Consider explicitly re-exporting to resolve the ambiguity.
+wds/wds-web/src/api/employer/index.ts(10,1): error TS2308: Module './order' has already exported a member named 'AfterSaleTypeEnum'. Consider explicitly re-exporting to resolve the ambiguity.
+wds/wds-web/src/api/employer/index.ts(10,1): error TS2308: Module './order' has already exported a member named 'getAfterSaleList'. Consider explicitly re-exporting to resolve the ambiguity.
+wds/wds-web/src/api/provider/index.ts(6,1): error TS2308: Module './order' has already exported a member named 'EmployerInfo'. Consider explicitly re-exporting to resolve the ambiguity.
+wds/wds-web/src/api/provider/order/types.ts(521,3): error TS2300: Duplicate identifier 'payAt'.
+wds/wds-web/src/api/provider/order/types.ts(527,3): error TS2300: Duplicate identifier 'fulfillmentModeName'.
+wds/wds-web/src/api/provider/order/types.ts(532,3): error TS2300: Duplicate identifier 'fulfillmentModeName'.
+wds/wds-web/src/api/provider/order/types.ts(536,3): error TS2300: Duplicate identifier 'payAt'.
+wds/wds-web/src/components/FileAttachmentList/index.vue(41,30): error TS2552: Cannot find name 'FileAttachmentItem'. Did you mean 'FileAttachmentItemData'?
+wds/wds-web/src/components/FileAttachmentList/index.vue(43,15): error TS2304: Cannot find name 'getFileExt'.
+wds/wds-web/src/components/FileAttachmentList/index.vue(52,36): error TS2552: Cannot find name 'FileAttachmentItem'. Did you mean 'FileAttachmentItemData'?
+wds/wds-web/src/components/FileAttachmentList/index.vue(85,21): error TS2304: Cannot find name 'identityStore'.
+wds/wds-web/src/components/FileAttachmentList/index.vue(86,7): error TS2304: Cannot find name 'getEmployerStreamOssDownloadUrl'.
+wds/wds-web/src/components/FileAttachmentList/index.vue(87,7): error TS2304: Cannot find name 'providerGetStreamOssDownloadUrl'.
+wds/wds-web/src/components/FileAttachmentList/index.vue(105,37): error TS2552: Cannot find name 'FileAttachmentItem'. Did you mean 'FileAttachmentItemData'?
+wds/wds-web/src/components/FileAttachmentList/index.vue(110,25): error TS2304: Cannot find name 'getPresignedUrl'.
+wds/wds-web/src/components/FileAttachmentList/index.vue(117,36): error TS2552: Cannot find name 'FileAttachmentItem'. Did you mean 'FileAttachmentItemData'?
+wds/wds-web/src/components/FileAttachmentList/index.vue(130,37): error TS2552: Cannot find name 'FileAttachmentItem'. Did you mean 'FileAttachmentItemData'?
+wds/wds-web/src/components/FileAttachmentList/index.vue(140,15): error TS2304: Cannot find name 'downloadUrlAsFile'.
+wds/wds-web/src/components/FileAttachmentList/index.vue(148,13): error TS2304: Cannot find name 'downloadUrlAsFile'.
+wds/wds-web/src/components/order/provider/detail/ContractCard.vue(148,47): error TS2551: Property 'fullCategoryName' does not exist on type 'OrderContractInfo'. Did you mean 'categoryName'?
+wds/wds-web/src/components/order/provider/detail/ContractCard.vue(155,49): error TS2551: Property 'fullCategoryName' does not exist on type 'OrderContractInfo'. Did you mean 'categoryName'?
+wds/wds-web/src/components/order/provider/detail/ContractCard.vue(159,30): error TS2551: Property 'fullCategoryName' does not exist on type 'OrderContractInfo'. Did you mean 'categoryName'?
+wds/wds-web/src/components/order/provider/detail/ContractCard.vue(160,23): error TS2551: Property 'fullCategoryName' does not exist on type 'OrderContractInfo'. Did you mean 'categoryName'?
+wds/wds-web/src/components/order/provider/ProviderOrderCard.vue(229,25): error TS2551: Property 'fullCategoryName' does not exist on type 'ProviderOrderInfo'. Did you mean 'categoryNames'?
+wds/wds-web/src/components/order/provider/ProviderOrderCard.vue(232,50): error TS2551: Property 'fullCategoryName' does not exist on type 'ProviderOrderInfo'. Did you mean 'categoryNames'?
+wds/wds-web/src/composables/useCardDataBuilder.ts(57,7): error TS2322: Type 'number | null' is not assignable to type 'number | undefined'.
+  Type 'null' is not assignable to type 'number | undefined'.
+wds/wds-web/src/composables/useCardDataBuilder.ts(58,7): error TS2322: Type 'number | null' is not assignable to type 'number | undefined'.
+  Type 'null' is not assignable to type 'number | undefined'.
+wds/wds-web/src/composables/useCardDataBuilder.ts(85,7): error TS2322: Type 'number | null | undefined' is not assignable to type 'number | undefined'.
+  Type 'null' is not assignable to type 'number | undefined'.
+wds/wds-web/src/composables/useCardDataBuilder.ts(86,7): error TS2322: Type 'number | null | undefined' is not assignable to type 'number | undefined'.
+  Type 'null' is not assignable to type 'number | undefined'.
+wds/wds-web/src/composables/useGrabOrder.ts(51,7): error TS2353: Object literal may only specify known properties, and 'fullCategoryName' does not exist in type 'QuoteTaskInfo'.
+wds/wds-web/src/layouts/portal/components/SidebarServiceHoverPopup.vue(58,58): error TS18048: 'sub.children.length' is possibly 'undefined'.
+wds/wds-web/src/layouts/portal/PortalLayout.vue(636,17): error TS2304: Cannot find name 'persistNologinConversationIdIfGuest'.
+wds/wds-web/src/main.ts(6,35): error TS7016: Could not find a declaration file for module '@wlydfe/http'. '/Users/limengxiao/workspace/wlyd/wds/wds-web/node_modules/.pnpm/@wlydfe+http@6.0.0/node_modules/@wlydfe/http/dist/index.js' implicitly has an 'any' type.
+  There are types at '/Users/limengxiao/workspace/wlyd/wds/wds-web/node_modules/@wlydfe/http/index.ts', but this result could not be resolved when respecting package.json "exports". The '@wlydfe/http' library may need to update its package.json or typings.
+wds/wds-web/src/stores/user.ts(34,10): error TS7053: Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{ readonly 1: "个人"; readonly 2: "个体工商户"; readonly 3: "企业"; }'.
+  No index signature with a parameter of type 'number' was found on type '{ readonly 1: "个人"; readonly 2: "个体工商户"; readonly 3: "企业"; }'.
+wds/wds-web/src/utils/domStabilize.ts(75,3): error TS2322: Type 'Promise<void | void[]>' is not assignable to type 'Promise<void>'.
+  Type 'void | void[]' is not assignable to type 'void'.
+    Type 'void[]' is not assignable to type 'void'.
+wds/wds-web/src/utils/urlQuery.ts(20,16): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.
+wds/wds-web/src/views/authentication/personalCenter/components/InviteMineCard.vue(173,23): error TS2554: Expected 1 arguments, but got 0.
+wds/wds-web/src/views/authentication/personalCenter/components/InviteMineCard.vue(174,30): error TS2554: Expected 1 arguments, but got 2.
+wds/wds-web/src/views/authentication/personalCenter/components/InviteMineCard.vue(180,31): error TS2339: Property 'login_status' does not exist on type '{ user_role: PopupTrackUserRole; user_role_id: string; }'.
+wds/wds-web/src/views/authentication/personalCenter/components/InviteMineCard.vue(181,31): error TS2339: Property 'phone_number' does not exist on type '{ user_role: PopupTrackUserRole; user_role_id: string; }'.
+wds/wds-web/src/views/authentication/personalCenter/components/InviteMineCard.vue(182,26): error TS2339: Property 'user_id' does not exist on type '{ user_role: PopupTrackUserRole; user_role_id: string; }'.
+wds/wds-web/src/views/authentication/personalCenter/components/InviteMineCard.vue(195,23): error TS2554: Expected 1 arguments, but got 0.
+wds/wds-web/src/views/authentication/personalCenter/components/InviteMineCard.vue(196,30): error TS2554: Expected 1 arguments, but got 2.
+wds/wds-web/src/views/authentication/personalCenter/components/InviteMineCard.vue(202,31): error TS2339: Property 'login_status' does not exist on type '{ user_role: PopupTrackUserRole; user_role_id: string; }'.
+wds/wds-web/src/views/authentication/personalCenter/components/InviteMineCard.vue(203,31): error TS2339: Property 'phone_number' does not exist on type '{ user_role: PopupTrackUserRole; user_role_id: string; }'.
+wds/wds-web/src/views/authentication/personalCenter/components/InviteMineCard.vue(204,26): error TS2339: Property 'user_id' does not exist on type '{ user_role: PopupTrackUserRole; user_role_id: string; }'.
+wds/wds-web/src/views/chat/api/index.ts(401,7): error TS2783: 'order' is specified more than once, so this usage will be overwritten.
+wds/wds-web/src/views/chat/components/parts/search/SearchResultItem.vue(81,53): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+wds/wds-web/src/views/chat/components/parts/search/SidebarSearchPanel.vue(22,10): error TS2305: Module '"@wanlian/ai-agent-interaction"' has no exported member 'AgentSearchResultRow'.
+wds/wds-web/src/views/chat/components/parts/search/SidebarSearchPanel.vue(23,15): error TS2305: Module '"@wanlian/ai-agent-interaction"' has no exported member 'AgentSearchMessageRaw'.
+wds/wds-web/src/views/chat/components/parts/search/SidebarSearchPanel.vue(277,64): error TS7006: Parameter 'r' implicitly has an 'any' type.
+wds/wds-web/src/views/chat/components/parts/search/SidebarSearchPanel.vue(465,18): error TS2345: Argument of type '{ type: string; conversationId: string; customerType: number | undefined; locate: true; messageId: string; timestamp: string; }' is not assignable to parameter of type 'ConversationList'.
+  Property 'originConversationId' is missing in type '{ type: string; conversationId: string; customerType: number | undefined; locate: true; messageId: string; timestamp: string; }' but required in type 'ConversationList'.
+wds/wds-web/src/views/chat/employer/imIndex.vue(89,8): error TS2322: Type 'number' is not assignable to type '1 | 2'.
+wds/wds-web/src/views/chat/im/messages/__dev__/PreviewAll.vue(306,10): error TS2345: Argument of type '{ message: ChatMessage; peerName: string; peerAvatar: string; roleType: any; onRetry: any; onAction: any; }' is not assignable to parameter of type '{ readonly message: ChatMessage; readonly peerName?: string | undefined; readonly peerAvatar?: string | undefined; readonly roleType: 1 | 2; readonly retryDisabled?: boolean | undefined; readonly isOperationConversation: boolean; readonly onRetry?: ((value: ChatMessage) => any) | undefined; readonly onAction?: ((val...'.
+  Property 'isOperationConversation' is missing in type '{ message: ChatMessage; peerName: string; peerAvatar: string; roleType: any; onRetry: any; onAction: any; }' but required in type '{ readonly message: ChatMessage; readonly peerName?: string | undefined; readonly peerAvatar?: string | undefined; readonly roleType: 1 | 2; readonly retryDisabled?: boolean | undefined; readonly isOperationConversation: boolean; readonly onRetry?: ((value: ChatMessage) => any) | undefined; readonly onAction?: ((val...'.
+wds/wds-web/src/views/chat/im/messages/__dev__/PreviewAll.vue(310,25): error TS2339: Property 'roleType' does not exist on type '{ title: string; message: ChatMessage; roleType: 1 | 2 | undefined; } | { title: string; message: ChatMessage; }'.
+  Property 'roleType' does not exist on type '{ title: string; message: ChatMessage; }'.
+wds/wds-web/src/views/chat/im/messages/__dev__/searchMock.ts(23,3): error TS2322: Type '{ messageId: string; convId: string; fromUserId: string; fromUserName: string; toUserId: string; toUserName: string; messageType: string; content: string; rongMessageId: string; createTime: string; sendTimeStamp: string; status: number; targetUnread?: number | undefined; }' is not assignable to type 'ImSearchMessageRaw'.
+  Types of property 'targetUnread' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+wds/wds-web/src/views/chat/im/messages/kinds/service-order-contract/Card.vue(35,57): error TS18048: 'props.cardData.bizData' is possibly 'undefined'.
+wds/wds-web/src/views/chat/im/messages/kinds/service-order-contract/Card.vue(35,82): error TS2339: Property 'contractId' does not exist on type 'string | Record<string, any>'.
+  Property 'contractId' does not exist on type 'string'.
+wds/wds-web/src/views/chat/im/messages/kinds/service-order-contract/Card.vue(37,9): error TS2322: Type 'Record<string, string>[]' is not assignable to type 'string | ImServiceCardRow[] | undefined'.
+  Type 'Record<string, string>[]' is not assignable to type 'ImServiceCardRow[]'.
+    Type 'Record<string, string>' is missing the following properties from type 'ImServiceCardRow': label, value, originValue
+wds/wds-web/src/views/chat/im/messages/kinds/service-order-contract/SearchCard.vue(28,62): error TS2339: Property 'contractId' does not exist on type '{}'.
+wds/wds-web/src/views/chat/im/messages/kinds/service-order-contract/SearchCard.vue(35,13): error TS2322: Type 'Record<string, string>[]' is not assignable to type 'string | ImServiceCardRow[] | { label: string; value: string; originValue: string; }[] | undefined'.
+  Type 'Record<string, string>[]' is not assignable to type 'ImServiceCardRow[]'.
+    Type 'Record<string, string>' is missing the following properties from type 'ImServiceCardRow': label, value, originValue
+wds/wds-web/src/views/chat/provider/imIndex.vue(121,6): error TS2322: Type 'number' is not assignable to type '1 | 2'.
+wds/wds-web/src/views/chat/utils/conversation-converter.ts(16,97): error TS2741: Property 'originConversationId' is missing in type '{ conversationId: string; title: string; avatar: string; lastMessage: string | undefined; updateTime: string | undefined; unreadCount: number | undefined; type: string; role: number | undefined; status: number | undefined; demandId: string | undefined; hasPublishedDemand: boolean; convSource: number | undefined; }' but required in type 'ConversationList'.
+wds/wds-web/src/views/chat/utils/conversation-converter.ts(52,3): error TS2741: Property 'originConversationId' is missing in type '{ conversationId: string; title: string; avatar: string; lastMessage: string; updateTime: string; unreadCount: number; type: string; customerType: number | undefined; }' but required in type 'ConversationList'.
+wds/wds-web/src/views/employer/contract/common.vue(526,7): error TS2345: Argument of type '{ orderId: string; invoiceTaxRate: number; contractId: string; name: string; productName: string; duration: number; durationUnit: string; unitPrice: number | string; count: number | string; ... 32 more ...; settlementMode?: 1 | 2 | undefined; }' is not assignable to parameter of type 'CreateContractParams'.
+  Types of property 'taxRate' are incompatible.
+    Type 'number[] | undefined' is not assignable to type 'number | undefined'.
+      Type 'number[]' is not assignable to type 'number'.
+wds/wds-web/src/views/employer/contract/index.vue(326,7): error TS2322: Type 'string | number' is not assignable to type 'number'.
+  Type 'string' is not assignable to type 'number'.
+wds/wds-web/src/views/employer/contract/index.vue(837,62): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'number'.
+  Type 'string' is not assignable to type 'number'.
+wds/wds-web/src/views/employer/contract/index.vue(956,29): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'number'.
+  Type 'string' is not assignable to type 'number'.
+wds/wds-web/src/views/employer/my/components/MyInvoices.vue(331,28): error TS2551: Property 'fullCategoryName' does not exist on type '{ category_id: string; category_name: string; company_name: string; company_subject_type: number; cover_web_url: string; default_receiver_email: string; invoice_amount: string; invoice_type: string; ... 14 more ...; tax_rate?: string | ... 1 more ... | undefined; }'. Did you mean 'category_name'?
+wds/wds-web/src/views/employer/my/components/TaskDetail.vue(92,18): error TS2352: Conversion of type 'DemandChildDetailResult | DemandDetailResult' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'DemandDetailResult' is not comparable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'DemandDetailResult'.
+wds/wds-web/src/views/employer/my/components/TaskDetail.vue(204,38): error TS2339: Property 'remark' does not exist on type '{ acceptanceCount: number; acceptanceType: number; afterSale: { afterSalePeriod?: number | undefined; afterSalePeriodUnit?: number | undefined; } | null; areaCodes: { code: string; name: string; }[]; ... 24 more ...; startDayUnitName?: string | undefined; } | { ...; }'.
+  Property 'remark' does not exist on type '{ acceptanceCount: number; acceptanceType: number; afterSale: { afterSalePeriod?: number | undefined; afterSalePeriodUnit?: number | undefined; } | null; areaCodes: { code: string; name: string; }[]; ... 24 more ...; startDayUnitName?: string | undefined; }'.
+wds/wds-web/src/views/employer/order/agent-contract/agentParentDisplay.ts(19,17): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.
+wds/wds-web/src/views/employer/order/agent-contract/agentParentDisplay.ts(24,10): error TS7053: Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{ 14: "accepted"; 15: "accepted"; 17: "accepted"; 3: "pending_sign"; 16: "pending_platform_sign"; 1: "pending_payment"; 5: "in_progress"; 10: "completed"; 11: "closed"; 12: "closed"; }'.
+  No index signature with a parameter of type 'number' was found on type '{ 14: "accepted"; 15: "accepted"; 17: "accepted"; 3: "pending_sign"; 16: "pending_platform_sign"; 1: "pending_payment"; 5: "in_progress"; 10: "completed"; 11: "closed"; 12: "closed"; }'.
+wds/wds-web/src/views/employer/order/agent-contract/child/components/ChildDeliverablesCard.vue(104,10): error TS4104: The type 'readonly ["pdf", "jpg", "jpeg", "png"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+wds/wds-web/src/views/employer/order/agent-contract/child/components/ChildDeliverablesCard.vue(151,10): error TS4104: The type 'readonly ["pdf", "jpg", "jpeg", "png"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+wds/wds-web/src/views/employer/order/agent-contract/child/components/ChildStageAcceptanceCard.vue(119,14): error TS4104: The type 'readonly ["pdf", "jpg", "jpeg", "png"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+wds/wds-web/src/views/employer/order/agent-contract/child/components/ChildStageAcceptanceCard.vue(156,14): error TS4104: The type 'readonly ["pdf", "jpg", "jpeg", "png"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+wds/wds-web/src/views/employer/order/agent-contract/child/components/ChildTaskInfoCard.vue(77,12): error TS4104: The type 'readonly ["pdf", "jpg", "jpeg", "png"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+wds/wds-web/src/views/employer/order/agent-contract/components/AgentDemandInfoCard.vue(144,10): error TS4104: The type 'readonly ["pdf", "jpg", "jpeg", "png"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+wds/wds-web/src/views/employer/order/detail.vue(1056,45): error TS2345: Argument of type 'Record<string, unknown> | ProductAttributeNode[]' is not assignable to parameter of type 'ProductAttributeNode[] | undefined'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'ProductAttributeNode[]': length, pop, push, concat, and 29 more.
+wds/wds-web/src/views/employer/order/general-contract/components/GeneralAcceptanceProgressCard.vue(130,14): error TS4104: The type 'readonly ["pdf", "jpg", "jpeg", "png"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+wds/wds-web/src/views/employer/order/general-contract/components/GeneralAcceptanceProgressCard.vue(160,14): error TS4104: The type 'readonly ["pdf", "jpg", "jpeg", "png"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+wds/wds-web/src/views/employer/order/general-contract/components/GeneralDemandInfoCard.vue(144,10): error TS4104: The type 'readonly ["pdf", "jpg", "jpeg", "png"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+wds/wds-web/src/views/employer/order/general-contract/components/GeneralOrderSidePanel.vue(42,10): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.
+wds/wds-web/src/views/employer/order/general-contract/components/GeneralPaymentProgressCard.vue(43,49): error TS2339: Property 'paymentPeriodDisplay' does not exist on type 'OrderStagePaymentView'.
+wds/wds-web/src/views/employer/order/general-contract/detail.vue(260,37): error TS2322: Type 'OrderDetailV2ProgressStep[]' is not assignable to type '{ stepName: string; stepNo: number; stepStatus: number; }[]'.
+  Type 'OrderDetailV2ProgressStep' is not assignable to type '{ stepName: string; stepNo: number; stepStatus: number; }'.
+    Types of property 'stepName' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string'.
+        Type 'undefined' is not assignable to type 'string'.
+wds/wds-web/src/views/employer/review/index.vue(48,3): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '(q: string | string[] | null | undefined) => void' is not assignable to parameter of type 'WatchCallback<() => LocationQueryValue | LocationQueryValue[], () => LocationQueryValue | LocationQueryValue[]>'.
+      Types of parameters 'q' and 'value' are incompatible.
+        Type '() => LocationQueryValue | LocationQueryValue[]' is not assignable to type 'string | string[] | null | undefined'.
+wds/wds-web/src/views/employer/review/index.vue(124,20): error TS2367: This comparison appears to be unintentional because the types '"received" | "reviewed"' and '"follow-up-eligible"' have no overlap.
+wds/wds-web/src/views/employer/supplier/detail.vue(81,14): error TS2322: Type 'EmployerSupplierProfileCaseItem' is not assignable to type 'HistoryStateValue'.
+  Type 'EmployerSupplierProfileCaseItem' is not assignable to type 'HistoryState'.
+    Index signature for type 'number' is missing in type 'EmployerSupplierProfileCaseItem'.
+wds/wds-web/src/views/provider/after-sale/detail.vue(520,16): error TS2322: Type 'string | number' is not assignable to type 'string'.
+  Type 'number' is not assignable to type 'string'.
+wds/wds-web/src/views/provider/after-sale/detail.vue(568,16): error TS2322: Type 'string | number' is not assignable to type 'string'.
+  Type 'number' is not assignable to type 'string'.
+wds/wds-web/src/views/provider/contract/index.vue(421,62): error TS2551: Property 'fullCategoryName' does not exist on type '{ contractId: string; orderId: string; name: string; productName: string; total: number; categoryId: string; categoryName: string; url: string; startsFrom: string; endsIn: string; providerSignedAt: string; status: ProviderContractStatus; providerInfo: { ...; }; employerInfo: { ...; }; }'. Did you mean 'categoryName'?
+wds/wds-web/src/views/provider/contract/index.vue(425,34): error TS2551: Property 'fullCategoryName' does not exist on type '{ contractId: string; orderId: string; name: string; productName: string; total: number; categoryId: string; categoryName: string; url: string; startsFrom: string; endsIn: string; providerSignedAt: string; status: ProviderContractStatus; providerInfo: { ...; }; employerInfo: { ...; }; }'. Did you mean 'categoryName'?
+wds/wds-web/src/views/provider/contract/index.vue(426,27): error TS2551: Property 'fullCategoryName' does not exist on type '{ contractId: string; orderId: string; name: string; productName: string; total: number; categoryId: string; categoryName: string; url: string; startsFrom: string; endsIn: string; providerSignedAt: string; status: ProviderContractStatus; providerInfo: { ...; }; employerInfo: { ...; }; }'. Did you mean 'categoryName'?
+wds/wds-web/src/views/provider/invoice/components/UploadInvoiceModal.vue(76,46): error TS2339: Property 'statusText' does not exist on type '{ id: string; createTime: string; orderName: string; categoryNames: string[]; productTier: string; deliveryCycle: number; productDesc: string; coverMobileUrl: string; coverWebUrl: string; }'.
+wds/wds-web/src/views/provider/invoice/index.vue(394,27): error TS2339: Property 'fullCategoryName' does not exist on type 'ProviderPlatformInvoiceOrder'.
+wds/wds-web/src/views/provider/invoice/index.vue(677,54): error TS2551: Property 'fullCategoryName' does not exist on type '{ category_id: string; category_name: string; company_name: string; default_email: string; finished_at: string; invoice_type: string; level1_category_id?: string | undefined; level1_category_name?: string | undefined; ... 11 more ...; tax_no: string; }'. Did you mean 'category_name'?
+wds/wds-web/src/views/provider/review/index.vue(47,3): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '(q: string | string[] | null | undefined) => void' is not assignable to parameter of type 'WatchCallback<() => LocationQueryValue | LocationQueryValue[], () => LocationQueryValue | LocationQueryValue[]>'.
+      Types of parameters 'q' and 'value' are incompatible.
+        Type '() => LocationQueryValue | LocationQueryValue[]' is not assignable to type 'string | string[] | null | undefined'.
+wds/wds-web/src/views/provider/review/index.vue(120,20): error TS2367: This comparison appears to be unintentional because the types '"received" | "reviewed"' and '"follow-up-eligible"' have no overlap.
+wds/wds-web/src/views/provider/service/list/detail.vue(455,11): error TS2304: Cannot find name 'ServiceProductPlanStage'.
+wds/wds-web/src/views/provider/service/list/detail.vue(461,31): error TS2304: Cannot find name 'ServiceProductPlan'.
+wds/wds-web/src/views/provider/service/list/detail.vue(478,25): error TS2304: Cannot find name 'ServiceProductPlan'.
+wds/wds-web/src/views/supplier/my/certification/components/CaseModalFileUpload.vue(124,6): error TS2345: Argument of type '{ class?: ClassValue; style?: StyleValue; ref: string; onChange: any; }' is not assignable to parameter of type '{ readonly withReview?: boolean | undefined; readonly isWatermark?: boolean | undefined; readonly businessType: string; readonly businessId: string; readonly accessMode?: "private" | "public" | undefined; ... 13 more ...; readonly onChange?: ((files: UploadedFile[]) => any) | undefined; } & VNodeProps & AllowedCompo...'.
+  Type '{ class?: ClassValue; style?: StyleValue; ref: string; onChange: any; }' is missing the following properties from type '{ readonly withReview?: boolean | undefined; readonly isWatermark?: boolean | undefined; readonly businessType: string; readonly businessId: string; readonly accessMode?: "private" | "public" | undefined; ... 13 more ...; readonly onChange?: ((files: UploadedFile[]) => any) | undefined; }': businessType, businessId
+wds/wds-web/src/views/supplier/order/components/SupplierOrderAttachmentCard.vue(27,8): error TS4104: The type 'readonly ["pdf", "jpg", "jpeg", "png"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+wds/wds-web/src/views/supplier/order/components/SupplierOrderContractCard.vue(108,16): error TS18047: '__VLS_ctx.detail.contract' is possibly 'null'.
+wds/wds-web/src/views/supplier/order/components/SupplierOrderContractCard.vue(131,31): error TS18047: '__VLS_ctx.detail.contract' is possibly 'null'.
+wds/wds-web/src/views/supplier/order/components/SupplierOrderContractCard.vue(135,47): error TS18047: '__VLS_ctx.detail.contract' is possibly 'null'.
+wds/wds-web/src/views/supplier/order/components/SupplierOrderTaskCard.vue(94,10): error TS4104: The type 'readonly ["pdf", "jpg", "jpeg", "png"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.

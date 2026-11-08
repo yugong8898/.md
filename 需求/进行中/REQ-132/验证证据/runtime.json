@@ -1,0 +1,45 @@
+{
+  "method": "源码转译执行，Vue hooks和定时器为受控替身；非浏览器端到端测试",
+  "results": [
+    {
+      "case": "卸载发生在首拉完成前",
+      "expected": "定时器和监听均为0",
+      "actual": {
+        "timers": 1,
+        "listeners": 1
+      },
+      "pass": false
+    },
+    {
+      "case": "新请求成功后旧请求失败",
+      "expected": "error=false",
+      "actual": true,
+      "pass": false
+    },
+    {
+      "case": "列表版本守卫",
+      "expected": "B",
+      "actual": [
+        "B"
+      ],
+      "pass": true
+    },
+    {
+      "case": "fetchFn 内先写计数的旧请求",
+      "expected": 2,
+      "actual": 1,
+      "pass": false
+    },
+    {
+      "case": "切主体后新请求失败",
+      "expected": "不展示A主体列表",
+      "actual": {
+        "list": [
+          "A"
+        ],
+        "error": true
+      },
+      "pass": false
+    }
+  ]
+}

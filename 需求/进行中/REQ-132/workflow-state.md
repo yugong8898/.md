@@ -1,5 +1,28 @@
 # REQ-132 工作流进度
 
+## 2026-11-07 后续验证与复盘更新
+
+用户确认：开发和测试基本完成。旧阶段状态为10月历史记录，不代表当前代码放行状态。
+
+|阶段|本次结论|产物|
+|---|---|---|
+|阶段4补充复审|发现D01-D05 P1，尚未修复，当前不放行|[补充验证](./阶段4-补充验证-REQ-132.md)|
+|阶段5覆盖核对|补充清单完成；正式QA证据未取得，不标出口通过|[测试用例](./阶段5-测试用例-REQ-132.md)|
+|阶段6补充执行|ESLint通过、应用类型检查失败、受控异步4项失败；未进行源码修复|[交付报告](./阶段6-交付报告-REQ-132.md)|
+|阶段7整体复盘|报告已完成，不等于需求已验收关闭|[复盘报告](./阶段7-复盘报告-REQ-132.md)|
+
+当前基线HEAD、范围及累计差异SHA-256见[baseline.json](./验证证据/baseline.json)。10月旧指纹不能覆盖当前业务代码。本次未修改业务源码、未提交、未归档需求、未修改规则或知识库。
+
+### 本轮验证闭环记录
+|阶段|锚点|偏差与处理|出口|
+|---|---|---|---|
+|补充复审|阶段0 R1与当前HEAD|五项P1已记录，未修复|不通过|
+|覆盖核对|需求规则与已有源码|补充TC01-TC12；与正式QA结果仍需对齐|不标绿|
+|补充执行|当前源码|日志已保存；类型及边界失败记录在报告|不通过|
+|整体复盘|历史提交、阶段材料及执行证据|完成事实核对与经验建议|文档已完成|
+
+以下保留历史状态与追踪表，当前结论以本节及补充报告为准。
+
 ## 需求信息
 - 需求名称：服务商工作台展示订单/售后动态（含重要商机推荐）
 - 需求编号：REQ-132（云效 RZMP-9033）
@@ -111,6 +134,129 @@
 | `api/provider/dashboard/types.ts` | REQ-132 四个新接口响应类型（WorkbenchAfterSaleItem/Response、WorkbenchOrderItem/ActionTarget/Response、WorkbenchMessagesResponse、WorkbenchOpportunityItem/Response） | 第二批 |
 | `api/provider/dashboard/index.ts` | 新增 getWorkbenchAfterSales/Orders/Messages/Opportunities 四个 API 函数 | 第二批 |
 | 三个模块 index.vue（Order/AfterSale/Opportunity） | fetchFn 已接入真实 API 调用并注释保留，当前 mock + setTimeout 先行，等后端通知启用 | 第三批 |
+
+## 本需求文件树
+
+### 核对口径
+
+- 核对日期：2026-11-07。
+- 本轮后续验证与复盘：需求文档仓库 `.md/`，以当前 HEAD 对比 staged、unstaged、untracked；9 个新增文件、2 个修改文件，共 11 个文件，均未提交。本次只补充本状态文件，不修改业务代码。
+- 业务代码历史范围：仓库 `wds/wds-web/`，沿用本轮验证基线 `2cfb29b30^` → `512e4dc0af7674a45a31f63b0512e3e72ca51ee1`，在已记录目标路径内累计 35 个差异文件。该范围含并行需求影响，不等于 REQ-132 的完整排他归属；开发起点为本轮核对起点，不断言是需求最早开发起点。
+- 业务仓库 staged、unstaged、untracked 均为空。历史新增/修改相对上述核对基线，本轮新增/修改相对 `.md/` 当前 HEAD。
+- 功能描述表示实际职责，不代表联调、测试或验收通过；验证结论以本页顶部及补充报告为准。
+
+### 本轮新增与调整（仓库 `.md/`）
+
+```text
+需求/进行中/REQ-132/
+├── workflow-state.md                         [修改] 更新阶段结论、验证闭环及本需求文件树
+├── 交接文档-REQ-132.md                       [修改] 置顶校正真实 API 和历史 P0 的当前状态
+├── 阶段4-补充验证-REQ-132.md                 [新增] 当前代码定向复审、D01-D05 及门禁结论
+├── 阶段5-测试用例-REQ-132.md                 [新增] 需求到用例覆盖矩阵与异常场景补充
+├── 阶段6-交付报告-REQ-132.md                 [新增] 实际执行结果、缺陷闭环及未验证范围
+├── 阶段7-复盘报告-REQ-132.md                 [新增] 全过程复盘、遗留项核对与流程改进建议
+└── 验证证据/
+    ├── baseline.json                        [新增] 代码 HEAD、核对范围、差异文件和 SHA-256
+    ├── eslint.log                           [新增] 工作台相关 ESLint 执行日志
+    ├── vue-tsc.log                          [新增] 应用类型检查错误日志
+    ├── verify-runtime.cjs                   [新增] 当前源码受控异步验证脚本，非浏览器端到端测试
+    └── runtime.json                         [新增] 五项受控检查的实际结果
+```
+
+### 业务代码历史差异（仓库 `wds/wds-web/`）
+
+以下为累计差异文件，本轮未改动。`utils/date.ts` 虽在验证范围内，但相对本次历史基线无差异，不虚列为改动文件。
+
+```text
+wds/wds-web/
+└── src/
+    ├── api/
+    │   └── provider/
+    │       └── dashboard/
+    │           ├── index.ts  [修改] 工作台接口封装
+    │           └── types.ts  [修改] 工作台接口数据类型
+    ├── stores/
+    │   └── provider/
+    │       └── dashboard.ts  [修改] 统计与待办计数状态
+    ├── tracking/
+    │   └── page_workbench.ts  [修改] 工作台埋点类型调整
+    └── views/
+        └── provider/
+            ├── dashboard/
+            │   ├── components/
+            │   │   ├── AfterSaleDynamicModule/
+            │   │   │   ├── AfterSaleEmpty.vue  [新增] 业务空态
+            │   │   │   ├── AfterSaleError.vue  [新增] 加载失败及重试
+            │   │   │   ├── AfterSaleListItem.vue  [新增] 售后类型、编号与处理入口
+            │   │   │   ├── AfterSaleSkeleton.vue  [新增] 加载骨架
+            │   │   │   └── index.vue  [新增] 售后模块编排与取数
+            │   │   ├── OpportunityRecommendModule/
+            │   │   │   ├── OpportunityEmpty.vue  [新增] 业务空态
+            │   │   │   ├── OpportunityError.vue  [新增] 加载失败及重试
+            │   │   │   ├── OpportunityListItem.vue  [新增] 商机展示与报价兼容映射
+            │   │   │   ├── OpportunitySkeleton.vue  [新增] 加载骨架
+            │   │   │   └── index.vue  [新增] 商机模块编排与取数
+            │   │   ├── OrderDynamicModule/
+            │   │   │   ├── OrderEmpty.vue  [新增] 业务空态
+            │   │   │   ├── OrderError.vue  [新增] 加载失败及重试
+            │   │   │   ├── OrderListItem.vue  [新增] 订单信息、金额分支及详情锚点入口
+            │   │   │   ├── OrderSkeleton.vue  [新增] 加载骨架
+            │   │   │   └── index.vue  [新增] 订单模块编排与取数
+            │   │   ├── SupplierCtaCard/
+            │   │   │   ├── SupplierRegisterCard.vue  [新增] 已认证未入驻引导
+            │   │   │   ├── SupplierWorkbenchCard.vue  [新增] 已入驻工作台入口
+            │   │   │   ├── UncertifiedCard.vue  [新增] 未认证引导
+            │   │   │   ├── index.vue  [新增] 认证与入驻三态编排
+            │   │   │   ├── styles.less  [新增] 供应商引导卡共享样式
+            │   │   │   └── useSupplierCtaCard.ts  [新增] 供应商认证及入驻引导状态
+            │   │   ├── ActionCenter.vue  [新增] 消息中心取数、轮询和通知入口
+            │   │   ├── CertificationBanner.vue  [新增] 认证接单规则图片与预览
+            │   │   ├── DynamicModuleHeader.vue  [新增] 模块标题、数量和更多入口
+            │   │   ├── MetricCards.vue  [新增] 统计指标与订单待办子项入口
+            │   │   ├── ModuleEmptyState.vue  [新增] 通用空态容器
+            │   │   └── WelcomeSection.vue  [新增] 欢迎区、发布服务与接单规则入口
+            │   ├── composables/
+            │   │   ├── useDynamicModule.ts  [新增] 动态列表、计数与主体切换重拉
+            │   │   └── usePolling.ts  [新增] 共用轮询及请求执行状态
+            │   └── index.vue  [修改] 工作台布局、认证分支与新手引导编排
+            └── order/
+                └── detail.vue  [修改] 订单详情及保证金、交付物锚点
+```
+
+### 经验沉淀追加调整（2026-11-07）
+
+本轮只修改以下5个既有文件，无新增文件；与前述验证/复盘文件范围分别记录。workflow 已升级至 v2.6（通用性与一致性复核），坑点新增 P-025—P-028；未修改业务源码、rules、知识库或个人记忆。
+
+```text
+wlyd/
+├── .cursor/
+│   ├── skills/
+│   │   └── wlyd-workflow/
+│   │       └── SKILL.md  [修改] 跨页/异步检查、类型检查有效性、版本与测试证据绑定
+│   └── context/
+│       └── known-pitfalls.md  [修改] P-025—P-028场景、防范方法及来源
+├── skills.md  [修改] workflow能力、行数与维护版本同步
+└── .md/
+    └── 需求/
+        └── 进行中/
+            └── REQ-132/
+                ├── workflow-state.md  [修改] 登记经验沉淀范围及文件树
+                └── 阶段7-复盘报告-REQ-132.md  [修改] 将历史建议更新为已落地状态
+```
+
+Skills通过Qoder/CodeBuddy/Trae symlink共享；context通过CodeBuddy/Trae symlink共享，按现有链接核验，无需复制。四端rules未改动。
+
+### 原始输入与外部方案（既有资料，本轮未改动）
+
+```text
+需求/进行中/REQ-132/
+├── 原始需求/
+│   ├── REQ-132 服务商工作台展示订单_售后动态.md  [输入] 原始 PRD
+│   └── 图片和附件/                             [输入] 原型、设计及附件，保留原目录
+└── REQ-132 服务商工作台-技术方案/
+    ├── REQ-132 服务商工作台-技术方案.md          [外部方案] 服务端方案资料
+    └── 接口契约-前端对接用.md                    [外部方案] 接口对接参考
+```
 
 ## 阶段 3 允许改动文件
 

@@ -1,5 +1,16 @@
 # REQ-132 工作流进度
 
+## 2026-11-10 分支增量核对
+
+本地 `wds/wds-web` 分支 `F-REQ-132-wxj`，基线 `512e4dc0a`，受检版本 `6af0e66b5b05c9f7daf92ee8c9c803c074e1d13f`。11 月 9 日共 3 个增量提交，业务工作区无未提交改动。[增量复审](./阶段4-补充验证-REQ-132.md#2026-11-10-增量复审)记录了最终代码和验证边界。
+
+| 阶段 | 当前结论 |
+|---|---|
+| 复审 | 6 个净变更文件，集中在响应式布局与引导展示，未发现新的阻断问题 |
+| 验证 | ESLint 0 错误、2 警告；原异步检查 1 项通过、4 项失败；D01 仍未闭环 |
+| 测试覆盖 | [TC13—TC15](./阶段5-测试用例-REQ-132.md#2026-11-10-响应式增量覆盖)待浏览器执行 |
+| 放行 | D01—D05 仍开放，正式验收状态未复核 |
+
 ## 2026-11-07 后续验证与复盘更新
 
 用户确认：开发和测试基本完成。旧阶段状态为10月历史记录，不代表当前代码放行状态。
@@ -137,35 +148,7 @@
 
 ## 本需求文件树
 
-### 核对口径
-
-- 核对日期：2026-11-07。
-- 本轮后续验证与复盘：需求文档仓库 `.md/`，以当前 HEAD 对比 staged、unstaged、untracked；9 个新增文件、2 个修改文件，共 11 个文件，均未提交。本次只补充本状态文件，不修改业务代码。
-- 业务代码历史范围：仓库 `wds/wds-web/`，沿用本轮验证基线 `2cfb29b30^` → `512e4dc0af7674a45a31f63b0512e3e72ca51ee1`，在已记录目标路径内累计 35 个差异文件。该范围含并行需求影响，不等于 REQ-132 的完整排他归属；开发起点为本轮核对起点，不断言是需求最早开发起点。
-- 业务仓库 staged、unstaged、untracked 均为空。历史新增/修改相对上述核对基线，本轮新增/修改相对 `.md/` 当前 HEAD。
-- 功能描述表示实际职责，不代表联调、测试或验收通过；验证结论以本页顶部及补充报告为准。
-
-### 本轮新增与调整（仓库 `.md/`）
-
-```text
-需求/进行中/REQ-132/
-├── workflow-state.md                         [修改] 更新阶段结论、验证闭环及本需求文件树
-├── 交接文档-REQ-132.md                       [修改] 置顶校正真实 API 和历史 P0 的当前状态
-├── 阶段4-补充验证-REQ-132.md                 [新增] 当前代码定向复审、D01-D05 及门禁结论
-├── 阶段5-测试用例-REQ-132.md                 [新增] 需求到用例覆盖矩阵与异常场景补充
-├── 阶段6-交付报告-REQ-132.md                 [新增] 实际执行结果、缺陷闭环及未验证范围
-├── 阶段7-复盘报告-REQ-132.md                 [新增] 全过程复盘、遗留项核对与流程改进建议
-└── 验证证据/
-    ├── baseline.json                        [新增] 代码 HEAD、核对范围、差异文件和 SHA-256
-    ├── eslint.log                           [新增] 工作台相关 ESLint 执行日志
-    ├── vue-tsc.log                          [新增] 应用类型检查错误日志
-    ├── verify-runtime.cjs                   [新增] 当前源码受控异步验证脚本，非浏览器端到端测试
-    └── runtime.json                         [新增] 五项受控检查的实际结果
-```
-
-### 业务代码历史差异（仓库 `wds/wds-web/`）
-
-以下为累计差异文件，本轮未改动。`utils/date.ts` 虽在验证范围内，但相对本次历史基线无差异，不虚列为改动文件。
+范围为 `wds/wds-web` 内 REQ-132 已核对路径的累计增删改。2026-11-10 核对基线 `2cfb29b30^` 至 `6af0e66b5b05c9f7daf92ee8c9c803c074e1d13f`，共 37 个文件（新增 31 个、修改 6 个、删除 0 个）。标记均相对该基线。后续变更合入本树。
 
 ```text
 wds/wds-web/
@@ -175,6 +158,10 @@ wds/wds-web/
     │       └── dashboard/
     │           ├── index.ts  [修改] 工作台接口封装
     │           └── types.ts  [修改] 工作台接口数据类型
+    ├── assets/
+    │   └── images/
+    │       ├── supplier-intro-xl.png  [新增] 1680px 起使用的宽屏引导图
+    │       └── supplier-intro.png  [新增] 普通引导图
     ├── stores/
     │   └── provider/
     │       └── dashboard.ts  [修改] 统计与待办计数状态
@@ -184,12 +171,17 @@ wds/wds-web/
         └── provider/
             ├── dashboard/
             │   ├── components/
+            │   │   ├── ActionCenter.vue  [新增] 消息中心取数、轮询和通知入口
             │   │   ├── AfterSaleDynamicModule/
             │   │   │   ├── AfterSaleEmpty.vue  [新增] 业务空态
             │   │   │   ├── AfterSaleError.vue  [新增] 加载失败及重试
             │   │   │   ├── AfterSaleListItem.vue  [新增] 售后类型、编号与处理入口
             │   │   │   ├── AfterSaleSkeleton.vue  [新增] 加载骨架
             │   │   │   └── index.vue  [新增] 售后模块编排与取数
+            │   │   ├── CertificationBanner.vue  [新增] 未认证引导图按断点切换，预览使用当前图片
+            │   │   ├── DynamicModuleHeader.vue  [新增] 共用标题、数量和更多入口，标题行高 24px
+            │   │   ├── MetricCards.vue  [新增] 统计指标与订单待办子项入口
+            │   │   ├── ModuleEmptyState.vue  [新增] 通用空态容器
             │   │   ├── OpportunityRecommendModule/
             │   │   │   ├── OpportunityEmpty.vue  [新增] 业务空态
             │   │   │   ├── OpportunityError.vue  [新增] 加载失败及重试
@@ -206,56 +198,16 @@ wds/wds-web/
             │   │   │   ├── SupplierRegisterCard.vue  [新增] 已认证未入驻引导
             │   │   │   ├── SupplierWorkbenchCard.vue  [新增] 已入驻工作台入口
             │   │   │   ├── UncertifiedCard.vue  [新增] 未认证引导
-            │   │   │   ├── index.vue  [新增] 认证与入驻三态编排
+            │   │   │   ├── index.vue  [新增] 认证与入驻三态编排，按认证状态设置卡片高度
             │   │   │   ├── styles.less  [新增] 供应商引导卡共享样式
             │   │   │   └── useSupplierCtaCard.ts  [新增] 供应商认证及入驻引导状态
-            │   │   ├── ActionCenter.vue  [新增] 消息中心取数、轮询和通知入口
-            │   │   ├── CertificationBanner.vue  [新增] 认证接单规则图片与预览
-            │   │   ├── DynamicModuleHeader.vue  [新增] 模块标题、数量和更多入口
-            │   │   ├── MetricCards.vue  [新增] 统计指标与订单待办子项入口
-            │   │   ├── ModuleEmptyState.vue  [新增] 通用空态容器
             │   │   └── WelcomeSection.vue  [新增] 欢迎区、发布服务与接单规则入口
             │   ├── composables/
             │   │   ├── useDynamicModule.ts  [新增] 动态列表、计数与主体切换重拉
             │   │   └── usePolling.ts  [新增] 共用轮询及请求执行状态
-            │   └── index.vue  [修改] 工作台布局、认证分支与新手引导编排
+            │   └── index.vue  [修改] 布局、认证分支、新手引导与响应式宽度
             └── order/
                 └── detail.vue  [修改] 订单详情及保证金、交付物锚点
-```
-
-### 经验沉淀追加调整（2026-11-07）
-
-本轮只修改以下5个既有文件，无新增文件；与前述验证/复盘文件范围分别记录。workflow 已升级至 v2.6（通用性与一致性复核），坑点新增 P-025—P-028；未修改业务源码、rules、知识库或个人记忆。
-
-```text
-wlyd/
-├── .cursor/
-│   ├── skills/
-│   │   └── wlyd-workflow/
-│   │       └── SKILL.md  [修改] 跨页/异步检查、类型检查有效性、版本与测试证据绑定
-│   └── context/
-│       └── known-pitfalls.md  [修改] P-025—P-028场景、防范方法及来源
-├── skills.md  [修改] workflow能力、行数与维护版本同步
-└── .md/
-    └── 需求/
-        └── 进行中/
-            └── REQ-132/
-                ├── workflow-state.md  [修改] 登记经验沉淀范围及文件树
-                └── 阶段7-复盘报告-REQ-132.md  [修改] 将历史建议更新为已落地状态
-```
-
-Skills通过Qoder/CodeBuddy/Trae symlink共享；context通过CodeBuddy/Trae symlink共享，按现有链接核验，无需复制。四端rules未改动。
-
-### 原始输入与外部方案（既有资料，本轮未改动）
-
-```text
-需求/进行中/REQ-132/
-├── 原始需求/
-│   ├── REQ-132 服务商工作台展示订单_售后动态.md  [输入] 原始 PRD
-│   └── 图片和附件/                             [输入] 原型、设计及附件，保留原目录
-└── REQ-132 服务商工作台-技术方案/
-    ├── REQ-132 服务商工作台-技术方案.md          [外部方案] 服务端方案资料
-    └── 接口契约-前端对接用.md                    [外部方案] 接口对接参考
 ```
 
 ## 阶段 3 允许改动文件

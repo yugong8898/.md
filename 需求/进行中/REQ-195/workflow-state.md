@@ -15,8 +15,9 @@
 ### Apifox 契约对照与本轮代码调整
 
 - 已按新契约调整短信发送、校验、重发请求体：只传 `caFlowId`（校验另传 `verifyCode`）；`/auth-file` 只传 `caFlowId` 与 `ossCode`；`/success-seen` 不传请求体。协议响应类型增加可选 `countdown`，有正值时按服务端秒数展示冷却。
-- **单独待确认：重传所需 `caFlowId` 来源。**用户已明确：四个场景中，委托书审核未通过后只上传新文件取得 `ossCode`，随后调用对应角色的 `/auth-file` 更新授权书；不重新申请协议，不重发或校验短信。Apifox 请求体仍要求 `caFlowId`，而 `/status` 未列该字段，刷新后前端无法取得有效值。请 Server 明确重传时从何处获取 `caFlowId`，或确认重传请求可省略它。明确前不将当前重新申请协议的兜底视为符合需求。
-- **代码处理**：已移除点击重传时重新申请协议的路径；当前页面持有有效 `caFlowId` 时，上传新文件后直接调用 `/auth-file`。页面刷新导致流程号缺失时明确拒绝提交，不重新走协议或短信；待 Server 确认流程号来源后补齐刷新恢复。
+- **[2026-11-11 口径修订（B 口径）] 重传链路改为重走全流程。** 2026-11-10 记录的「原地替换：只上传新文件直接调 `/auth-file`，不重新申请协议、不重发或校验短信」口径**作废**。现行口径：被拒后步骤条由接口状态驱动回第一步（认证场景重读 `user/info`，签署场景重读 `/status`），经办人重新收集委托书后重走协议+动态码，`check-sms-code` 通过且 `nextAction=UPLOAD_AUTH_FILE` 时凭本轮新 `caFlowId` 提交 `/auth-file`。原「重传 `caFlowId` 来源待 Server 确认」问题随之关闭：每轮重走经 `/agreement` 取得新流程号，不再依赖 `/status` 下发。
+- **代码处理（已按 B 口径落地）**：独立页重传入口不再沿用会话流程号直传 `/auth-file`（原 `reuploading` 路径注释保留），回委托书第一步收集后由 `ElectronicSign` 重走 `/agreement` + 短信校验再送审；服务商/雇主认证容器「重新初始化按接口状态定位步骤」本就与 B 口径一致，无需改动。新增联调点：RE_UPLOAD 用户重走 `check-sms-code` 时 Server 须返回 `nextAction=UPLOAD_AUTH_FILE`。
+- **[2026-11-11 二轮口径（送审方式分流 + 5 秒静默等待 + 方案 a）]** ① 认证环节经办人改为「收集即落库」：收集步上传 OSS 后立即调 `ca-auth-letter` 落认证域物料，动态码通过后由 Server 用已落库物料自动送审，前端认证环节**不再调 `/auth-file`**（前端拿不到 oss 资源）；非经办人动态码通过即进下一环节（无审核无等待）。② 合同签署/固定入口（独立页）经办人可取到 oss 资源，维持短信通过后调 `/auth-file` 送审。③ 经办人审核通过后**静默等待 5 秒**（常量 `CA_AUTH_PASS_ADVANCE_DELAY_MS=5000`，无页面倒计时）再进下一环节（认证场景→签署协议；独立页/合同场景→回退 returnUrl/back）；独立页重进时已是认证成功态同样自动 5 秒回退，不停留在结果页。④ P1「重新上传」拍板方案 a：重进先见驳回态，点重新上传后认证场景调 `user/info`、合同场景调 `/status` 刷状态，仍处 RE_UPLOAD 则回委托书收集步重走。⑤ 雇主认证页补齐经办人委托书收集步（原仅服务商容器有 `authLetterUpload` 视图）。
 - 待联调：`isAuthFileNeeded` 虽在 schema 标为必填，示例却缺失；新用户委托书物料落库 T1 与短信重发冷却时长也未闭环。以上不视为已验收。
 
 - **当前依据**：`电子签章接口契约-Apifox-REQ-195.md`。内容取自 Apifox 项目 `8677491`「万大圣企业服务平台API接口」默认模块实测数据，覆盖 `/v1/employer/ca-verification/*` 与 `/v1/provider/ca-verification/*` 共 14 个接口及其 20 个 schema（请求体、响应 model、枚举取值、服务端错误文案、失败语义、调用时序）。**接口字段名、类型、层级、必传参数一律以该文档为准，不再引用对齐表的预估签名。**
@@ -37,11 +38,23 @@
 | 阶段7 需求复盘（可选） | ⏳待开始 | - | - |
 
 ## 当前阶段
+**2026-11-11 阶段3出口检查**：`wds-web` 分支 `F-REQ-195-wxj` 当前有 12 个未提交文件（含已暂存和未暂存）。`quick-verify.sh --scope both --files ...` 实际检查这 12 个文件，exit=0：无新增 `console.log`、无大文件、diff 无空白错误，ESLint 0 error（99 条 warning）；差异指纹 `1ee0d31a3b7035685d23fc007bce86ace53fb753269e58a2034981ffa7e7bb81`。完整 `vue-tsc -b --noEmit` 仍有其他模块类型错误，未取得页面和接口联调证据；阶段3保持进行中，阶段4不标通过。Server 状态时序及 `isAuthFileNeeded` 缺省按用户确认不作为本轮前端阻塞项。
+
+**2026-11-11 提测前复核**：统一 `/status.isAuthFileNeeded` 缺失时按非经办人处理，两端认证页不再因此阻断；`entryStatus=4` 重传按状态进入委托书步骤。验证码只校验非空，不限制长度；发送失败显示接口错误。授权委托书上传上限为 10MB。清理已不可达的重传变量、回调和调试注释。`ElectronicSign` 的 5 秒跳转在状态失效或状态刷新期间取消，并在刷新确认成功后重新计时。改动范围 ESLint 为 0 error；完整 `vue-tsc -b --noEmit` 仍有仓库其他模块的类型错误，REQ-195 关键模块未报错。接口时序与真实页面效果仍待联调。
+
 阶段3 编码执行：接口封装、独立状态层、电子签章组件、两端认证页与合同签署守卫已接入；服务商恢复分支已区分 `authPhase=3/4`。本期五处固定入口（两端个人中心、两端合同列表、供应商个人中心）已接入，待接口联调。原始需求 V1.2 的 PC 规则已同步至阶段0；新增的「从未与平台签署爱签协议需重签」须核对 Server 状态语义。用户已取消协议内容滚动与获取验证码前等待 3 秒的交互门槛；验证码发送后的重发冷却仍按接口规则处理。供应商入口按特殊服务商复用 `providerId` 状态，从供应商路由进入认证组件，待联调核验。Server 认证模块方案另写 `user/info` 三字段透传，与本期前端独立状态接口方案存在差异，待 Server 复核；前端不新增 CA DTO/store。
 
-本轮代码审查已修复状态请求卸载后续轮询、驳回态申请新流程失败后错误离开结果页、即将到期入口进入认证页却未加载协议，以及 `ElectronicSign.vue` 的泛型语法错误。驳回重传仍需 Server 提供有效 `caFlowId` 的获取方式：现有兜底会重新申请协议并再次校验短信，不按“原地直接上传”验收。首次爱签协议重签与新经办人委托书收集仍待产品/Server 契约。依用户本轮指示跳过 `vue-tsc` 与 ESLint 后续处理。
+本轮代码审查已修复状态请求卸载后续轮询、驳回态申请新流程失败后错误离开结果页、即将到期入口进入认证页却未加载协议，以及 `ElectronicSign.vue` 的泛型语法错误。驳回重传已按 2026-11-11 B 口径落地：回第一步重新收集，重走协议+动态码凭新 `caFlowId` 送审，不再依赖 `/status` 下发流程号（详见「Apifox 契约对照」节口径修订）。首次爱签协议重签与新经办人委托书收集仍待产品/Server 契约。依用户本轮指示跳过 `vue-tsc` 与 ESLint 后续处理。
 
-独立电子签章页按 `GET /status.isAuthFileNeeded` 展示经办人双步或其他身份单步；服务商平台认证总步骤条保持“提交材料 → 完善信息 → 电子合同签章认证 → 签署协议 → 系统审核”，委托书上传是电子签章认证环节内页面，不额外增加总步骤。经办人 UI 先上传 OSS 文件，再完成协议与短信；验证码通过且 `nextAction=1` 后才调用 `/auth-file` 送审。老用户/过期用户先调用 `ca-auth-letter` 落物料，新认证用户当前直接调用 `/auth-file`。送审成功不等于审核通过；平台认证页观察到审核中转认证成功且 `canSign=true` 后沿用 `next` 事件继续原协议，继续前重查 `canSign`，不增加成功态按钮。合同入口、固定入口、平台认证使用对应来源文案。Server T1 所述新用户材料落库、`isAuthFileNeeded` 实际响应层级和审核回调仍待联调，阶段3不标完成。
+独立电子签章页按 `GET /status.isAuthFileNeeded` 展示经办人双步或其他身份单步；服务商平台认证总步骤条保持“提交材料 → 完善信息 → 电子合同签章认证 → 签署协议 → 系统审核”，委托书上传是电子签章认证环节内页面，不额外增加总步骤（雇主端同样处理，收集步与签章认证同处一个步骤位）。经办人 UI 先上传 OSS 文件，再完成协议与短信。~~验证码通过且 `nextAction=1` 后才调用 `/auth-file` 送审。老用户/过期用户先调用 `ca-auth-letter` 落物料，新认证用户当前直接调用 `/auth-file`。~~〔2026-11-11 二轮口径后此句仅适用于独立页/合同场景；认证环节改为收集步 `ca-auth-letter` 收集即落库，动态码通过后 Server 自动送审，前端不调 `/auth-file`，详见「Apifox 契约对照」节二轮口径条目。〕送审成功不等于审核通过；~~平台认证页观察到审核中转认证成功且 `canSign=true` 后沿用 `next` 事件继续原协议，继续前重查 `canSign`，不增加成功态按钮。~~〔2026-11-11 二轮口径后改为：审核通过后静默等待 5 秒（常量 `CA_AUTH_PASS_ADVANCE_DELAY_MS`）再沿用 `next` 流转；独立页重进已是成功态同样自动 5 秒回退；非经办人验证码通过即放行。〕合同入口、固定入口、平台认证使用对应来源文案。Server T1 所述新用户材料落库、`isAuthFileNeeded` 实际响应层级和审核回调仍待联调，阶段3不标完成。
+
+**2026-11-11 二轮编码落地**：`const.ts` 新增 5 秒常量；`ProviderAuthLetterUpload.vue` collectOnly+persistAuthLetter 组合实现收集即落库；`ElectronicSign.vue` 认证分支（非经办人放行/经办人刷状态）与审核通过 5 秒静默等待、独立页重进自动回退、卸载清理定时器；服务商认证页 `handleFaceNext`/`handleAuthLetterReUpload` 按方案 a 分流、收集步模板切换 collect-only+persist-auth-letter（旧 A 口径注释保留）；雇主认证页补齐 `authLetterUpload` 视图、两处入口 CA 分流、断点续走分流、`handleAuthLetterReUpload` 方案 a、模板收集步与 `preuploaded-auth-file` 防死锁接线。本轮 `vue-tsc --noEmit` exit=0、改动文件 ESLint 0 error（存量模板风格 warning 不动）。待联调点不变，另新增：`check-sms-code` 后 Server 自动送审时序、非经办人 `canSign` 同步返回、RE_UPLOAD 重走返回 `UPLOAD_AUTH_FILE`。
+
+**2026-11-11 二轮验证与收尾**：全链路验证通过——ElectronicSign 5 秒定时（防重复/卸载清理/immediate 覆盖父子时序）、独立页 B 项重进回退链路（`currentView`→ELECTRONIC_SIGN→watch `previousStatus==null`→`handleSignCompleted`）、落物料语义双场景各自正确（独立页未传 `persist-preuploaded-auth-letter` 默认 true 走老用户 `ca-auth-letter`→`/auth-file`；认证页显式 false 防收集步重复落库）、vue-tsc exit=0 / ESLint 0 error。经用户确认处理三项：① 恢复独立页 L45 状态门控（`identityReady` 取消注释 + `content-area` 包回 `v-if`，联调验证期曾临时停用）；② 独立页收集步简化为显式 `collect-only`（旧 reuploading 三元与 `handleReUploadSubmitted` 注释保留）；③ provider 页 `reuploading`/`reuploadFlowId` 死变量拍板保持注释标注现状，待后续版本统一清理。后端联调点 4 项前端不动。
+
+**2026-11-11 白屏缺陷修复（联调实证）**：服务商合同入口 `/provider/my/electronic-sign?returnUrl=/provider/contract` 页面为空。实测 `/status` 响应（entryStatus=2、canSign=false）**未下发 `isAuthFileNeeded`**，P-1 契约缺口实锤——恢复后的门控 `isAuthFileNeeded !== null` 恒 false 导致 `content-area` 不渲染。经用户确认采用**前端兼容降级**：门控改为 `status 已加载且无 error`（旧条件注释保留）；字段缺失时独立页按非经办人单步渲染（`isKnownOperator === true` 才双步），真经办人由 `check-sms-code` 返回 `UPLOAD_AUTH_FILE` 拉起内嵌上传兜底，流程不断；后端补齐字段后前端无需再改。`useElectronicSignStatus` 的 `isAuthFileNeeded` 注释防线同步更新（认证容器 null 时仍不分流收集步，仅独立页按单步渲染）。vue-tsc exit=0、ESLint 0 error。遗留小项：独立页 `/status` 加载失败且从未成功时门控下页面无重试入口（原门控即此行为，如需错误重试 UI 另立需求）。
+
+**2026-11-11 三轮缺陷修复（外部静态 check 复核）**：复核另一模型对调整后流程的 6 条静态质疑，判定 2 条真实卡死缺陷并经用户拍板修复，其余 4 条处置如下。已修（均落 `ElectronicSign.vue`）：① **5 秒等待触发过窄**——原 watch 仅「审核中(3)→成功(7)」触发，验证码后首刷若直接 2→7 则卡死；放宽为「前值任何非成功态→成功均触发」（覆盖 3→7/2→7/4→7/null→7，immediate 首触兜底父子挂载时序与独立页重进已是成功态的自动回退；7→7 变化不重复排队）。② **送审时序差停住**——认证环节经办人验证码通过后 Server 自动送审存在时序差，首刷仍 entryStatus=2 时轮询（仅 REVIEWING 续排）不启动；新增 `confirmAutoSubmit` 送审确认循环（`AUTO_SUBMIT_CONFIRM_MAX_RETRIES=5`、间隔 `AUTH_POLLING_INTERVAL_MS`，generation 标记防重走协议/切换主体/卸载后旧循环污染；查到 REVIEWING 交还 refresh 自动续排轮询、直接成功交还状态 watch 排 5 秒等待、查询失败不重试交还既有链路）。登记联调点（不改代码）：非经办人 `check-sms-code` 返回 `canSign=true` 后父页面 `GET /status` 是否同事务同步返回。判定不成立：组件内上传页缺少文件时打开（系 P-1 兜底设计）；独立页 5s 回退未区分经办人/非经办人（B 项拍板口径统一回退，无需区分）；白屏与响应矛盾（现场在旧门控版本，已按兼容降级修复）。vue-tsc exit=0、ESLint 0 error。
 
 **2026-11-10 交叉复核**：按原始需求、Server 方案和代码核对了服务商平台认证固定五步、独立认证页双步/单步、`check-sms-code → ca-auth-letter（老用户）→ auth-file` 的调用门禁、审核成功后的 `canSign` 复查，以及合同/固定入口文案。补齐异步请求在主体切换或组件卸载后的失效检查，避免旧流程继续用新主体参数送审。Vue 单文件组件编译检查和 `git diff --check` 通过；真实接口响应、新用户委托书物料落库（Server T1）与审核流转仍待联调。
 
@@ -144,15 +157,20 @@ wds/wds-web/src/
 | 新增遗留 | ~~验证码 60s 倒计时字段~~ 已于 2026-11-10 收口（= `AgreementModel.countdown`，见 C-007）；仍待确认：短信发送频控规则（纪要待办 @盛瑞泽）；供应商独立入参属于后续扩展；中台 `userId` 必填冲突与 `fileType=20` 来源；CA 委托书 `material_type=10` 占用核对 | 部分确认 | 后端/产品 | 阶段3 |
 | U-010 | 审核结果态展示位置：容器页新 ViewType vs ElectronicSign.vue 内部切换 | ✅已确认：ElectronicSign.vue 内部根据 entryStatus 切换，不新增容器页 ViewType | 产品/开发 | 阶段3 |
 | U-011 | 审核中状态轮询频率和终止条件 | ✅已确认（2026-11-10 产品最终口径）：与既有认证统一 5 秒轮询，复用 `AUTH_POLLING_INTERVAL_MS`，直到查到结果（审核通过或拒绝）后停止 | 产品+后端 | 阶段3 |
-| U-012 | 审核未通过后的「重新上传」入口 | ✅已确认：认证场景重新读取 `user/info` 后回到认证流程材料首步；签署合同场景重新读取独立 CA `/status`，仍为经办人且 `entryStatus=4` 时回到授权委托书首步。重传所需 `caFlowId` 来源仍待 Server 确认 | 产品 / Server | 阶段3 |
+| U-012 | 审核未通过后的「重新上传」入口 | ✅已确认（2026-11-11 修订为 B 口径，推翻 11-06「原地替换」记录；同日二轮拍板方案 a）：**重进先见驳回态**，点重新上传后认证场景调 `user/info`、合同场景调 `/status` 刷状态，仍处 RE_UPLOAD 则回委托书收集步（非材料首步）重新收集后**重走协议+动态码**；认证环节收集即落库由 Server 自动送审（不调 `/auth-file`），签署场景凭本轮新 `caFlowId` 调 `/auth-file`，`caFlowId` 来源问题随之关闭。联调点：RE_UPLOAD 重走 `check-sms-code` 须返回 `nextAction=UPLOAD_AUTH_FILE` | 产品 / Server | 阶段3 |
 | U-013 | 审核未通过是否展示驳回原因 | ✅已确认（2026-11-10 产品）：UI 不展示具体驳回原因，维持 RE_UPLOAD 中性文案；无需接口下发意见字段 | 产品+后端 | 阶段3 |
 | U-014 | 合同签署场景跳转后认证页展示逻辑 | ✅已确认：认证页根据 entryStatus 直接展示对应状态 | 产品 | 阶段3 |
 | U-015 | V1.1 首次爱签协议重签条件与 `canSign`、`/protocol` 的关系 | 待产品与 Server 确认协议范围及判定字段；前端不以本地记录推断 | 产品/后端 | 阶段2、阶段3 |
-| CA 流程恢复 | `entryStatus=2` 继续认证与驳回后重传的流程号 | `2` 已按 Server 方案重新申请协议和新 `caFlowId`，不再作为缺失契约；`4` 驳回后若要求原地复用有效流程，当前 `/status` 未提供 `caFlowId`，需确认续传接口/流程号来源。现有代码以重新申请流程兜底，联调前不按“原地续传已完成”验收 | 后端 | 阶段3 |
+| CA 流程恢复 | `entryStatus=2` 继续认证与驳回后重传的流程号 | `2` 已按 Server 方案重新申请协议和新 `caFlowId`，不再作为缺失契约；`4` 驳回重传按 2026-11-11 B 口径执行：回第一步重新收集后重走协议+动态码，凭新 `caFlowId` 送审，不再要求 `/status` 下发流程号。联调点：RE_UPLOAD 重走 `check-sms-code` 须返回 `nextAction=UPLOAD_AUTH_FILE` | 后端 | 阶段3 |
 
 ## 需求变更日志
 | 版本 | 变更时间 | 变更内容 | 影响的需求 | 回退阶段 | 处理结果 |
 |---|---|---|---|---|---|
+| R1 | 2026-11-11 | 三轮缺陷修复（外部静态 check 复核）：修 A——5 秒等待 watch 由「3→7」放宽为「前值任何非成功态→成功均触发」（含 immediate 兜底独立页重进）；修 B——认证环节经办人验证码通过后新增 confirmAutoSubmit 送审确认循环（最多 5 次、间隔 5s，generation 防旧循环污染）；登记联调点：非经办人 canSign=true 后 GET /status 同步性；另 3 条质疑判定不成立（P-1 兜底设计/B 项拍板口径/白屏信息过期）。 | ElectronicSign.vue、workflow-state、阶段2 技术方案 | 阶段3 | vue-tsc exit=0、ESLint 0 error；四场景卡死路径均已消除，待页面联调验证。 |
+| R1 | 2026-11-11 | 二轮口径拍板并落地：①认证环节经办人「收集即落库」（收集步调 `ca-auth-letter`，动态码通过后 Server 自动送审，前端不调 `/auth-file`）；非经办人动态码通过即放行。②经办人审核通过后静默 5 秒（常量 `CA_AUTH_PASS_ADVANCE_DELAY_MS`，无页面展示）进下一环节；独立页重进已是认证成功态自动 5 秒回退。③P1 重新上传定方案 a：重进先见驳回态，点重新上传后调 `user/info`/`/status` 刷状态，仍处 RE_UPLOAD 回委托书收集步。④雇主认证页补齐经办人收集步。 | ElectronicSign.vue、ProviderAuthLetterUpload.vue、authentication/const.ts、两端认证容器、U-012、阶段2 技术方案 | 阶段3 | 已编码落地：vue-tsc exit=0、ESLint 0 error；新增联调点：check-sms-code 后 Server 自动送审时序、非经办人 canSign 同步返回、RE_UPLOAD 重走返回 UPLOAD_AUTH_FILE。 |
+| R1 | 2026-11-11 | 联调实证 P-1：/status 未下发 isAuthFileNeeded（entryStatus=2 响应无该字段），恢复门控后独立页白屏。经确认前端兼容降级：门控改 status 已加载即就绪，字段缺失按非经办人单步走、真经办人靠 UPLOAD_AUTH_FILE 兜底。 | electronicSign/index.vue、useElectronicSignStatus.ts（仅注释）、workflow-state、阶段2 v2.16 | 阶段3 | vue-tsc exit=0、ESLint 0 error；后端补字段后前端无需再改。 |
+| R1 | 2026-11-11 | 二轮验证收尾（经用户逐项确认）：恢复独立页 L45 状态门控（identityReady + content-area v-if）；独立页收集步简化为显式 collect-only（旧 reuploading 三元/handleReUploadSubmitted 注释保留）；provider 页 reuploading/reuploadFlowId 死变量拍板保持注释标注现状。 | electronicSign/index.vue、workflow-state、阶段2 v2.16 | 阶段3 | vue-tsc exit=0、ESLint 0 error；后端联调点 4 项前端不动。 |
+| R1 | 2026-11-11 | 用户澄清被拒后步骤条由接口状态驱动回第一步，并修订 U-012 为 B 口径：废除 11-10「原地替换（不重走协议/短信）」，改为重新收集委托书后重走协议+动态码，凭本轮新 `caFlowId` 调 `/auth-file`；「重传 `caFlowId` 来源」待确认项随之关闭。 | 独立页重传链路、U-012、CA 流程恢复项、阶段2 技术方案 | 阶段2/3 | 独立页 `reuploading` 直传路径注释保留，改为回第一步收集重走；workflow-state 与阶段2 已同步。 |
 | R1 | 2026-11-10 | 校准经办人认证步骤及入口文案：平台认证不新增“补充授权委托书”总步骤；审核通过后沿用现有 `next` 流转，不增加成功态按钮。 | 阶段2、阶段3、接口对齐表、服务商认证页及签章组件 | 阶段2/3 | 代码与正式文档已调整；静态核对通过，页面和接口联调待完成。 |
 | R1 | 2026-11-10 | 用户确认 `GET /status` 返回经办人布尔值 `isAuthFileNeeded`；经办人 UI 先上传委托书、再验短信，验证码成功后才提交委托书审核。 | 原始需求、阶段0～3、接口对齐表、workflow-state | 阶段0/2 | 已更新文档并交叉核对；Server 原方案未改，实际响应层级待联调；代码按用户要求等文档确认后再动。 |
 | R1 | 2026-11-06 | 用户确认供应商也需要 PC 固定入口，补充截图定位在供应商个人中心主体资料卡下方、保证金提示上方。 | 原始需求、阶段0～3、接口对齐表、workflow-state | 阶段0/2 | 位置与范围已回填；本轮进一步确认供应商是特殊服务商，U-009 复用 `providerId` 与服务商 CA 契约。 |

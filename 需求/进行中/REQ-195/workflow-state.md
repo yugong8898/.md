@@ -12,6 +12,13 @@
 
 ## 接口契约开发依据（2026-11-10 切换）
 
+### Apifox 契约对照与本轮代码调整
+
+- 已按新契约调整短信发送、校验、重发请求体：只传 `caFlowId`（校验另传 `verifyCode`）；`/auth-file` 只传 `caFlowId` 与 `ossCode`；`/success-seen` 不传请求体。协议响应类型增加可选 `countdown`，有正值时按服务端秒数展示冷却。
+- **单独待确认：重传所需 `caFlowId` 来源。**用户已明确：四个场景中，委托书审核未通过后只上传新文件取得 `ossCode`，随后调用对应角色的 `/auth-file` 更新授权书；不重新申请协议，不重发或校验短信。Apifox 请求体仍要求 `caFlowId`，而 `/status` 未列该字段，刷新后前端无法取得有效值。请 Server 明确重传时从何处获取 `caFlowId`，或确认重传请求可省略它。明确前不将当前重新申请协议的兜底视为符合需求。
+- **代码处理**：已移除点击重传时重新申请协议的路径；当前页面持有有效 `caFlowId` 时，上传新文件后直接调用 `/auth-file`。页面刷新导致流程号缺失时明确拒绝提交，不重新走协议或短信；待 Server 确认流程号来源后补齐刷新恢复。
+- 待联调：`isAuthFileNeeded` 虽在 schema 标为必填，示例却缺失；新用户委托书物料落库 T1 与短信重发冷却时长也未闭环。以上不视为已验收。
+
 - **当前依据**：`电子签章接口契约-Apifox-REQ-195.md`。内容取自 Apifox 项目 `8677491`「万大圣企业服务平台API接口」默认模块实测数据，覆盖 `/v1/employer/ca-verification/*` 与 `/v1/provider/ca-verification/*` 共 14 个接口及其 20 个 schema（请求体、响应 model、枚举取值、服务端错误文案、失败语义、调用时序）。**接口字段名、类型、层级、必传参数一律以该文档为准，不再引用对齐表的预估签名。**
 - **停止作为依据**：`后端接口契约对齐表-REQ-195.md`。其零章 0.1 节的 7 个核身接口预估已被 Apifox 实测契约取代，已知差异包括：`/auth-file` 实际为 `caFlowId` + `ossCode`（不收 `fileName`/`fileUrl`）；`/success-seen` 无请求体；`/send-sms-code`、`/check-sms-code`、`/resend-sms-code` 不传主体 ID；`/status` 另有 `authStatus`、`authPhase`；`entryStatus` 枚举无 0；短信倒计时 `countdown` 挂在 `/agreement` 响应。
 - **保留原因**：对齐表不删除，继续承担两项追溯——① C-001~C-007 / U-008 等确认项的决策历史；② 认证域接口（`ca-auth-letter`、`/v1/{role}/protocol` 服务端强校验、`url-2-osscode`、`user/info` 透传差异）的契约记录。**这部分内容不在新契约文档范围内，仍只能从对齐表查。**
@@ -137,7 +144,7 @@ wds/wds-web/src/
 | 新增遗留 | ~~验证码 60s 倒计时字段~~ 已于 2026-11-10 收口（= `AgreementModel.countdown`，见 C-007）；仍待确认：短信发送频控规则（纪要待办 @盛瑞泽）；供应商独立入参属于后续扩展；中台 `userId` 必填冲突与 `fileType=20` 来源；CA 委托书 `material_type=10` 占用核对 | 部分确认 | 后端/产品 | 阶段3 |
 | U-010 | 审核结果态展示位置：容器页新 ViewType vs ElectronicSign.vue 内部切换 | ✅已确认：ElectronicSign.vue 内部根据 entryStatus 切换，不新增容器页 ViewType | 产品/开发 | 阶段3 |
 | U-011 | 审核中状态轮询频率和终止条件 | ✅已确认（2026-11-10 产品最终口径）：与既有认证统一 5 秒轮询，复用 `AUTH_POLLING_INTERVAL_MS`，直到查到结果（审核通过或拒绝）后停止 | 产品+后端 | 阶段3 |
-| U-012 | "重新上传"按钮行为：回退步骤01 vs 原地替换 | ✅已确认：原地替换，清空文件重新上传，不回退步骤 | 产品 | 阶段3 |
+| U-012 | 审核未通过后的「重新上传」入口 | ✅已确认：认证场景重新读取 `user/info` 后回到认证流程材料首步；签署合同场景重新读取独立 CA `/status`，仍为经办人且 `entryStatus=4` 时回到授权委托书首步。重传所需 `caFlowId` 来源仍待 Server 确认 | 产品 / Server | 阶段3 |
 | U-013 | 审核未通过是否展示驳回原因 | ✅已确认（2026-11-10 产品）：UI 不展示具体驳回原因，维持 RE_UPLOAD 中性文案；无需接口下发意见字段 | 产品+后端 | 阶段3 |
 | U-014 | 合同签署场景跳转后认证页展示逻辑 | ✅已确认：认证页根据 entryStatus 直接展示对应状态 | 产品 | 阶段3 |
 | U-015 | V1.1 首次爱签协议重签条件与 `canSign`、`/protocol` 的关系 | 待产品与 Server 确认协议范围及判定字段；前端不以本地记录推断 | 产品/后端 | 阶段2、阶段3 |

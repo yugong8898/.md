@@ -38,6 +38,9 @@
 | 阶段7 需求复盘（可选） | ⏳待开始 | - | - |
 
 ## 当前阶段
+**2026-11-12 固定入口补平台实名认证前置门控**：按 R-006-1 「仅对已完成平台实名认证的用户展示」，在 `ElectronicSignEntry.vue` 内部新增 `platformAuthCompleted` 判定并在三处同时短路（`visible` 不渲染、`handleAction` 不emit、成功曝光 watch 不调 `success-seen`）。口径经用户拍板：雇主取 `employerInfo.authStatus===1`、服务商取 `providerInfo.authStatus===1`（均由组件按 `role` 自取）、供应商取 `onboarding.status===2` 由 `supplier/personalCenter/index.vue` 以新增可选 prop `authCompleted` 传入（未认证不渲染，非禁用）。背景：上一轮为收敛显隐决策权已删掉四个消费页的本地认证位 `v-if`，使 R-006-1 一度失去实现依托，本轮把门控收回组件内部后与「显隐单点决策」不再矛盾。ESLint 0 error（仅存量模板风格 warning）；已同步阶段0 v2.10、阶段2 v2.17、阶段3 v1.11。待确认：未认证用户仍会触发一次 `GET /status`（组件自带取数，未在本次范围内加停止条件）；签署守卫 `useElectronicSignGuard` 只读 CA 状态，未补平台实名认证前置（理论上未实名用户走不到合同页，待产品确认是否需兜底）。
+**2026-11-11 合同页重复请求修正**：`/provider/contract` 与雇主合同页首屏由固定入口组件查询一次 `/status`；签署守卫关闭自动查询（包括主体切换时的自动查询），仅在点击“立即签署”时主动刷新。相关 composable ESLint 与 diff 检查通过，浏览器 Network 仍待实测。
+
 **2026-11-11 阶段3出口检查**：`wds-web` 分支 `F-REQ-195-wxj` 当前有 12 个未提交文件（含已暂存和未暂存）。`quick-verify.sh --scope both --files ...` 实际检查这 12 个文件，exit=0：无新增 `console.log`、无大文件、diff 无空白错误，ESLint 0 error（99 条 warning）；差异指纹 `1ee0d31a3b7035685d23fc007bce86ace53fb753269e58a2034981ffa7e7bb81`。完整 `vue-tsc -b --noEmit` 仍有其他模块类型错误，未取得页面和接口联调证据；阶段3保持进行中，阶段4不标通过。Server 状态时序及 `isAuthFileNeeded` 缺省按用户确认不作为本轮前端阻塞项。
 
 **2026-11-11 提测前复核**：统一 `/status.isAuthFileNeeded` 缺失时按非经办人处理，两端认证页不再因此阻断；`entryStatus=4` 重传按状态进入委托书步骤。验证码只校验非空，不限制长度；发送失败显示接口错误。授权委托书上传上限为 10MB。清理已不可达的重传变量、回调和调试注释。`ElectronicSign` 的 5 秒跳转在状态失效或状态刷新期间取消，并在刷新确认成功后重新计时。改动范围 ESLint 为 0 error；完整 `vue-tsc -b --noEmit` 仍有仓库其他模块的类型错误，REQ-195 关键模块未报错。接口时序与真实页面效果仍待联调。
@@ -76,6 +79,8 @@
 ## 本需求文件树（2026-11-07 核对）
 
 代码口径：`wds/wds-web` 的 `F-REQ-195-wxj` 分支，以 `b78b1e73d` 为开发起点，统计至当前 HEAD `dcf298da5`；共 24 个文件（A 新增 11、M 修改 13），代码工作区无未提交改动。功能说明表示文件当前承担的职责，不代表接口联调或验收通过。
+
+〔2026-11-12 修正〕上段 HEAD 锚点与未提交状态已过期：REQ-195 代码已陆续提交至 `e952ae4e7`（接口竞态），上方 24 文件清单与 A/M 标注仍以 2026-11-07 核对为准，未随后续提交重算。当前工作区未提交 2 个文件（均为本轮固定入口门控改动）：`views/authentication/components/ElectronicSignEntry.vue`、`views/supplier/personalCenter/index.vue`。
 
 ```text
 wds/wds-web/src/
@@ -166,6 +171,7 @@ wds/wds-web/src/
 ## 需求变更日志
 | 版本 | 变更时间 | 变更内容 | 影响的需求 | 回退阶段 | 处理结果 |
 |---|---|---|---|---|---|
+| R1 | 2026-11-12 | 固定入口增加平台实名认证前置门控（R-006-1 回填实现口径）：`ElectronicSignEntry.vue` 新增可选 prop `authCompleted`，组件内 `platformAuthCompleted` 按雇主/服务商口径自取、供应商口径由消费页传入；未认证时 `visible`/`handleAction`/成功曝光 watch 三处均短路，入口不渲染。供应商页接 `:auth-completed="isSupplierProfileCertified"`。 | ElectronicSignEntry.vue、supplier/personalCenter/index.vue、阶段0 v2.10、阶段2 v2.17、阶段3 v1.11 | 阶段3 | ESLint 0 error；本轮只动入口显隐，CA 状态接口调用时机与签署守卫口径列为待确认，未自行扩大范围。 |
 | R1 | 2026-11-11 | 三轮缺陷修复（外部静态 check 复核）：修 A——5 秒等待 watch 由「3→7」放宽为「前值任何非成功态→成功均触发」（含 immediate 兜底独立页重进）；修 B——认证环节经办人验证码通过后新增 confirmAutoSubmit 送审确认循环（最多 5 次、间隔 5s，generation 防旧循环污染）；登记联调点：非经办人 canSign=true 后 GET /status 同步性；另 3 条质疑判定不成立（P-1 兜底设计/B 项拍板口径/白屏信息过期）。 | ElectronicSign.vue、workflow-state、阶段2 技术方案 | 阶段3 | vue-tsc exit=0、ESLint 0 error；四场景卡死路径均已消除，待页面联调验证。 |
 | R1 | 2026-11-11 | 二轮口径拍板并落地：①认证环节经办人「收集即落库」（收集步调 `ca-auth-letter`，动态码通过后 Server 自动送审，前端不调 `/auth-file`）；非经办人动态码通过即放行。②经办人审核通过后静默 5 秒（常量 `CA_AUTH_PASS_ADVANCE_DELAY_MS`，无页面展示）进下一环节；独立页重进已是认证成功态自动 5 秒回退。③P1 重新上传定方案 a：重进先见驳回态，点重新上传后调 `user/info`/`/status` 刷状态，仍处 RE_UPLOAD 回委托书收集步。④雇主认证页补齐经办人收集步。 | ElectronicSign.vue、ProviderAuthLetterUpload.vue、authentication/const.ts、两端认证容器、U-012、阶段2 技术方案 | 阶段3 | 已编码落地：vue-tsc exit=0、ESLint 0 error；新增联调点：check-sms-code 后 Server 自动送审时序、非经办人 canSign 同步返回、RE_UPLOAD 重走返回 UPLOAD_AUTH_FILE。 |
 | R1 | 2026-11-11 | 联调实证 P-1：/status 未下发 isAuthFileNeeded（entryStatus=2 响应无该字段），恢复门控后独立页白屏。经确认前端兼容降级：门控改 status 已加载即就绪，字段缺失按非经办人单步走、真经办人靠 UPLOAD_AUTH_FILE 兜底。 | electronicSign/index.vue、useElectronicSignStatus.ts（仅注释）、workflow-state、阶段2 v2.16 | 阶段3 | vue-tsc exit=0、ESLint 0 error；后端补字段后前端无需再改。 |
@@ -211,4 +217,5 @@ wds/wds-web/src/
 - 本期功能：在现有认证流程（雇主端 `/employer/certification` + 服务商端 `/provider/certification`）中新增“电子合同签章认证”环节
 - 涉及端：雇主端、服务商端、供应商端（Web PC）
 - 关键决策：ElectronicSign.vue 跨两端复用；authLetterUpload 仅服务商端；useElectronicSignGuard.ts 放 src/composables/；认证成功一次性曝光由 Server `showSuccessEntry` / `success-seen` 维护；电子签章状态事实源为独立状态接口，`authPhase=4` 仅作恢复检查点。
+- 入口显隐口径（2026-11-12）：固定入口显隐单点由 `ElectronicSignEntry.vue` 内部决策（含平台实名认证前置门控），消费页只传 props、不包 `v-if`；平台实名认证与 CA 认证是两个不同数据源，不得互替。
 - 接口契约依据：自 2026-11-10 起以 `电子签章接口契约-Apifox-REQ-195.md` 为准，《后端接口契约对齐表-REQ-195.md》转为历史比对基线。

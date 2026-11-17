@@ -2,7 +2,7 @@
 
 > **数据来源**：Apifox 项目 `8677491`「万大圣企业服务平台API接口」— 默认模块，2026 年 11 月 10 日通过 apifox MCP 实拉，字段与描述均为文档原文，非前端推测。
 >
-> **整理范围**：`/v1/employer/ca-verification/*` 7 个 + `/v1/provider/ca-verification/*` 7 个，共 14 个对称接口。**不含**认证域 `ca-auth-letter`、`url-2-osscode` 等接口。
+> **整理范围**：`/v1/employer/ca-verification/*` 7 个 + `/v1/provider/ca-verification/*` 7 个，共 14 个对称接口。**不含**认证域 `ca-auth-letter`、`url-2-osscode` 等接口。〔2026-11-16 补〕新增两端共用无角色前缀接口 `GET /v1/ca-verification/auth_file_template`（见第九节），核身接口口径 14→15。
 >
 > **与源文档关系**：本文档只做「后端已落地的接口契约」整理，《后端接口契约对齐表-REQ-195.md》内容未做任何改动；两者口径差异不写入本文档，另行口头同步。
 >
@@ -27,6 +27,7 @@
 - [六、调用时序](#六调用时序)
 - [七、契约内的待明确点](#七契约内的待明确点)
 - [八、附：复现方式](#八附复现方式)
+- [九、2026-11-16 增量接口：auth_file_template](#九2026-11-16-增量接口auth_file_template)
 
 ---
 
@@ -471,11 +472,32 @@ flowchart LR
 2. 逐条取 `/paths/_v1_{role}_ca-verification_{action}.json` 得 method、参数、requestBody/response 的 `$ref`、`operationId`、tags、服务端描述；
 3. schema 名先经 `/components/schemas/index.json` 定位到 `/components/schemas/{Name}.json`，再取叶子（共 20 个 schema，含 `EnvelopeBase`、`StatusModel`、`AgreementModel`、`MaskedPhoneModel`、`CheckSmsModel`、`AuthFileModel`、`EmptyModelEnvelope` 及 6 个 Envelope 与 8 个请求体）。
 
-Apifox 侧更新后需显式重新拉取，本地缓存不会自动失效。
+Apifox 侧更新后需显式重新拉取，本地缓存不会自动失效。〔2026-11-16 注〕MCP 工具后缀已由 `35ck23` 变更为 `s7a4oq`（现为 `read_project_oas_s7a4oq` / `read_project_oas_ref_resources_s7a4oq` / `refresh_project_oas_s7a4oq`），上文旧后缀保留作历史记录。索引零命中不等于接口未收录：必须先 refresh 重拉再二次检索才可断言（auth_file_template 即首轮零命中、刷新后命中，见第九节）。
 
 ---
 
-**文档版本**: v1.0
+## 九、2026-11-16 增量接口：auth_file_template
+
+> 本节为 2026-11-16 重拉 Apifox 后的增量登记，原 14 接口基线（第一至八节）未改动。接口 summary「获取授权委托书模板地址」，前端已消费并随 `19fe1c2f7` 提交。
+
+### 9.1 GET /v1/ca-verification/auth_file_template 获取授权委托书模板地址
+
+| 项 | 契约 |
+|---|---|
+| 路径 | `/v1/ca-verification/auth_file_template`（**两端共用，无角色前缀**，与 14 个对称接口不同） |
+| 方法 | GET |
+| 登录态 | 无需登录 |
+| 入参 | 无 query 参数、无请求体 |
+| 成功响应 | `model.url`（string，required）——模板资源 URL，来源后端配置项 `ca_verification.auth_file_template_url` |
+| 未配置响应 | HTTP 200 + `code=11001` + `succeed=false` + `model=null` + message「授权委托书模板暂未配置」 |
+
+**前端消费链路**：`fetchCaAuthFileTemplate()`（`api/electronicSign/index.ts`，httpGet、非静默）→ `downloadAuthLetterTemplate()`（`utils/downloadUrlAsFile.ts`，已 async 化：取 `res.data?.url`，取不到直接 return，拿到后沿用原 a 标签 href+download+click，文件名保持「授权委托书模板.docx」）→ 3 个调用方（`ProviderAuthLetterUpload.vue`、`EmployerBusinessSubmitMaterials.vue`、`ProviderBusinessSubmitMaterials.vue`）零改动。11001 未配置文案由请求层统一提示，组件不再兜底。前端静态资源 `/files/authorization-letter-template.docx` 口径作废（U-006）。
+
+**联调必验**：① 接口可用性与未配置场景提示；② 模板 URL 为跨域 CDN/OSS 地址时浏览器忽略 `a.download`，实际落盘文件名由服务端响应头决定（用户已拍板保持 a 标签逻辑，不改 fetch+Blob）。
+
+---
+
+**文档版本**: v1.1
 
 **最后更新**: 2026年11月
 

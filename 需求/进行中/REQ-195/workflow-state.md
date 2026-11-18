@@ -32,12 +32,26 @@
 | 阶段1 代码分析 | ✅已完成 | 阶段1-代码分析-REQ-195.md | 2026-11-04 |
 | 阶段2 技术方案 | ✅已完成 | 阶段2-技术方案-REQ-195.md | 2026-11-04 |
 | 阶段3 编码执行 | ✅已完成 | 阶段3-编码执行计划-REQ-195.md | 2026-11-17 |
-| 阶段4 代码审查 | 🔄进行中 | 阶段4-审查报告-REQ-195.md | - |
+| 阶段4 代码审查 | ✅已完成 2026-11-17（bugfix 后指纹已更新） | 阶段4-审查报告-REQ-195.md | 通过（无代码 P0）；R4-01 文档校准待阶段5 前，R4-04~R4-11 P2 待裁决；2026-11-17 晚 entryStatus=3/4 分流 bug 修复、协议文案统一、RZMP-11254 两端订单页签署守卫补齐及 RZMP-11265 按钮文案条件化（含口径二次修正）后 SHA 更新为 74a0be18…3e8a3f（受检 33 文件） |
 | 阶段5 测试基线与覆盖对齐 | ⏳待开始 | - | - |
 | 阶段6 测试执行与Bug修复循环 | ⏳待开始 | - | - |
 | 阶段7 需求复盘（可选） | ⏳待开始 | - | - |
 
 ## 当前阶段
+**2026-11-17 独立页委托书提交顺序确认**：用户确认点击委托书下一步时 `/draft` 成功后立即调 `ca-auth-letter`，两者成功才进入短信步骤；短信通过后只调 `/auth-file`。新用户平台认证不调用 `ca-auth-letter`；接口失败由请求层提示，不处理跨刷新补偿。代码与补充方案已同步，待联调验证。
+
+**2026-11-17 独立页委托书草稿恢复**：Apifox 确认雇主/服务商 `POST /ca-verification/draft` 的主体 ID + `draftOssCode` 契约；独立页上传后先暂存，`/status.authFileOssCode` 决定经办人默认在上传还是签章步骤，审核中/驳回态仍显示结果。详见《阶段2-补充方案-新用户委托书复用》。改动未提交，阶段4需增量复审。
+
+**2026-11-17 新用户委托书复用**：按用户新口径，新用户经办人平台认证不再二次上传委托书；从认证草稿 `uploads.authLetter.ossCode` 在短信通过后调 `/auth-file`，驳回重传回“提交材料”；独立签章页保持原上传流程。实施依据见《阶段2-补充方案-新用户委托书复用》。当前为未提交改动，阶段4既有审查指纹需增量复审；静态检查与联调边界见补充方案。
+
+**2026-11-17 签署守卫去重**：六个合同/订单签署入口统一调用 `useElectronicSignGuard.checkBeforeSign()` 处理查询失败提示与未认证跳转；各页原签署请求、埋点和 loading/busy 清理不变。改动未提交，阶段4既有指纹不覆盖本次去重，后续增量复审时更新。ESLint 7 文件 0 error（332 条 warning），电子签章回归测试 2/2，`git diff --check` 通过。
+
+**2026-11-17 晚 RZMP-11265 按钮文案条件化（云效缺陷，用户明确口径后实施）**：缺陷标题「服务商web端，个人老用户进入电子合同签章页面，按钮应该展示文案为确认」，描述为空。用户明确口径：**按钮文案按入口场景区分——合同签署时「提交」，认证时「下一步」**（非按个人/企业或新老用户）。修复：ElectronicSign.vue 新增 `verifyButtonText = computed(() => props.contractFlow ? '提交' : '下一步')`，模板硬编码「下一步」改插值（旧文案 HTML 注释保留）。判定复用既有 contractFlow prop：独立页传 route.query.source==='contract'（守卫弹窗跳转带 source:'contract'），两端认证容器不传（恒「下一步」），三消费点零改动。验证：ESLint 0 error（5 存量 warning 均不在新增行）、vue-tsc 110 存量持平零新增（本文件 0 条）。受检清单 33 文件不变（ElectronicSign.vue 本在清单内），SHA 更新 6813eb3c…1f5c83。审查报告新增 R4-15 节（v1.5）。云效状态未回写待授权。〔2026-11-17 晚二次修正：用户纠正「需求理解错了」——判定维度是承载页面而非合同触发与否：**所有 /electronic-sign 独立页入口（合同签署+固定入口）均「提交」，所有 /certification 认证容器均「下一步」**。contractFlow 口径作废（固定入口进独立页也须「提交」）：新增 standalonePage prop，verifyButtonText 改按 standalonePage 判定（旧 computed 行注释保留），独立页传 standalone-page，两端容器不传。验证：ESLint 2 文件 0 error（12 存量 warning）、vue-tsc 110 存量持平零新增；SHA 二次更新 74a0be18…3e8a3f；审查报告 R4-15 删除线更正升版 v1.6；原遗留①（固定入口文案待裁决）关闭〕
+**2026-11-17 晚 RZMP-11254 雇主订单页守卫补齐（用户追问「雇主的呢？」，范围裁决后实施）**：重查推翻上一轮「雇主端无订单页直调签署链路」错误结论（当时仅 grep 服务商接口名未查雇主自有封装 postEmployerOrderSignContract）。实测雇主签署出口全景：订单 list/detail handleSignContract（briefStatus 分流：直开 URL/选方式弹窗→common/custom/审核提示/兜底跳 common）、contract/common.vue、contract/confirm.vue、总分包 5 页（openSubpackageSignContractUrl）均无守卫。**用户裁决：仅补雇主订单 list/detail 2 页入口守卫**，common/confirm 旁路（purchase/buy 等入口）与总分包 5 页范围另议。修复：两页 handleSignContract 入口插 useElectronicSignGuard('employer').guardBeforeSign()，未认证 confirmAndGoElectronicSign(router, route)（雇主无路径常量，沿用雇主合同页无参写法，默认目标即雇主独立页，身份正确），原 briefStatus 链路零删改。验证：ESLint 0 error（253 存量 warning）、vue-tsc 110 存量持平（detail.vue 存量错行号 1056→1072 随插入位移，内容逐字一致，diff 比对确认零新增）、回归 2/2、diff --check 通过。受检 31→33 文件（/tmp/req195-files-v4.txt），SHA 更新 a4d22803…850865。审查报告 R4-13 错误结论已删除线更正，新增 R4-14 节（v1.4）。
+**2026-11-17 晚 RZMP-11254 订单页签署守卫补齐（云效缺陷，回退阶段3）**：测试报障——服务商 web 端订单管理列表和详情点「签署合同」未弹去认证弹窗。根因：provider/order/list.vue handleSignContract 与 detail.vue handleSignContract 直调 postProviderSignContract，从未接入 REQ-195 签署前置守卫（阶段2 入口收敛只覆盖两个核心合同页，订单页属遗漏面）。修复：两处 handler 在 busy/loading 置位后、调签署接口前插入 `useElectronicSignGuard('provider').guardBeforeSign()`，未认证走 `confirmAndGoElectronicSign(router, route, PROVIDER_ELECTRONIC_SIGN_PATH)` 弹「去认证」，查询失败 message.error 拦截，loading 静默返回；镜像合同页 handleSign 既有模式，原签署链路零删改纯插入。横向搜索：postProviderSignContract 第三消费点 ProviderOrderDetailBasicInfoCard.vue 经全仓 grep 确认无任何 import/注册（仅 uploadAchievements.vue 注释提及），为孤儿组件不在活跃链路，按最小改动不动。验证：ESLint 2 文件 0 error（27 存量 warning）、vue-tsc 110 存量持平零新增、回归测试 2/2。受检清单 29→31 文件（/tmp/req195-files-v3.txt），SHA 更新 43fdb2a9…c3bad91。注意：当前 useElectronicSignStatus 为用户手改 mock（entryStatus=3），守卫必拦截弹窗，真实放行需待 mock 恢复后联调。云效状态未回写（默认只读，待用户单独授权）。
+**2026-11-17 晚 协议详情描述文案统一（用户指令）**：ElectronicSign.vue 协议详情描述不再区分 contractFlow，统一为「请滑动阅读下方全部协议，确认同意后，获取验证码完成电子认证，方可签署合同。」，旧三元 HTML 注释保留。横向搜索：同文案另仅 useElectronicSignGuard.ts L36 守卫弹窗 content 一处（合同页拦截弹窗，非本次点名范围，未动，待用户确认是否同步）。contractFlow prop 仍被 ProviderAuthLetterUpload 传参消费，无 unused。ESLint 0 error（5 存量 warning）；受检 diff SHA 更新 d2671832…d4abeb。
+**2026-11-17 晚 entryStatus=3/4 分流 bug 修复（回退阶段3）**：用户报障——/status 返回 entryStatus=3（审核中）时点「下一步」误入委托书收集步，上传后进协议页误显「协议加载失败」。根因：两端容器 4 处前进 handler（provider handleMoreInfoNext/handleFaceNext、employer handleSubmitNext/handleFaceNext）分流只看 isAuthFileNeeded 未排除 3/4 结果态；首屏恢复路径已有排除故刷新重进正常，仅前进触发。修复：types.ts 新增共享集合 `CA_AUTH_LETTER_REVIEW_STATUS=[REVIEWING, RE_UPLOAD]`（用户指令避免双 !== 链，按项目枚举数组+includes 惯例），4 处三元补 `&& !CA_AUTH_LETTER_REVIEW_STATUS.includes(entryStatus.value!)`（前置守卫已保 status 非空），旧三元注释保留。全状态矩阵核验仅 3/4 行为变化，审核通过 5 秒静默流转/4 态重传闭环不受影响；附带堵住 3 态重传覆盖 ca-auth-letter 物料副作用。验证：ESLint 3 文件 0 error（32 存量 warning）、回归测试 2/2、vue-tsc 修复 3 文件零报错（全仓 111=110 存量+1 为用户手改 mock 块多余字段 authPhase/authstatus/ShowSuccessEntry 所致，非本次引入，mock 拼写瑕疵已提示不顺手改）。受检 diff SHA 更新 c21a72ce…1837195（含用户 mock 工作区改动）。复现口径：需首屏落 moreInfo 的早期进度企业账号点下一步；authPhase=2/4 账号首屏直落审核中页且 StepBar 无回退，无法触发。待用户 mock 复验后提交。
+**2026-11-17 阶段4 审查通过**：29 个受检文件逐文件读完（Vue SFC 含完整 template），范围限定 REQ-195 19 笔提交（排除 master 合并带入的 REQ-206 草稿/REQ-132 工作台等他人改动）。结论：**无代码 P0**；双弹 toast 疑虑实测请求层后排除（静默接口返回 data、非静默弹一次后 reject，组件无叠加提示）；回归测试 2/2 通过。P1 仅 R4-01（阶段2/逐条验证旧送审口径文档校准，阶段5 前完成）；P2 八项（R4-04 雇主容器 ElectronicSign 缺 :key、R4-05 认证容器双状态源重复查询/轮询、R4-06 英文兜底文案、R4-07 re-upload 事件 kebab 命名、R4-08 模板下载 url 空静默、R4-09 succeed 旧口径注释、R4-10 returnUrl 未校验同源、R4-11 范围外删两行他需求 TODO 注释）均不顺手改，待用户逐项裁决。mock 块/断言按开发阶段保留口径不判缺陷。受检 diff SHA-256 `4ada5a17…a1c9d9` 已写入「阶段 4 审查差异」；阶段5 准入时业务代码 diff 变化须复审。报告 v1.1。
 **2026-11-17 阶段3 收尾与阶段4 启动**：用户手动提交并推送 `eac55dfa3`（13 文件 +42/-27，与 commit 提案一致无漂移）。出口门禁按兜底口径执行（`quick-verify.sh` 只查工作区 staged/unstaged，不适用已提交改动）：ESLint 13 文件 0 error（exit=0，112 条存量 warning）、`vue-tsc --noEmit -p tsconfig.app.json` 110 条存量持平零新增。R 类全部闭环（R-02 Server 确认关闭）。工作区仅剩 `ElectronicSignEntry.vue` 两行行尾空格清理（L165/L168，无逻辑改动），待下次顺带提交。遗留 U-015/T1/P-1 与联调必验项转阶段5/6，不阻塞编码出口。**阶段3 标完成，阶段4 启动**：分支 `b78b1e73d..HEAD` 全量 diff 187 文件含 master 合并带入的他人改动（不作审查范围），审查范围限定 REQ-195 自身 **19 笔提交、29 个文件**（`git log --grep="REQ-195" --name-only` 并集）。
 **2026-11-17 阶段3出口核验**：分支相对 `master` 的 30 个 TS/Vue/测试文件 ESLint 0 error（178 warning）；电子签章回归测试 2/2 通过；全量 `vue-tsc -b --noEmit` 仍有 110 条错误，CA 核心文件零报错，雇主合同页 3 条错误对应 `master` 已有代码。修正固定入口组件 2 行尾随空格后，`git diff master --check` 通过，`quick-verify.sh` 对这 1 个未提交文件通过；脚本不能覆盖已提交的整个分支。当前无本地页面服务或真实接口联调记录。阶段3步骤8尚未满足，阶段4不标开始。〔2026-11-17 晚更新：commit 已由用户手动完成并推送，本段结论被上方「阶段3 收尾与阶段4 启动」段取代，保留作历史快照〕
 **2026-11-17 R-02 关闭**：用户确认当前短信恢复实现没有问题，前端保持现状，不再将 R-02 列为待 Server 确认的开发阻塞项；短信接口行为仍随正常联调验收。代码零改动；同步阶段3和《测试用例逐条验证》当前状态。〔2026-11-17 晚升级〕用户转达 Server 结论：send-sms-code / resend-sms-code 选择现行实现没问题，依据由「用户确认」升级为 **Server 确认**；R 类全部闭环，无待处理代码项。同步逐条验证 v1.15（头部依据升级 + 3.4.1/3.4.3/变更记录补齐）。
@@ -85,6 +99,8 @@
 | 阶段1 代码分析 | 阶段0需求文档与认证精读 | 已修正后通过 | 4 | 4 | 阶段1-代码分析-REQ-195.md v1.4：确认服务商个人与个体/企业法人均先进入 moreInfo；`authPhase` 不可复用；本期签署入口收敛为两个核心合同页。 |
 | 阶段2 技术方案 | 阶段0、阶段1、源码状态机与 11-05 Server 评审 | 已修正后通过 | 7 | 7 | 阶段2-技术方案-REQ-195.md：api 签名按 `caFlowId` 流程制落定，电子签章状态统一走独立接口，`authPhase=4` 恢复门禁保留；C-005 经办人标识与 T1 仍开放。 |
 | 阶段3 编码执行 | 阶段2 技术方案 + 用户逐项裁决（A1–A8/C1/C3/D1）+ Apifox 契约 | 通过 | 0 | 0 | 2026-11-17 出口门禁：用户手动提交 `eac55dfa3`（13 文件与提案一致无漂移）；ESLint 13 文件 0 error（exit=0，112 存量 warning）；vue-tsc -p tsconfig.app.json 110 条存量持平零新增；R 类全部闭环（R-02 Server 确认）；quick-verify.sh 不适用已提交改动，按兜底口径手动 lint 留证。遗留：工作区 ElectronicSignEntry.vue 两行行尾空格清理待顺带提交；U-015/T1/P-1 与联调必验项转阶段5/6。 |
+| 阶段4 代码审查 | 阶段0 需求 + 阶段2 方案 + Apifox 契约 + 2026-11-16 送审口径 | 通过 | 1（文档） | 0 | 2026-11-17：29 文件逐文件审查（含完整 template）；无代码 P0；双弹 toast 实测请求层排除；回归测试 2/2；受检 diff SHA-256 4ada5a175baa8ba724ce6b89f3969eb8c31c93e0c5f7558eca3590b974a1c9d9。偏差：R4-01 旧送审口径文档待校准（阶段5 前）；R4-04~R4-11 P2 待用户裁决，零代码改动。见阶段4-审查报告 v1.1。 |
+| 阶段3 bugfix（entryStatus=3/4 分流） | 用户报障截图 + 恢复路径既有排除条件 | 已修正后通过 | 1（代码） | 1 | 2026-11-17 晚：4 处前进 handler 补结果态排除（共享集合 CA_AUTH_LETTER_REVIEW_STATUS + includes，旧三元注释保留）；全状态矩阵核验仅 3/4 变化；ESLint 0 error、回归 2/2、vue-tsc 修复文件零报错；SHA 更新 c21a72ceb67ef28320bd16e6153a9d0db54f08b5fc1c3aa0705c2abdb1837195。待用户 mock 复验。 |
 
 ## 已处理文件（阶段3用）
 - 阶段3-编码执行计划-REQ-195.md：完成执行步骤、目标、涉及文件与验收效果拆分；服务商实际链路已纳入步骤4与验收约束。
@@ -157,10 +173,16 @@ wds/wds-web/src/
 - 允许文件范围以 `阶段3-编码执行计划-REQ-195.md` 步骤2至步骤7列出的文件为准；供应商入口位置已确认，复用同一服务商主体 `providerId` 的 CA 状态。
 
 ## 阶段 4 审查差异
-- SHA-256：未生成
-- 受检文件：未生成
-- 审查时间：未生成
-- 复审失效原因：无
+- SHA-256：`74a0be18abf2ee53c36c8d6355f4451cb114e8461df369b1cd04c848363e8a3f`（`git diff b78b1e73d -- <33文件>`，含工作区改动：entryStatus bugfix 3 文件 + 协议文案统一与 RZMP-11265 按钮文案 ElectronicSign.vue + 独立页 standalone-page 传参 + 用户手改 mock + RZMP-11254 两端订单页守卫 4 文件；清单 /tmp/req195-files-v4.txt）〔2026-11-17 晚 RZMP-11265 口径二次修正（standalonePage）后重算〕
+- ~~SHA-256：`6813eb3c757909203c676c29941bd59b60047777104902995b687132fc1f5c83`（`git diff b78b1e73d -- <33文件>`）~~〔2026-11-17 晚失效：RZMP-11265 口径二次修正（contractFlow→standalonePage，独立页新增传参）改变业务 diff，保留作首轮 contractFlow 口径快照〕
+- ~~SHA-256：`a4d2280305c1b57123d36bfcd78674b17feb0965249484d987a31148e8850865`（`git diff b78b1e73d -- <33文件>`）~~〔2026-11-17 晚失效：RZMP-11265 按钮文案条件化改变 ElectronicSign.vue 业务 diff，保留作雇主订单页补齐轮快照〕
+- ~~SHA-256：`43fdb2a9ac72e9ace472045f68734f47cd755063a2ec4ef552cb29d91c3bad91`（`git diff b78b1e73d -- <31文件>`）~~〔2026-11-17 晚失效：雇主订单页守卫补齐改变业务 diff 且受检清单扩至 33 文件，保留作服务商订单页轮快照〕
+- ~~SHA-256：`d2671832671ce8c93de05e3ca80a16df9d5fea1a2543f7537cf1a7e9f5d4abeb`（`git diff b78b1e73d -- <29文件>`）~~〔2026-11-17 晚失效：RZMP-11254 订单页守卫补齐改变业务 diff 且受检清单扩至 31 文件，保留作文案统一轮快照〕
+- ~~SHA-256：`c21a72ceb67ef28320bd16e6153a9d0db54f08b5fc1c3aa0705c2abdb1837195`~~〔2026-11-17 晚失效：协议详情描述文案统一改变业务 diff，保留作 bugfix 轮快照〕
+- ~~SHA-256：`4ada5a175baa8ba724ce6b89f3969eb8c31c93e0c5f7558eca3590b974a1c9d9`（`git diff b78b1e73d HEAD -- <29文件>`，HEAD=eac55dfa3）~~〔2026-11-17 晚失效：entryStatus=3/4 分流 bugfix 改变业务 diff，保留作首轮审查快照〕
+- 受检文件：REQ-195 19 笔提交并集 29 文件（api/electronicSign 2 + constants 1 + composables 2 + router 3 + utils 1 + authentication 组件/页面 8 + employer 4 + provider 4 + supplier 1 + assets 1 + tests 1 + const.ts 1）+ RZMP-11254 新增 provider/order/list.vue、detail.vue 与 employer/order/list.vue、detail.vue 共 **33 文件**；工作区 ElectronicSignEntry.vue 两行行尾空格未纳入
+- 审查时间：2026-11-17（首轮）；2026-11-17 晚 bugfix 增量复审（4 处分流条件 + 共享集合，全状态矩阵核验）；2026-11-17 晚 RZMP-11254 增量复审（服务商订单页 2 处 + 雇主订单页 2 处守卫插入，镜像各自合同页模式）；2026-11-17 晚 RZMP-11265 增量复审（ElectronicSign.vue 按钮文案按 contractFlow 条件化，三消费点传参核验；同晚口径二次修正为 standalonePage 承载页面判定，独立页新增传参）
+- 复审失效原因：首轮 SHA 因 bugfix 失效已重算；文案统一轮 SHA 因 RZMP-11254 服务商轮失效已重算；服务商轮 SHA 因雇主订单页补齐失效已重算；雇主轮 SHA 因 RZMP-11265 按钮文案失效已重算；RZMP-11265 首轮 SHA 因口径二次修正失效已重算；新 SHA 含用户手改 mock 块（开发阶段保留口径，收口时随 mock 清理再变）
 
 ## 不确定项追踪
 | # | 问题 | 状态 | 确认人 | 影响阶段 |
@@ -192,6 +214,13 @@ wds/wds-web/src/
 ## 需求变更日志
 | 版本 | 变更时间 | 变更内容 | 影响的需求 | 回退阶段 | 处理结果 |
 |---|---|---|---|---|---|
+| R1 | 2026-11-17 | RZMP-11265 口径二次修正（用户纠正「需求理解错了」）：判定维度改为承载页面——所有 /electronic-sign 独立页入口（合同签署+固定入口）「提交」，所有 /certification 认证容器「下一步」；contractFlow 口径作废，新增 standalonePage prop（旧 computed 注释保留），独立页传 standalone-page，两端容器零改动；原遗留「固定入口文案待裁决」关闭。 | ElectronicSign.vue、electronicSign/index.vue、审查报告 v1.6（R4-15 更正）、workflow-state | 阶段3 | ESLint 0 error、vue-tsc 110 存量持平零新增；受检 33 文件不变，SHA 二次更新 74a0be18…3e8a3f；云效未回写待授权。 |
+| R1 | 2026-11-17 | RZMP-11265 修复（云效缺陷，用户明确口径）：电子签章页主按钮文案按入口场景区分——合同签署（contractFlow=true）「提交」，认证「下一步」；ElectronicSign.vue 新增 verifyButtonText computed，旧硬编码文案 HTML 注释保留；判定复用既有 contractFlow prop，独立页/两端认证容器三消费点零改动。 | ElectronicSign.vue、审查报告 v1.5（R4-15）、workflow-state | 阶段3 | ESLint 0 error、vue-tsc 110 存量持平零新增；受检 33 文件不变，SHA 更新 6813eb3c…1f5c83；云效未回写待授权。 |
+| R1 | 2026-11-17 | RZMP-11254 雇主端补齐（用户追问后范围裁决）：更正上轮「雇主端无直调链路」错误结论；实测雇主订单/common/confirm/总分包 5 页签署出口均无守卫，用户裁决仅补雇主订单 list/detail 2 页入口守卫（employer 角色，沿用雇主合同页无参跳转写法），common/confirm 旁路与总分包范围另议。 | employer/order/list.vue、detail.vue、审查报告 v1.4（R4-13 更正+R4-14）、workflow-state | 阶段3 | ESLint 0 error、vue-tsc 110 存量持平零新增、回归 2/2；受检 31→33 文件，SHA 更新 a4d22803…850865；云效未回写待授权。 |
+| R1 | 2026-11-17 | RZMP-11254 修复（云效缺陷，回退阶段3）：服务商订单列表/详情「签署合同」直调签署接口未接守卫，未认证不弹去认证弹窗。两处 handler 插入 guardBeforeSign + confirmAndGoElectronicSign（镜像合同页模式，原链路零删改）；第三消费点 ProviderOrderDetailBasicInfoCard.vue 确认为孤儿组件不动。 | provider/order/list.vue、detail.vue、审查报告、workflow-state | 阶段3 | ESLint 0 error、vue-tsc 110 存量持平、回归 2/2；受检 29→31 文件，SHA 更新 43fdb2a9…c3bad91；云效状态未回写待授权；mock 下守卫必拦截，真实放行待联调。 |
+| R1 | 2026-11-17 | 协议详情描述文案统一（用户指令不区分业务）：ElectronicSign.vue 旧 contractFlow 三元改固定文案「请滑动阅读下方全部协议，确认同意后，获取验证码完成电子认证，方可签署合同。」，旧三元 HTML 注释保留；守卫弹窗同文案一处非点名范围未动待确认。 | ElectronicSign.vue、workflow-state | 阶段3 | ESLint 0 error；阶段4 SHA 更新 d2671832…d4abeb；随 bugfix 一并待提交。 |
+| R1 | 2026-11-17 | entryStatus=3/4 分流 bug 修复（用户报障，回退阶段3）：两端容器 4 处前进 handler 只看 isAuthFileNeeded 未排除审核中/驳回结果态，致 3 态误入收集步、上传后协议页误显加载失败并覆盖审核中物料。types.ts 新增 CA_AUTH_LETTER_REVIEW_STATUS 共享集合，4 处补 includes 排除（用户指令避免双 !== 链），旧三元注释保留。 | api/electronicSign/types.ts、两端 certification/index.vue、审查报告、workflow-state | 阶段3 | ESLint 0 error、回归 2/2、vue-tsc 修复文件零报错；阶段4 SHA 更新 c21a72ce…1837195；待用户 mock 复验后提交。 |
+| R1 | 2026-11-17 | 阶段4 审查通过：29 文件逐文件审查无代码 P0；双弹 toast 实测请求层排除；回归测试 2/2；P1 仅 R4-01 文档口径校准，P2 八项（R4-04~R4-11）待用户裁决零代码改动；受检 diff SHA-256 4ada5a17…a1c9d9 写入状态文件。 | 阶段4-审查报告 v1.1、workflow-state | 阶段5 | 阶段4 标完成；R4-01 阶段5 前校准；P2 逐项待裁决；联调必验项转阶段5/6。 |
 | R1 | 2026-11-17 | 阶段3 收尾：用户手动提交推送 eac55dfa3（13 文件），出口门禁 ESLint 0 error + vue-tsc 110 存量持平，无范围漂移，R 类全部闭环；阶段3 标完成，阶段4 启动，审查范围限定 REQ-195 自身 19 笔提交 29 文件（排除 master 合并带入的他人改动）。 | workflow-state、阶段4 审查输入 | 阶段4 | U-015/T1/P-1 与联调必验项转阶段5/6；工作区仅剩两行行尾空格清理待顺带提交。 |
 | R1 | 2026-11-17 | R-02 关闭依据升级：用户转达 Server 结论「send-sms-code / resend-sms-code 现行实现没问题」，保持 codeSent=false + 按 countdown 冷却 + 据 codeSent 选 send/resend 现状；R 类全部闭环，无待处理代码项。 | 逐条验证 v1.15、阶段3 v1.18、workflow-state | 阶段3 | 代码零改动；剩余开口仅 U-015/T1/P-1 等外部契约与联调必验项；commit 仍待确认（12 改 + 1 新增）。 |
 | R1 | 2026-11-17 | 文案常量化已实施：用户裁决直接替换不注释保留；新建零依赖 src/constants/electronicSign.ts 导出 CA_CERT_NAME，复测活跃字面量 19 行/12 文件全部替换（守卫弹窗、两端合同 toast、两端认证步骤、独立页步骤+标题、入口 4 处、委托书上传/结果态、三端路由 meta.title），注释/JSDoc 7 处不动。 | constants/electronicSign.ts + 12 消费文件、workflow-state | 阶段3 | ESLint 0 error、vue-tsc 110 存量持平零新增、回搜活跃字面量零残留；commit 提案更新待确认（12 改 + 1 新增）。 |

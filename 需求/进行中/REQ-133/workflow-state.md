@@ -27,7 +27,7 @@
 - 开始时间：2026-11-20（需求评审）；开发启动 2026-11-24
 - 需求来源：`原始需求/REQ-133 二级频道适配APP端_H5浏览器.md`（含 60 余张截图）、`REQ-133 二级频道页二次优化-功能清单/REQ-133 二级频道页二次优化-功能清单.md`、`REQ-133 二级频道页二次优化-技术方案.md`（两份团队输入均为 2026-11-24 更新版，R7 依据）
 - **miniapp 落地基座（Part B）**：`wds/wds-miniapp`（Taro 4.3 + Vue 3.5，微信小程序 + H5 双端编译）；二级频道新页面与顶部打开 APP 组件落此仓。~~运管后台 H5 跳转能力由本人负责，但后台仓库尚未定位。~~（R4 已定位，见下条）页面暂定 `src/pages/category-channel`，路由 `/pages/category-channel/index`（参数 `slug` + 可选 `categoryId`）
-- **运管后台落地基座（Part A，R4 定位）**：`wds/wds-admin-web`（Vue 3 + TS + Vite 6 + Element Plus），分支 `F-REQ-133` @ `f12a0589`，工作区干净；二级频道模块 `src/pages/secondary-channel/`，12 处手填链接点位新增 `h5Url`（非必填）；验证脚本 `pnpm lint` / `pnpm type-check` / `pnpm stylelint` / `build:test` 均存在
+- **运管后台落地基座（Part A，R4 定位）**：`wds/wds-admin-web`（Vue 3 + TS + Vite 6 + Element Plus），分支 `F-REQ-133` @ `4f436cc7`（已提交推送），工作区干净；二级频道模块 `src/pages/secondary-channel/`，12 处手填链接点位新增 `h5Url`（非必填）；验证脚本 `pnpm lint` / `pnpm type-check` / `pnpm stylelint` / `build:test` 均存在
 - **参考项目（零改动）**：`wds/wds-web-channel`（PC 频道页 DTO / 模块顺序 / 视觉）、`wds/es-app-main`（Flutter 交互契约与 H5 容器桥接文档）
 - **交付端口径**：代码一处开发，Taro 编译 weapp + h5；不新建小程序原生频道页，H5 链接在微信内打开需可用，~~小程序端只做回归~~（R7：技术方案第十七章划掉「微信开发者工具完成小程序回归」，weapp 侧仅保留 `build:weapp:test` 构建验收）；H5 覆盖手机、iPad 竖屏 / 横屏与桌面浏览器
 - **技术方案**：团队 `REQ-133 二级频道页二次优化-技术方案.md` 是输入材料；正式阶段产物为 `阶段2-技术方案-REQ-133.md`
@@ -84,7 +84,7 @@
 | 阶段0 需求分析 | ✅已完成（R7 同步更新 v1.5） | 阶段0-需求文档-REQ-133.md | 2026-11-23（R7 更新 2026-11-24） |
 | 阶段1 代码分析 | ✅已完成（R7 同步更新 v1.4） | 阶段1-代码分析-REQ-133.md | 2026-11-23（R7 更新 2026-11-24） |
 | 阶段2 技术方案 | ⚠️待确认（正式方案已形成，出口受 U 项阻塞；R7 更新 v1.7，R8 登录门禁与端分流补节 v1.9） | 阶段2-技术方案-REQ-133.md | 2026-11-23（R7 2026-11-24，R8 2026-11-26） |
-| 阶段3 编码执行 | 🔄进行中（批次1~34 已落地，明细见验证闭环表与阶段3 实施记录；批次30~34：外链放行/登录门禁/清理+P2/公共抽取/APP 登录口子；待收口：mock 去留裁决 + 门禁走查 + weapp/构建证据 + U-020 原生登录 path） | 阶段3-实施记录-REQ-133.md（代码改动见「已处理文件」） | 2026-11-23 起（批次30~34 2026-11-26） |
+| 阶段3 编码执行 | 🔄进行中（批次1~35 已落地，明细见验证闭环表与阶段3 实施记录；批次30~35：外链放行/登录门禁/清理+P2/公共抽取/APP 登录口子/三裁决收口；待收口：门禁走查 + weapp/构建证据 + U-020 原生登录 path；mock 已删） | 阶段3-实施记录-REQ-133.md（代码改动见「已处理文件」） | 2026-11-23 起（批次30~34 2026-11-26） |
 | 阶段4 代码审查 | ⏳待开始 | - | - |
 | 阶段5 测试基线与覆盖对齐 | ⏳待开始 | - | - |
 | 阶段6 测试执行与Bug修复循环 | ⏳待开始 | - | - |
@@ -179,7 +179,9 @@
 
 **批次 29（2026-11-26，用户「活动中心/智能体会话 直接处理；--scroll padding-block 直接处理；mock 暂时保留」）**：3 文件——①`employer-marketing-jump.ts` 新导出 `openEmployerDestination(path, query)` 目的地单点（destinations 查找 + demandHall entry + benefits walletTab + 同页无参跳过），`openEmployerMarketingTarget` 旧导航行注释保留改调单点（行为等价）；②`category-channel-jump.ts` inquiry 分支后接入单点（绝对 URL 取 path 命中同样生效），核销已解决的智能体映射 TODO；③`ChannelCategories.vue` `.cats` 补回 `padding-block: 8px`（批次9 口径，注释残骸历次清理已删故直接补）。mock 按用户指令保留零改动。复测（路由注入 industryNews/agents 链接）：agent 卡→agent-chat?initialText=hello；资讯活动链接→activity-center?zone=zone1；不可信域→toast「暂无法打开该链接」不跳；可信未知路径→webview（url encode）；cats padding 8/8/8；零 pageerror。探针口径修正三处：swiper circular 克隆片须按视口可见片定位（nth0 点克隆空链接片）、news DTO 字段为 industryNews、H5 tap 用 click。门禁 ESLint exit=0（3 文件）、vue-tsc 4=基线。未执行：weapp、build、营销位消费方（home/activity-center/EmployerMarketingBanner）实测回归（等价重构+旧行保留，收口补验）。probe 用后即删。
 
-**待办**：①~~dev server Node 环境阻塞~~ 已解决：`.temp/ts-hook.cjs` esbuild require 钩子绕过 Node22 strip-only 限制，watch 编译成功（:10086），浏览器实测已 完成；②U-006 deep link path 规则、~~U-014 类目区 2 张布局~~（批次9 闭环）、U-015 顶部条显隐、行数 配置字段、APP 容器 UA 标识均按建议口径先行并 `TODO: wxj` 占位；③U-009 yeeda 软链仍断，按仓自身 AGENTS.md 约定执行（偏差已记录）；④批次15 已恢复真实调用（游客前缀白名单放行），批次17 已用 test 有效 slug 见证真实渲染；mock 注释分支与 category-channel.mock.ts 待收口按用户指令删除（2026-11-26 用户指令：暂时保留，收口统一删）；⑤~~类目区 UI 修正挂起~~ 批次9 已完成：三档布局 + 出血 + 120×90 落地并六配置实测通过，验收口径为用户标注截图 + 三项裁决（到边 + 首卡 8 / fit 内留白 8 / 直角）；⑥批次10 滚动单点收敛已闭；~~`--scroll` padding-block 恢复与否待用户裁决~~ 批次29 按用户「直接处理」恢复 padding-block 8px（实测 8/8/8）；⑦~~U-019~~ 撤销闭环（批次17：游客+有效 slug 返回全量 model，前几轮 {} 系无效 slug 所致，非后端游客限制）。
+**批次 35（2026-11-26，用户三裁决：「频道不会PC和H5互跳的 H5会有单独的链接在后台配置」「mock 直接干掉」「U-006 这个还待定啥呀」）**：①删除 `src/services/category-channel.mock.ts`（删前全仓 grep 零消费方实证；覆盖 11-26 早先「暂保留」指令）；②互跳口径裁决入档：频道不与 PC 互跳、H5 链接由后台单独配置（h5Url，字段形态仍待 C-A1），现码 jump.ts 已无 slug/互跳分支（批次30/32 清理实证），原「互跳链接格式」待确认作废；③U-006 闭环：deep link path 传当前 H5 路径（APP 未登记 path 落 Flutter 路由解析）、Android 沿用线上既有 a.app.qq.com（应用宝候选作废），invoke-app.ts 零改动（现实现即裁决终态）；④文档同步：交接文档 v1.2（待定 16→13 + 闭环注）、state/record/阶段0/阶段2 销项。门禁：vue-tsc 4=基线（删除无引用破坏）。
+
+**待办**：①~~dev server Node 环境阻塞~~ 已解决：`.temp/ts-hook.cjs` esbuild require 钩子绕过 Node22 strip-only 限制，watch 编译成功（:10086），浏览器实测已 完成；②~~U-006 deep link path 规则~~（批次35 闭环：path 传当前 H5 路径、APP 未登记 path 落 Flutter 路由解析；Android 沿用线上既有 a.app.qq.com，应用宝候选作废）、~~U-014 类目区 2 张布局~~（批次9 闭环）、U-015 顶部条显隐、行数 配置字段、APP 容器 UA 标识均按建议口径先行并 `TODO: wxj` 占位；③U-009 yeeda 软链仍断，按仓自身 AGENTS.md 约定执行（偏差已记录）；④批次15 已恢复真实调用（游客前缀白名单放行），批次17 已用 test 有效 slug 见证真实渲染；mock 注释分支批次32 已移除、`category-channel.mock.ts` 批次35 按用户「mock 直接干掉」已删（删前零消费方 grep 实证）；⑤~~类目区 UI 修正挂起~~ 批次9 已完成：三档布局 + 出血 + 120×90 落地并六配置实测通过，验收口径为用户标注截图 + 三项裁决（到边 + 首卡 8 / fit 内留白 8 / 直角）；⑥批次10 滚动单点收敛已闭；~~`--scroll` padding-block 恢复与否待用户裁决~~ 批次29 按用户「直接处理」恢复 padding-block 8px（实测 8/8/8）；⑦~~U-019~~ 撤销闭环（批次17：游客+有效 slug 返回全量 model，前几轮 {} 系无效 slug 所致，非后端游客限制）。
 
 ## 验证闭环记录
 
@@ -229,11 +231,13 @@
 | 阶段3 批次32（全量 check 清理+P2 修复，2026-11-26） | 用户「不要历史包袱和过度设计」+三角色 prompt 二轮 check+「修复P2」 | 通过（静态门禁+消费点 grep 实证） | ①清 3 处死码：service.ts mock 注释死码 10 行（用户已切纯真实调用）、index.vue R-020 编号+console.log、invoke-app buildAppOpenUrl 死导出降内部；②ChannelBanner carousel 死 prop 删除；③P2#1 类目树懒拉（ensureCategories+openCategoryRow，in-flight 防重）；④P2#3 五处内容图 lazy-load（weapp 生效性待收口验证）；⑤P2#2 服务端兜底双保险维持；⑥P2#4 重读发现 loadEpoch 已防覆盖，修正初判不修；⑦es-nav/single/half/input-text 实证穿透/动态类非死码；⑧ESLint exit=0、vue-tsc 4=基线 |
 | 阶段3 批次33（公共抽取+过度设计审视，2026-11-26） | 用户「有没有过度设计 或者重复的内容可以抽取公共逻辑」 | 通过（静态门禁+孤儿符号回搜） | ①requireLoginForCurrentPage 落 router.ts（同步门禁不等待结果，与 promptLogin 异步语义区分），index/Inquiry 两处逐字副本删除，11 处接线齐全，孤儿 import 清理；②不抽判定：imageUrl filter×2 各 1 行净亏、SectionHeader 已组件化 5 消费点；③过度设计审视结论：无（splitUrl/readQuery 跨端必需、loadEpoch 竞态防护、薄壳三零交集）；④ESLint exit=0、vue-tsc 4=基线、旧符号回搜零命中 |
 | 阶段3 批次34（APP 容器登录口子预留，2026-11-26） | 用户「单独预留口子 APP内要调用APP的登陆 端不同处理逻辑肯定不同」 | 通过（静态门禁+循环依赖自检） | ①新增 app-bridge.ts：桥接口+getAppBridge 从 jump.ts 提升共享单点；openNativeLogin 特性检测+try/catch，path 占位 wdsheng://open/es/auth/login（TODO: wxj U-020）；②openLoginForCurrentPage 端分流：APP 容器→原生登录，失败降级 H5 登录页，其余端不变；133 门禁+服务端兜底链单点全生效；③已知中间态：容器登录态识别未落地（U-013 缺口），原生登录回 H5 仍判游客，替换条件已写注释；④ESLint exit=0、vue-tsc 4=基线、无循环依赖；⑤未执行：APP 真机原生登录实测（待 U-020 path 登记） |
+| 阶段3 批次35（三裁决收口，2026-11-26） | 用户「频道不会PC和H5互跳 H5单独链接后台配置」「mock 直接干掉」「U-006 还待定啥呀」 | 通过（删除零消费方实证+vue-tsc 基线） | ①mock 文件删除（删前 grep 零消费方）；②互跳待确认作废：现码 jump.ts 已无 slug 分支（批次30/32 已清），H5 链接=后台配置 h5Url（字段待 C-A1）；③U-006 闭环：path 传当前 H5 路径+Android 沿用线上地址，文档全量销项；④交接文档 v1.2 待定 16→13 |
+| 提交推送（2026-11-26，用户提交） | admin-web 39 文件 | git log/status 实证 | 提交为 `4f436cc7` 并推 origin/F-REQ-133（message 与 miniapp 同格式：`feat: REQ-133 二级频道页二次优化-H5 — 二级频道开发 #RZMP-11817`）；两仓功能分支均已推送、工作区干净；state/record/交接基线口径同步 |
 
 - 阶段 1 检查范围：文件存在性、当前逻辑、依赖关系、公共组件契约、接口契约、双端能力、APP 容器桥接、知识库覆盖度、横向页面关联、脚本可用性。
 - 知识库检索：INDEX.md → L1 README（缺失）→ L2 九份索引 → L4 368 个逐文件详情 → maps 目录树；`.sync-state.json` 锚点与 dev HEAD 一致，`git diff --stat` 为空。L1 断链按「先确认再改库」未擅自修改。
 - 验证状态：**批次7 已修正后通过（静态层 + 浏览器实测）**；weapp 端渲染与生产构建证据待收口补。
-- 是否允许进入下一阶段：**否**（阶段3 收口待 mock 清理 + 真实接口联调 + weapp/构建证据）。
+- 是否允许进入下一阶段：**否**（阶段3 收口待门禁走查 + 真机/构建证据 + U-020；mock 已删、真实接口已联调）。
 
 ## 已处理文件
 
@@ -242,8 +246,8 @@
 | 状态 | 文件 | 职责 |
 |---|---|---|
 | 新增 | `src/types/category-channel.ts` | PC DTO 镜像 + 页面模型 + mapCategoryChannelPage + 商品卡适配器 |
-| 新增 | `src/services/category-channel.ts` | categoryChannelApi；当前 mock 生效，真实调用注释保留 |
-| 新增 | `src/services/category-channel.mock.ts` | 全模块 mock（原始 DTO 形状，资讯 2 条验证留空位） |
+| 新增 | `src/services/category-channel.ts` | categoryChannelApi；真实调用（mock 分支批次32 移除） |
+| 已删 | `src/services/category-channel.mock.ts` | 批次35 按用户「mock 直接干掉」删除（零消费方） |
 | 新增 | `src/store/category-channel.ts` | Pinia store，slug 切换 epoch 防过期请求 |
 | 新增 | `src/utils/invoke-app.ts` | H5 scheme 唤起 + visibilitychange + 2500ms 商店回退，资源可清理 |
 | 新增 | `src/utils/category-channel-jump.ts` | 运营链接白名单路由（可信域 + 已知内部路由） |
@@ -267,7 +271,7 @@
 
 ## 本需求文件树
 
-核对日期 2026-11-26；仓库：需求工作区（`.md/需求/进行中/REQ-133/`，独立仓库）、`wds/wds-miniapp`（`F-REQ-133` @ `126fce7` 已推 origin，Part B 批次1~34 已提交、工作区干净）、`wds/wds-admin-web`（`F-REQ-133` @ `f12a0589`，Part A 39 文件 staged 未提交）、`wds/wds-web-channel`（HEAD `7fc0967`，干净）、`wds/es-app-main`（只读参考）；代码改动文件数 **Part A 39 / Part B 41**（下方树按 git diff `7f096af..126fce7` 与 admin-web status 逐条核对）。
+核对日期 2026-11-26；仓库：需求工作区（`.md/需求/进行中/REQ-133/`，独立仓库）、`wds/wds-miniapp`（`F-REQ-133` @ `126fce7` 已推 origin，Part B 批次1~34 已提交、批次35 mock 删除未提交）、`wds/wds-admin-web`（`F-REQ-133` @ `4f436cc7` 已提交推送、工作区干净）、`wds/wds-web-channel`（HEAD `7fc0967`，干净）、`wds/es-app-main`（只读参考）；代码改动文件数 **Part A 39 / Part B 41**（下方树按 git diff `7f096af..126fce7` + 未提交删除、admin-web `f12a0589..4f436cc7` 逐条核对）。
 
 ```text
 .md/需求/进行中/REQ-133/
@@ -285,7 +289,7 @@
 ```
 
 ```text
-wds/wds-miniapp/  (F-REQ-133 @ 126fce7，已推 origin；Part B 批次1~34 全部已提交 cf5b138/126fce7，工作区干净；核对 2026-11-26，41 文件)
+wds/wds-miniapp/  (F-REQ-133 @ 126fce7，已推 origin；Part B 批次1~34 已提交 cf5b138/126fce7；批次35 mock 删除未提交；核对 2026-11-26，40 文件)
 ├── src/
 │   ├── app.config.ts  [修改] 频道分包注册
 │   ├── config/
@@ -295,14 +299,13 @@ wds/wds-miniapp/  (F-REQ-133 @ 126fce7，已推 origin；Part B 批次1~34 全�
 │   │   └── home.ts  [修改] 必需横向补漏：displayText 消费链（漂移重分类保留）
 │   ├── services/
 │   │   ├── category-channel.ts  [新增] 真实接口调用（mock 分支批次32 移除）
-│   │   ├── category-channel.mock.ts  [新增·过渡] 零消费方，按 11-26 指令暂保留，收口统一删
 │   │   └── core/
 │   │       └── request.ts  [修改] isPublicPath 前缀匹配，游客预检仅放行频道读接口
 │   ├── store/
 │   │   └── category-channel.ts  [新增] 页面状态 + 防过期请求
 │   ├── utils/
 │   │   ├── app-bridge.ts  [新增] APP 容器桥 getAppBridge（批次33/34 公共抽取）
-│   │   ├── invoke-app.ts  [新增] H5 唤起 APP + 商店回退（U-006 占位）
+│   │   ├── invoke-app.ts  [新增] H5 唤起 APP + 商店回退（深链 path/商店地址批次35 裁决闭环）
 │   │   ├── category-channel-jump.ts  [新增] 站内目的地单点分发 + 绝对 URL 直进 webview（白名单批次30 移除）；openServiceDetail 原生桥 + 降级
 │   │   ├── employer-marketing-jump.ts  [修改] openEmployerDestination 单点导出供频道复用（批次29，旧行注释保留）
 │   │   ├── router.ts  [修改] Routes.categoryChannel + requireLoginForCurrentPage 同步登录门禁（批次31）
@@ -333,7 +336,7 @@ wds/wds-miniapp/  (F-REQ-133 @ 126fce7，已推 origin；Part B 批次1~34 全�
 ```
 
 ```text
-wds/wds-admin-web/  (F-REQ-133 @ f12a0589；Part A 39 文件全部 staged 未提交，无 untracked；核对 2026-11-26)
+wds/wds-admin-web/  (F-REQ-133 @ 4f436cc7，已提交推送；Part A 39 文件；核对 2026-11-26)
 └── src/
     ├── api/secondary-channel/
     │   ├── api-types.ts  [修改 +5] CategoryChannelJumpLinkDTO 加 h5Url?，附 C-A1~C-A3 待确认 TODO: wxj
@@ -453,7 +456,7 @@ wds/es-app-main/      (只读；docs/integrations/h5/h5-bridge-api.md 给出容�
 | U-003 | APP 新版 WebView 容器与配置跳转权限；容器标识按桥接文档落地 | 待确认 | 客户端 / 前端 | ~~本人~~ 华春风（R7 移交，app端跳转h5；本人消费其结论） | 阶段3 |
 | U-004 | ~~新增H5跳转链接已确定由本人负责；后台仓、字段/API契约及与PC字段关系待定位~~（R4 收窄）：后台仓已定位 `wds-admin-web`，字段口径已确认（h5Url 暂定/非必填/12 处全量）；**仅剩 DTO 层字段形态待后端书面确认（阶段2 10.4 C-A1~C-A5）**，不阻塞编码，阻塞联调收口 | 部分确认 | 后端 / 运管后台 | 本人 | Part A 阶段3 联调 |
 | U-005 | 接口契约四件套：复用许可、`/gateway` 前缀、旧参数行为、行数字段落点与默认值。**R6 补充：推荐 `line_count` 已有代码事实；latest 需新增行数字段（现 DTO 仅 `display_count` 数量语义），字段名/层级/默认值待后端书面确认（阶段2 11.4 C-B1~C-B4）** | 待确认（未确认前 `TODO: wxj`） | 后端 / 运管后台 | 本人 | 阶段2、阶段3、Part A 扩展 |
-| U-006 | Android/iOS 商店地址及 `wdsheng://open/<path>` scheme 已提供；频道 path 来源和唤起失败回退策略待确认。**R7 部分重开**：Android 新增应用宝候选 `microdown.yyb.qq.com/o/simple.jsp?pkgname=com.wlit.esp`，原 `a.app.qq.com` 标待确认（同 pkgname 两候选，确认前沿用原地址） | 部分确认（R7 部分重开） | 产品 / 前端 / 客户端 | 本人 | 阶段2、阶段3 |
+| U-006 | ~~Android/iOS 商店地址及 scheme 待确认~~ **批次35（2026-11-26）用户裁决闭环**：deep link path 传当前 H5 路径（APP 未登记 path 自动落 Flutter 路由解析，es-app-main 契约实证）；Android 沿用线上既有 `a.app.qq.com`（应用宝 `microdown.yyb.qq.com` 候选作废，非本期变更点）；iOS 地址不变 | 已闭环 | — | 本人 | 阶段2、阶段3 |
 | U-007 | 频道新页面主体已转本人负责；主包/分包注册方式按目标仓约定确定 | 待确认 | 前端 | 本人 | 阶段2、阶段3 |
 | U-008 | 设计稿缺口：**R3 部分确认——移动端 H5 整页（`175570-262826`）与顶部打开 APP（`175975-30231`）已提供**；iPad 断点、服务商详情 H5、后台配置交互稿、section 直链仍缺 | 部分确认 | 设计 | 共同 | 阶段3、阶段5 |
 | U-009 | yeeda 技能库六端软链全断，`AGENTS.md` 要求编码前必读 | 待确认（阶段 3 硬前置） | 开发 / 用户 | 本人 | 阶段3 前 |
@@ -492,6 +495,6 @@ wds/es-app-main/      (只读；docs/integrations/h5/h5-bridge-api.md 给出容�
 
 ---
 
-**文档版本**：v1.37
+**文档版本**：v1.39
 **最后更新**：2026年11月
 **整理人**：王新骏

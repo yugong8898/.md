@@ -83,8 +83,8 @@
 |------|------|---------|---------|
 | 阶段0 需求分析 | ✅已完成（R7 同步更新 v1.5） | 阶段0-需求文档-REQ-133.md | 2026-11-23（R7 更新 2026-11-24） |
 | 阶段1 代码分析 | ✅已完成（R7 同步更新 v1.4） | 阶段1-代码分析-REQ-133.md | 2026-11-23（R7 更新 2026-11-24） |
-| 阶段2 技术方案 | ⚠️待确认（正式方案已形成，出口受 U 项阻塞；R7 更新 v1.7） | 阶段2-技术方案-REQ-133.md | 2026-11-23（R7 更新 2026-11-24） |
-| 阶段3 编码执行 | 🔄进行中（批次1~7 + R-034 已落地：批次1~7 浏览器实测通过、R-034 静态层+行为断言；待收口：mock 清理 + 真实接口联调 + weapp/构建证据） | 阶段3-实施记录-REQ-133.md（代码改动见「已处理文件」） | 2026-11-23 起（批次7 / R-034 2026-11-24） |
+| 阶段2 技术方案 | ⚠️待确认（正式方案已形成，出口受 U 项阻塞；R7 更新 v1.7，R8 登录门禁与端分流补节 v1.9） | 阶段2-技术方案-REQ-133.md | 2026-11-23（R7 2026-11-24，R8 2026-11-26） |
+| 阶段3 编码执行 | 🔄进行中（批次1~34 已落地，明细见验证闭环表与阶段3 实施记录；批次30~34：外链放行/登录门禁/清理+P2/公共抽取/APP 登录口子；待收口：mock 去留裁决 + 门禁走查 + weapp/构建证据 + U-020 原生登录 path） | 阶段3-实施记录-REQ-133.md（代码改动见「已处理文件」） | 2026-11-23 起（批次30~34 2026-11-26） |
 | 阶段4 代码审查 | ⏳待开始 | - | - |
 | 阶段5 测试基线与覆盖对齐 | ⏳待开始 | - | - |
 | 阶段6 测试执行与Bug修复循环 | ⏳待开始 | - | - |
@@ -223,7 +223,12 @@
 | 阶段3 批次26（留资成功态改 toast，2026-11-25） | 用户「成功态面板纯纯多余 一个toast 参考channel」 | 通过（路由注入开关+真实提交实测） | ①成功态面板/submitted/.success 全删零注释残骸；②成功=reset+toast('提交成功','success')+登录链保留（对齐 PC）；③H5 路由清理全局 toast 实证→跳转分支延 400ms；④toast 可见窗 +600~+2000ms、goBack 表单全空、零错误；⑤ESLint exit=0、vue-tsc 4=基线；⑥未执行：weapp 渲染、build；**批次27 延迟补偿已按用户裁决删除** |
 | 阶段3 批次27（成功路径收敛 toast+reset，2026-11-25） | 用户「多余动作太多 toast 然后 reset 就可以」 | 通过（真实提交实测） | ①setTimeout/分支/注释全删，成功=toast→reset→登录契约行；②toast 即时可见、goBack 表单全空、停留 1.5s 零错误；③毫秒级 back 竞态 ×16 登记不修（平台缺陷非本次引入）；④ESLint exit=0、vue-tsc 4=基线；⑤未执行：weapp、build |
 | 阶段3 批次28（顶栏整体吸顶，2026-11-25） | 用户「滚动时 banner+导航在最顶端 banner 可能不存在」 | 通过（双 UA 态浏览器实测） | ①`.top` wrapper 单一 sticky 单元 + 内层 es-nav static 防重叠；②高度自适应 104/44；③滚 600 顶栏钉 0 无重叠、内容下穿、截图目检、零错误；④滚动层 `.taro_page` 非 window（探针口径修正）；⑤ESLint exit=0、vue-tsc 4=基线；⑥未执行：weapp、build |
-| 阶段3 批次29（目的地单点接通+padding 恢复，2026-11-26） | 用户「活动中心/智能体 直接处理；padding-block 直接处理；mock 暂保留」 | 通过（路由注入浏览器实测） | ①openEmployerDestination 单点导出+频道接入，活动/智能体误路由修复；②营销旧行注释保留行为等价；③cats padding-block 8 恢复实测 8/8/8；④白名单回归 evil toast/可信未知 webview；⑤ESLint exit=0、vue-tsc 4=基线；⑥未执行：weapp、build、营销消费方回归 |
+| 阶段3 批次29（目的地单点接通+padding 恢复，2026-11-26） | 用户「活动中心/智能体 直接处理；padding-block 直接处理；mock 暂保留」 | 通过（路由注入浏览器实测） | ①openEmployerDestination 单点导出+频道接入，活动/智能体误路由修复；②营销旧行注释保留行为等价；③cats padding-block 8 恢复实测 8/8/8；④~~白名单回归 evil toast/可信未知 webview~~（批次30 白名单移除后失效）；⑤ESLint exit=0、vue-tsc 4=基线；⑥未执行：weapp、build、营销消费方回归 |
+| 阶段3 批次30（外链白名单移除，2026-11-26） | 用户「查看更多外链是随机的 直接放行 运营对结果负责」 | 通过（静态门禁） | ①TRUSTED_HOST 定义与拦截行注释移除（[REQ-133] 标注，残骸后经用户手删+本轮确认清理），任意 http(s) URL 落 webview 分支；②知会 APP 容器 Cookie 只注入 *.wdsheng.com 边界（随机外链可打开但不带登录态）；③ESLint exit=0、vue-tsc 4=基线；④未执行：浏览器外链实测 |
+| 阶段3 批次31（登录门禁体系，2026-11-26） | 用户新规则+设计流程图；两轮收窄裁决「搞多了 只在banner 类目」「类目两种类型点击都要」；留资误操作回退后确认重放 | 通过（静态门禁+接线 grep 实证） | ①门禁矩阵：banner×2/类目 STANDARD+IMAGE/留资聚焦×5+picker+提交 有门禁；服务卡/资讯/智能体/查看更多 直跳；②handleGatedSelect 分流，handleSelectLink 恢复无门禁；③留资改动被用户误操作整体回退，确认后按清单原样重放 7 处；④已知行为：未登录聚焦键盘可能瞬现再随跳页收起；⑤ESLint exit=0、vue-tsc 4=基线；⑥未执行：未登录态浏览器/weapp 走查（收口待办） |
+| 阶段3 批次32（全量 check 清理+P2 修复，2026-11-26） | 用户「不要历史包袱和过度设计」+三角色 prompt 二轮 check+「修复P2」 | 通过（静态门禁+消费点 grep 实证） | ①清 3 处死码：service.ts mock 注释死码 10 行（用户已切纯真实调用）、index.vue R-020 编号+console.log、invoke-app buildAppOpenUrl 死导出降内部；②ChannelBanner carousel 死 prop 删除；③P2#1 类目树懒拉（ensureCategories+openCategoryRow，in-flight 防重）；④P2#3 五处内容图 lazy-load（weapp 生效性待收口验证）；⑤P2#2 服务端兜底双保险维持；⑥P2#4 重读发现 loadEpoch 已防覆盖，修正初判不修；⑦es-nav/single/half/input-text 实证穿透/动态类非死码；⑧ESLint exit=0、vue-tsc 4=基线 |
+| 阶段3 批次33（公共抽取+过度设计审视，2026-11-26） | 用户「有没有过度设计 或者重复的内容可以抽取公共逻辑」 | 通过（静态门禁+孤儿符号回搜） | ①requireLoginForCurrentPage 落 router.ts（同步门禁不等待结果，与 promptLogin 异步语义区分），index/Inquiry 两处逐字副本删除，11 处接线齐全，孤儿 import 清理；②不抽判定：imageUrl filter×2 各 1 行净亏、SectionHeader 已组件化 5 消费点；③过度设计审视结论：无（splitUrl/readQuery 跨端必需、loadEpoch 竞态防护、薄壳三零交集）；④ESLint exit=0、vue-tsc 4=基线、旧符号回搜零命中 |
+| 阶段3 批次34（APP 容器登录口子预留，2026-11-26） | 用户「单独预留口子 APP内要调用APP的登陆 端不同处理逻辑肯定不同」 | 通过（静态门禁+循环依赖自检） | ①新增 app-bridge.ts：桥接口+getAppBridge 从 jump.ts 提升共享单点；openNativeLogin 特性检测+try/catch，path 占位 wdsheng://open/es/auth/login（TODO: wxj U-020）；②openLoginForCurrentPage 端分流：APP 容器→原生登录，失败降级 H5 登录页，其余端不变；133 门禁+服务端兜底链单点全生效；③已知中间态：容器登录态识别未落地（U-013 缺口），原生登录回 H5 仍判游客，替换条件已写注释；④ESLint exit=0、vue-tsc 4=基线、无循环依赖；⑤未执行：APP 真机原生登录实测（待 U-020 path 登记） |
 
 - 阶段 1 检查范围：文件存在性、当前逻辑、依赖关系、公共组件契约、接口契约、双端能力、APP 容器桥接、知识库覆盖度、横向页面关联、脚本可用性。
 - 知识库检索：INDEX.md → L1 README（缺失）→ L2 九份索引 → L4 368 个逐文件详情 → maps 目录树；`.sync-state.json` 锚点与 dev HEAD 一致，`git diff --stat` 为空。L1 断链按「先确认再改库」未擅自修改。
@@ -258,10 +263,11 @@
 - 新增未跟踪资源 12 个：`src/assets/category-channel/` 下类目图标 svg×10、`customer_service_wechat_qr.png`、`ic_expand_dark.svg`；已跟踪新增 `icon_right_outlined.svg`（staged）——频道页 UI 资源，归属待确认（疑似其他会话/用户补充）。
 - REQ-133 清单外改动 3 处（批次12 审计重分类）：`src/types/home.ts` + `src/utils/service-plan-display.ts` 判**必需横向补漏**保留（消费链实证：频道 mapper `category-channel.ts:303` 写 `displayText` → `ServiceCard/index.vue:190` `planPromoTags` 消费，缺则频道商品卡折扣话术丢失）；`types/components.d.ts` 为 auto-import 类型登记必需保留。
 - **待办**：Part B 收口/阶段4 审查前需与用户确认上述漂移归属，并重核受检基线；本轮 Part A 文档更新不受影响。
+- 2026-11-26 收口：上述漂移改动与新增资源已全部随 `cf5b138`/`126fce7` 提交（git diff `7f096af..126fce7` 核对含 assets 13 项与 logo.svg），归属明确、工作区干净；本待办销项，文件树已按提交态重写。
 
 ## 本需求文件树
 
-核对日期 2026-11-24（R4）；仓库：需求工作区（`.md/需求/进行中/REQ-133/`，独立仓库）、`wds/wds-miniapp`（`F-REQ-133`，~~@ `a0f347d`，20 个文件未提交~~ HEAD 已漂移至 `7f096af`，staged+unstaged 混合，含新增资源与清单外改动，见「已处理文件」漂移记录，Part B）、`wds/wds-admin-web`（`F-REQ-133` @ `f12a0589`，~~工作区干净，Part A 待 check 后编码~~ 阶段3 已落地 38 文件均 unstaged，Part A）、`wds/wds-web-channel`（HEAD `7fc0967`，干净）、`wds/es-app-main`（只读参考）；本轮代码改动文件数 **Part A 38**（Part B 存量改动 20+ 文件见漂移记录，本轮未触碰）。
+核对日期 2026-11-26；仓库：需求工作区（`.md/需求/进行中/REQ-133/`，独立仓库）、`wds/wds-miniapp`（`F-REQ-133` @ `126fce7` 已推 origin，Part B 批次1~34 已提交、工作区干净）、`wds/wds-admin-web`（`F-REQ-133` @ `f12a0589`，Part A 39 文件 staged 未提交）、`wds/wds-web-channel`（HEAD `7fc0967`，干净）、`wds/es-app-main`（只读参考）；代码改动文件数 **Part A 39 / Part B 41**（下方树按 git diff `7f096af..126fce7` 与 admin-web status 逐条核对）。
 
 ```text
 .md/需求/进行中/REQ-133/
@@ -270,32 +276,64 @@
 │   └── 图片和附件/  [输入] 60 余张现状与设计稿截图，未改动
 ├── REQ-133 二级频道页二次优化-功能清单/  [团队输入] 功能清单.md + 图片和附件（2026-11-24 更新版，R7 分工重划依据）
 ├── REQ-133 二级频道页二次优化-技术方案.md  [团队输入] 18 章迁移方案（2026-11-24 更新版，R7 依据：域名废弃划线、微信开发者工具回归划掉）
-├── 阶段2-技术方案-REQ-133.md  [正式产物] v1.8；Part B 方案 + 第 10 节 Part A h5Url + 第 11 节行数配置 + R7 分工/契约更新 + APP 契约证据补充（R-034 实现口径）
+├── 阶段2-技术方案-REQ-133.md  [正式产物] v1.9；Part B 方案 + 第 10 节 Part A h5Url + 第 11 节行数配置 + 第 12 节登录门禁与端分流（R8）+ R7 分工/契约更新 + APP 契约证据补充（R-034 实现口径）
 ├── 阶段0-需求文档-REQ-133.md  [正式文档] v1.6；规则（含 R-028~R-035）、合作分工（R7 重划）、待确认（含 U-017/U-018）、验证与风险 + APP 契约证据补充段
 ├── 阶段1-代码分析-REQ-133.md  [正式文档] v1.5；方案核查、差距矩阵 + 第十章 Part A + 第十一章配置扩展 + R7 移出留档 + APP 契约证据注记
-├── 阶段3-实施记录-REQ-133.md  [正式产物] v1.0（2026-11-24 补建）；双轨基线与授权、Part B 批次1~7+R-034、Part A h5Url+R-032、验证闭环汇总、漂移与范围外说明、遗留项
+├── 阶段3-实施记录-REQ-133.md  [正式产物] v1.25（2026-11-24 补建，2026-11-26 更新至批次34）；双轨基线与授权、Part B 批次1~34、Part A h5Url+R-032、验证闭环汇总、漂移与范围外说明、遗留项（含 U-013 缺口/U-020）
+├── 交接文档-REQ-133.md  [离线交接] v1.1；自包含六段式（概况/已完成/目录树/核心文件/待定/注意），供无本机工作流的接手人；含 PRD 链接与功能分支登记
 └── workflow-state.md  [状态文件] 阶段进度、验证闭环、不确定项追踪
 ```
 
 ```text
-wds/wds-miniapp/  (F-REQ-133，HEAD 7f096af；原 20 文件 + 新增资源/清单外改动，staged+unstaged 混合，见漂移记录)
-└── src/
-    ├── types/category-channel.ts  [新增] DTO 镜像 + 模型 + mapper + 商品卡适配
-    ├── services/category-channel.ts  [新增] api（mock 生效，真实调用注释保留）
-    ├── services/category-channel.mock.ts  [新增] 全模块 mock 数据
-    ├── store/category-channel.ts  [新增] 页面状态 + 防过期请求
-    ├── utils/invoke-app.ts  [新增] H5 唤起 APP + 商店回退
-    ├── utils/category-channel-jump.ts  [新增] 运营链接白名单跳转
-    ├── utils/router.ts  [修改] Routes.categoryChannel
-    ├── config/endpoints.ts  [修改] 频道接口（游客前缀批次12 删除）
-    ├── services/core/request.ts  [已还原] 批次12 审计判非必要（纯注释预置）
-    ├── app.config.ts  [修改] 分包注册
-    ├── components/AppOpenBanner/index.vue  [新增] 顶部打开 APP 指引条
-    └── pages/category-channel/  [新增] index.vue + index.config.ts + components/×9（含 ChannelSectionHeader 共享标题行、ChannelInquiry 内联留言；批次8 类目区拆分：ChannelCategories 薄壳 + ChannelCategoryCards [新增] STANDARD + ChannelCategoryImages [新增] IMAGE；批次9 三档布局 + 滑动出血 + 图片固定 120×90）
+wds/wds-miniapp/  (F-REQ-133 @ 126fce7，已推 origin；Part B 批次1~34 全部已提交 cf5b138/126fce7，工作区干净；核对 2026-11-26，41 文件)
+├── src/
+│   ├── app.config.ts  [修改] 频道分包注册
+│   ├── config/
+│   │   └── endpoints.ts  [修改] 频道接口 + PUBLIC_PATH_PREFIXES 游客前缀（批次15）
+│   ├── types/
+│   │   ├── category-channel.ts  [新增] DTO 镜像 + 模型 + mapper + 商品卡适配
+│   │   └── home.ts  [修改] 必需横向补漏：displayText 消费链（漂移重分类保留）
+│   ├── services/
+│   │   ├── category-channel.ts  [新增] 真实接口调用（mock 分支批次32 移除）
+│   │   ├── category-channel.mock.ts  [新增·过渡] 零消费方，按 11-26 指令暂保留，收口统一删
+│   │   └── core/
+│   │       └── request.ts  [修改] isPublicPath 前缀匹配，游客预检仅放行频道读接口
+│   ├── store/
+│   │   └── category-channel.ts  [新增] 页面状态 + 防过期请求
+│   ├── utils/
+│   │   ├── app-bridge.ts  [新增] APP 容器桥 getAppBridge（批次33/34 公共抽取）
+│   │   ├── invoke-app.ts  [新增] H5 唤起 APP + 商店回退（U-006 占位）
+│   │   ├── category-channel-jump.ts  [新增] 站内目的地单点分发 + 绝对 URL 直进 webview（白名单批次30 移除）；openServiceDetail 原生桥 + 降级
+│   │   ├── employer-marketing-jump.ts  [修改] openEmployerDestination 单点导出供频道复用（批次29，旧行注释保留）
+│   │   ├── router.ts  [修改] Routes.categoryChannel + requireLoginForCurrentPage 同步登录门禁（批次31）
+│   │   └── service-plan-display.ts  [修改] 必需横向补漏（漂移重分类保留）
+│   ├── components/
+│   │   └── AppOpenBanner/
+│   │       └── index.vue  [新增] 顶部打开 APP 指引条（容器内隐藏）
+│   ├── assets/
+│   │   ├── category-channel/  [新增] 类目图标 svg×10 + 客服二维码 png + ic_expand_dark.svg + icon_right_outlined.svg
+│   │   └── common/
+│   │       └── logo.svg  [新增] 指引条 logo
+│   └── pages/
+│       └── category-channel/  [新增]
+│           ├── index.vue  主页面（批次28 顶栏 .top 单一吸顶单元）
+│           ├── index.config.ts  页面配置
+│           └── components/  ×9
+│               ├── ChannelBanner.vue  主视觉 swiper
+│               ├── ChannelCategories.vue  类目区薄壳（scroll-view 出血）
+│               ├── ChannelCategoryCards.vue  STANDARD 卡片档
+│               ├── ChannelCategoryImages.vue  IMAGE 图片档
+│               ├── ChannelAgents.vue  智能体区
+│               ├── ChannelProducts.vue  商品区
+│               ├── ChannelNews.vue  资讯区
+│               ├── ChannelInquiry.vue  内联留资（含客服二维码）
+│               └── ChannelSectionHeader.vue  共享标题行
+└── types/
+    └── components.d.ts  [修改] auto-import 类型登记
 ```
 
 ```text
-wds/wds-admin-web/  (F-REQ-133 @ f12a0589；Part A 阶段3 已落地，38 文件全部 unstaged，无 untracked；核对日期 2026-11-24)
+wds/wds-admin-web/  (F-REQ-133 @ f12a0589；Part A 39 文件全部 staged 未提交，无 untracked；核对 2026-11-26)
 └── src/
     ├── api/secondary-channel/
     │   ├── api-types.ts  [修改 +5] CategoryChannelJumpLinkDTO 加 h5Url?，附 C-A1~C-A3 待确认 TODO: wxj
@@ -422,12 +460,13 @@ wds/es-app-main/      (只读；docs/integrations/h5/h5-bridge-api.md 给出容�
 | U-010 | ~~H5 生产域名 `channel.wdsheng.com`~~（R7：技术方案划线废弃，「产品业务重新确认h5对应域名」）；新候选 `m.wdsheng.com`（功能清单域名段）与 `h5.wdsheng.com`（运维段，接口走 `h5.wdsheng.com/xx/gateway` 转发四环境）不一致；网关回源、历史深链与流水线待确认。**契约证据补充（2026-11-24）：最终域名必须 `*.wdsheng.com` 子域（APP 容器白名单 + Cookie 注入域，硬约束）** | 待确认（R7 重开，华春风跟进域名确认，本人依赖） | 产品 / 运维 / 合作方 | 合作方 | 阶段3、阶段6 |
 | U-011 | ~~访问后缀配置与带后缀链接是否仍保留（最新两篇未涉及）~~（R6 复活）：新 PRD 明确后缀管理与带后缀链接生成，按用户范围声明纳入 Part A（R-033）；**剩余**：接口契约、交互稿、后缀与 slug 的 URL 组合规则缺失（后台 grep 零命中）；契约与交互稿确认前不启动编码 | 待确认（R6 重写） | 产品 / 后端 / 设计 | 本人（运管配置侧） | Part A 扩展 |
 | U-012 | ~~技术方案中残留的埋点条目与 `category-channel-tracking.ts` 不进入本期改动清单~~（R6 复活）：新 PRD 含按后缀维度埋点（PV/UV、导流访问量，6 事件规格 @王宇轩）；~~用户侧实现归属待裁决~~ **2026-11-24 用户裁决：不接手**（APlus 属 `wds-web`，本人基座 `wds-miniapp`），R-019 维持有效 | 已裁决（不接手） | 用户 / 产品 | 共同 | 阶段3、Part B 不新增埋点层 |
-| U-013 | 已确认 Cookie-only 读取 `Authorization` / `ct`，忽略 localStorage；APP 直用页面清单、Cookie 域/path/属性及缺失/过期/登出处理待确认。**契约证据补充（2026-11-24）：APP 打开 H5 前写 Cookie 到目标 origin（path `/`），加载后写同源 localStorage 并发 `pageReady`（`flutterMessage`）——可以 pageReady 为读取时机信号；未登录不注入** | 部分确认 | 产品 / 客户端 / 前端 | 本人（客户端依赖） | 阶段2、阶段3、阶段5 |
+| U-013 | 已确认 Cookie-only 读取 `Authorization` / `ct`，忽略 localStorage；APP 直用页面清单、Cookie 域/path/属性及缺失/过期/登出处理待确认。**契约证据补充（2026-11-24）：APP 打开 H5 前写 Cookie 到目标 origin（path `/`），加载后写同源 localStorage 并发 `pageReady`（`flutterMessage`）——可以 pageReady 为读取时机信号；未登录不注入**。**实现缺口登记（2026-11-26 批次34）：miniapp H5 登录态只认自有 authSession（localStorage），不消费容器注入态——APP 已登录用户会被误判游客；跳登录口子已预留（app-bridge），容器登录态识别（pageReady→注入态校验建 session）为后续改造项** | 部分确认（识别未落地） | 产品 / 客户端 / 前端 | 本人（客户端依赖） | 阶段2、阶段3、阶段5 |
 | U-014 | 类目区 2 个类目时布局：标注只覆盖 1 个（等比填充）与 ≥3 个（固定宽横滑）；建议 2 个时同 1 个口径，待设计确认 | 待确认 | 设计 / 产品 | 本人 | 阶段3 |
 | U-015 | 顶部指引条展示范围：APP 内 / weapp 是否隐藏、是否可关闭；建议仅 H5 浏览器展示、不可关闭，待产品确认 | 待确认 | 产品 / UI | 本人 | 阶段3 |
 | U-016 | 行数范围与默认值口径冲突（R6 新增）：PRD 建议 1~10 行、默认待评审 vs 存量推荐 2~99、默认 2（且必配至少 10 个服务的选品下限联动）；latest 固定 10 改行数后选品/校验联动未定义。**2026-11-24 用户部分裁决：latest 按 1~10 先行 + `TODO: wxj` 占位；recommended 参数不动待产品评审** | 部分裁决（余待产品评审） | 产品 / 后端 | 本人 | Part A 扩展（R-032） |
 | U-017（R7 新增） | ~~R-034 app内服务详情跳原生桥接契约：具体 handler 名（`WLYDBridge` / `webview_ultra.callHandler`）、原生路由标识、productId 参数映射、失败降级行为；桥接文档未覆盖，miniapp 内三标识零命中~~ **部分闭环（2026-11-24 APP 契约证据）**：navigate handler、`wdsheng://open/es/employer/service/<id>`（id int）、失败 reject/`{ok:false}` 已代码实证；剩余 productId↔id 主键映射、employer 角色匹配、APP 版本兼容 | 部分确认（已授权编码，映射处 `TODO: wxj` 占位，失败降级浏览器路径） | 客户端 | 本人 | 阶段3（R-034） |
 | U-018（R7 新增） | R-035 留资表单末尾内联：功能清单标「按 web 类似追加到二级频道末尾（11月23日修正，待业务确认）」；内联形态是否采纳、字段与 web 版 `DemandLeaveMessageCard` 差异；批次2 ChannelInquiry 方向已一致 | 待确认（确认前现实现零改动） | 业务 / 产品 | 本人 | 阶段3（R-035） |
+| U-020（批次34 新增） | 原生登录页统一链接 path 是否已登记 UniversalRouteConfig：app-bridge.ts openNativeLogin 现占位 `wdsheng://open/es/auth/login`（TODO: wxj），未登记则 native 解析失败降级 H5 登录页 | 待确认（阻塞 APP 内原生登录实测） | 客户端 | 本人 | 阶段3（批次34） |
 
 ## 备注
 
@@ -453,6 +492,6 @@ wds/es-app-main/      (只读；docs/integrations/h5/h5-bridge-api.md 给出容�
 
 ---
 
-**文档版本**：v1.34
+**文档版本**：v1.37
 **最后更新**：2026年11月
 **整理人**：王新骏

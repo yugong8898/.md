@@ -177,7 +177,9 @@
 
 **批次 28（2026-11-25，用户「页面滚动时 AppOpenBanner+EsNavBar 要在最顶端，banner 可能不存在」→ 思路确认后落地）**：index.vue 顶栏包 `.top` wrapper 单一 sticky 单元（position:sticky top:0 z-index:100），banner 显隐仍由组件内部 v-if 决定、wrapper 高度自适应（有 104 / 无 44）；wrapper 内 `.es-nav` 置 static（EsNavBar 自带 sticky 在吸顶 wrapper 内会与 banner 重叠吸同一点），覆写限定 `.top` 祖先内不影响其他消费页。零 JS 零测高。探针双态（浏览器 UA / wdshengapp 容器 UA）：滚动层为 `.taro_page`（非 window，scrollY 恒 0 系探针首跑误判已修正）；滚 600 后 wrapper top 0、entry 0-60 / nav 60-104 无重叠、容器态 nav 0-44、首内容 top -496/-556 从顶栏下穿过；截图目检钉顶无透底；零 pageerror。门禁 ESLint exit=0、vue-tsc 4=基线。未执行：weapp 渲染（页面级滚动 sticky 口径同 H5，收口补验）、build。probe/截图用后即删。
 
-**待办**：①~~dev server Node 环境阻塞~~ 已解决：`.temp/ts-hook.cjs` esbuild require 钩子绕过 Node22 strip-only 限制，watch 编译成功（:10086），浏览器实测已 完成；②U-006 deep link path 规则、~~U-014 类目区 2 张布局~~（批次9 闭环）、U-015 顶部条显隐、行数 配置字段、APP 容器 UA 标识均按建议口径先行并 `TODO: wxj` 占位；③U-009 yeeda 软链仍断，按仓自身 AGENTS.md 约定执行（偏差已记录）；④批次15 已恢复真实调用（游客前缀白名单放行），批次17 已用 test 有效 slug 见证真实渲染；mock 注释分支与 category-channel.mock.ts 待收口按用户指令删除；⑤~~类目区 UI 修正挂起~~ 批次9 已完成：三档布局 + 出血 + 120×90 落地并六配置实测通过，验收口径为用户标注截图 + 三项裁决（到边 + 首卡 8 / fit 内留白 8 / 直角）；⑥批次10 滚动单点收敛已闭；`--scroll` padding-block 恢复与否待用户裁决（现注释态纵向贴边）；⑦~~U-019~~ 撤销闭环（批次17：游客+有效 slug 返回全量 model，前几轮 {} 系无效 slug 所致，非后端游客限制）。
+**批次 29（2026-11-26，用户「活动中心/智能体会话 直接处理；--scroll padding-block 直接处理；mock 暂时保留」）**：3 文件——①`employer-marketing-jump.ts` 新导出 `openEmployerDestination(path, query)` 目的地单点（destinations 查找 + demandHall entry + benefits walletTab + 同页无参跳过），`openEmployerMarketingTarget` 旧导航行注释保留改调单点（行为等价）；②`category-channel-jump.ts` inquiry 分支后接入单点（绝对 URL 取 path 命中同样生效），核销已解决的智能体映射 TODO；③`ChannelCategories.vue` `.cats` 补回 `padding-block: 8px`（批次9 口径，注释残骸历次清理已删故直接补）。mock 按用户指令保留零改动。复测（路由注入 industryNews/agents 链接）：agent 卡→agent-chat?initialText=hello；资讯活动链接→activity-center?zone=zone1；不可信域→toast「暂无法打开该链接」不跳；可信未知路径→webview（url encode）；cats padding 8/8/8；零 pageerror。探针口径修正三处：swiper circular 克隆片须按视口可见片定位（nth0 点克隆空链接片）、news DTO 字段为 industryNews、H5 tap 用 click。门禁 ESLint exit=0（3 文件）、vue-tsc 4=基线。未执行：weapp、build、营销位消费方（home/activity-center/EmployerMarketingBanner）实测回归（等价重构+旧行保留，收口补验）。probe 用后即删。
+
+**待办**：①~~dev server Node 环境阻塞~~ 已解决：`.temp/ts-hook.cjs` esbuild require 钩子绕过 Node22 strip-only 限制，watch 编译成功（:10086），浏览器实测已 完成；②U-006 deep link path 规则、~~U-014 类目区 2 张布局~~（批次9 闭环）、U-015 顶部条显隐、行数 配置字段、APP 容器 UA 标识均按建议口径先行并 `TODO: wxj` 占位；③U-009 yeeda 软链仍断，按仓自身 AGENTS.md 约定执行（偏差已记录）；④批次15 已恢复真实调用（游客前缀白名单放行），批次17 已用 test 有效 slug 见证真实渲染；mock 注释分支与 category-channel.mock.ts 待收口按用户指令删除（2026-11-26 用户指令：暂时保留，收口统一删）；⑤~~类目区 UI 修正挂起~~ 批次9 已完成：三档布局 + 出血 + 120×90 落地并六配置实测通过，验收口径为用户标注截图 + 三项裁决（到边 + 首卡 8 / fit 内留白 8 / 直角）；⑥批次10 滚动单点收敛已闭；~~`--scroll` padding-block 恢复与否待用户裁决~~ 批次29 按用户「直接处理」恢复 padding-block 8px（实测 8/8/8）；⑦~~U-019~~ 撤销闭环（批次17：游客+有效 slug 返回全量 model，前几轮 {} 系无效 slug 所致，非后端游客限制）。
 
 ## 验证闭环记录
 
@@ -221,6 +223,7 @@
 | 阶段3 批次26（留资成功态改 toast，2026-11-25） | 用户「成功态面板纯纯多余 一个toast 参考channel」 | 通过（路由注入开关+真实提交实测） | ①成功态面板/submitted/.success 全删零注释残骸；②成功=reset+toast('提交成功','success')+登录链保留（对齐 PC）；③H5 路由清理全局 toast 实证→跳转分支延 400ms；④toast 可见窗 +600~+2000ms、goBack 表单全空、零错误；⑤ESLint exit=0、vue-tsc 4=基线；⑥未执行：weapp 渲染、build；**批次27 延迟补偿已按用户裁决删除** |
 | 阶段3 批次27（成功路径收敛 toast+reset，2026-11-25） | 用户「多余动作太多 toast 然后 reset 就可以」 | 通过（真实提交实测） | ①setTimeout/分支/注释全删，成功=toast→reset→登录契约行；②toast 即时可见、goBack 表单全空、停留 1.5s 零错误；③毫秒级 back 竞态 ×16 登记不修（平台缺陷非本次引入）；④ESLint exit=0、vue-tsc 4=基线；⑤未执行：weapp、build |
 | 阶段3 批次28（顶栏整体吸顶，2026-11-25） | 用户「滚动时 banner+导航在最顶端 banner 可能不存在」 | 通过（双 UA 态浏览器实测） | ①`.top` wrapper 单一 sticky 单元 + 内层 es-nav static 防重叠；②高度自适应 104/44；③滚 600 顶栏钉 0 无重叠、内容下穿、截图目检、零错误；④滚动层 `.taro_page` 非 window（探针口径修正）；⑤ESLint exit=0、vue-tsc 4=基线；⑥未执行：weapp、build |
+| 阶段3 批次29（目的地单点接通+padding 恢复，2026-11-26） | 用户「活动中心/智能体 直接处理；padding-block 直接处理；mock 暂保留」 | 通过（路由注入浏览器实测） | ①openEmployerDestination 单点导出+频道接入，活动/智能体误路由修复；②营销旧行注释保留行为等价；③cats padding-block 8 恢复实测 8/8/8；④白名单回归 evil toast/可信未知 webview；⑤ESLint exit=0、vue-tsc 4=基线；⑥未执行：weapp、build、营销消费方回归 |
 
 - 阶段 1 检查范围：文件存在性、当前逻辑、依赖关系、公共组件契约、接口契约、双端能力、APP 容器桥接、知识库覆盖度、横向页面关联、脚本可用性。
 - 知识库检索：INDEX.md → L1 README（缺失）→ L2 九份索引 → L4 368 个逐文件详情 → maps 目录树；`.sync-state.json` 锚点与 dev HEAD 一致，`git diff --stat` 为空。L1 断链按「先确认再改库」未擅自修改。
@@ -450,6 +453,6 @@ wds/es-app-main/      (只读；docs/integrations/h5/h5-bridge-api.md 给出容�
 
 ---
 
-**文档版本**：v1.33
+**文档版本**：v1.34
 **最后更新**：2026年11月
 **整理人**：王新骏
